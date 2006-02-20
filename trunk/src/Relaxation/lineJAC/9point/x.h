@@ -16,8 +16,7 @@ namespace mg
 		if(stencil.is_constant())
 		{
 			// get const operator L
-			const std::val
-			array<precision> L = stencil.get_L_c(2,2,Nx,Ny);
+			const std::valarray<precision> L = stencil.get_L_c(2,2,Nx,Ny);
 			const std::valarray<int> J_x = stencil.get_J_x(c);
 			const std::valarray<int> J_y = stencil.get_J_y(c);
 
