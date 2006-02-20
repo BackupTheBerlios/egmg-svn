@@ -1,68 +1,130 @@
-\documentclass[ngerman,11pt]{article}
-\usepackage[paper=a4paper,dvipdfm]{geometry}
-\usepackage{babel}
-\usepackage[T1]{fontenc}
-\begin{document}
-\tableofcontents
-\section{Namensgebung}
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML v4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<article>
+<sect1><title>Namensgebung</title>
+<para>
 Die Projektsprache im Quelltext ist Englisch.
-\subsection{Dateien}
-Dateinnamen enthalten nur kleinbuchstaben und heiﬂen wie die Klasse bzw. Funktion die sie enthalten.
-F¸r jede Klasse und jede Funktion wird eine Headerdatei (\texttt{*.h}) mit dem Deklaration und inline Implementierungen, sowie eine Implementierungsdatei (\texttt{*.cpp}).
-\subsection{Namespace}
+</para>
+<sect2><title>Dateien</title>
+<para>
+Dateinnamen enthalten nur kleinbuchstaben und hei√üen wie die Klasse bzw. Funktion die sie enthalten.
+F√ºr jede Klasse und jede Funktion wird eine Headerdatei <filename class="headerfile">*.h</filename> mit dem Deklaration und inline Implementierungen, sowie eine Implementierungsdatei <filename>*.cpp</filename>.
+</para>
+</sect2>
+<sect2><title>Namespace</title>
+<para>
 Wir benutzen den Namespace mg, d.h. alles was wir implementierun steht in
-\begin{verbatim}
+<programlisting>
+<![CDATA[
 namespace mg
 {
 }
-\end{verbatim}
-\subsection{\#define}
-In einem \texttt{\#define} verwenden wir nur GROSSBUCHSTABEN\_MIT\_UNTERSTRICHEN.
-\subsubsection{Headerdatei include guard}
+]]>
+</programlisting>
+</para>
+</sect2>
+<sect2><title>#define</title>
+<para>
+In einem #define verwenden wir nur GROSSBUCHSTABEN_MIT_UNTERSTRICHEN.
+</para>
+<sect3><title>Headerdatei include guard</title>
+<para>
 Eine Headerdatei wird umramt von
-\begin{verbatim}
+<programlisting>
+<![CDATA[
 #ifndef NAMEDERHEADERDATEI_H_
 #define NAMEDERHEADERDATEI_H_
 ...
 #endif //NAMEDERHEADERDATEI_H_
-\end{verbatim}
-\subsection{typedefs}
-Wir behandeln Typedefs wie Klassennamen (\ref{sec:class}).
-\subsection{Variablen}\label{sec:var}
-Variablen beginnen mit einem kleinbuchstaben und enthalten kein ``\_'', falls ein neues Wort beginnt, verwenden wir die sogenannte CamelCaseNotation.
-\begin{verbatim}
+]]>
+</programlisting>
+</para>
+</sect3>
+</sect2>
+<sect2><title>typedefs</title>
+<para>
+Wir behandeln Typedefs wie Klassennamen.
+</para>
+</sect2>
+<sect2><title>Variablen</title>
+<para>
+Variablen beginnen mit einem kleinbuchstaben und enthalten kein &quot;_&quot;, falls ein neues Wort beginnt, verwenden wir die sogenannte CamelCaseNotation.
+<programlisting>
+<![CDATA[
 std::valarray<Precision> coarsGridCorrection;
-\end{verbatim}
-\subsection{Klassen}\label{sec:class}
-Klassennamen beginen mit einem Groﬂbuchstaben und verwenden wie Variablen die CamelCaseNotation.
-\subsection{Membervariablen}
-Membervariablen werden wie Variablen (\ref{sec:var}) behandelnt und enden mit einem Unterstrich.
-\begin{verbatim}
+]]>
+</programlisting>
+</para>
+</sect2>
+<sect2><title>Klassen</title>
+<para>
+Klassennamen beginen mit einem Gro√übuchstaben und verwenden wie Variablen die CamelCaseNotation.
+</para>
+</sect2>
+<sect2><title>Membervariablen</title>
+<para>
+Membervariablen werden wie Variablen behandelnt und enden mit einem Unterstrich.
+<programlisting>
 int omega_;
-\end{verbatim}
-\subsection{Funktionen / Memberfunktionen}
-Funktionen werden wie Variablen (\ref{sec:var}) benannt.
-\section{Formatierung}
-\subsection{Klammern}
-Geschweifte Klammern gehˆren untereinander und in eine Eigene Zeile. Falls ein Codeblock nur eine Anweisung enth‰lt lassen wir die geschweiften Klammern weg. Rundeklammern verwenden wir sowenig wie mˆglich.
-\begin{verbatim}
+</programlisting>
+</para>
+</sect2>
+	<sect2><title>Funktionen / Memberfunktionen</title>
+	<para>
+	Funktionen werden wie Variablen benannt.
+	</para>
+	</sect2>
+</sect1>
+<sect1><title>Formatierung</title>
+<sect2><title>Klammern</title>
+<para>
+Geschweifte Klammern geh√∂ren untereinander und in eine Eigene Zeile. Falls ein Codeblock nur eine Anweisung enth√§lt lassen wir die geschweiften Klammern weg. Rundeklammern verwenden wir sowenig wie m√∂glich.
+<programlisting>
+<![CDATA[
 if (a<3 && c+d<7)
-\end{verbatim}
-\subsection{Einr¸cken}
-Codeblˆcke werden mit 4 Leerzeichen einger¸ckt, wir verwenden keine Tabulatoren. Die geschweiften Klammern werden nicht mit einger¸ckt.
-\begin{verbatim}
+]]>
+</programlisting>
+</para>
+</sect2>
+<sect2><title>Einr√ºcken</title>
+<para>
+Codebl√∂cke werden mit 4 Leerzeichen einger√ºckt, wir verwenden keine Tabulatoren. Die geschweiften Klammern werden nicht mit einger√ºckt.
+<programlisting>
+<![CDATA[
 for (size_t i=0; i<u.size(); ++i)
 {
     u[i]+=i;
     u[i]-=i;
 }
-\end{verbatim}
-\subsection{Leerzeichen}
-
-\subsection{Zeilenl‰nge}
-\subsection{Kommentare}
-\subsection{Funktionsdeklarationen/-definitionen}
-\section{Formulierung}
-\subsection{Operatoren}
-\subsection{Keine public member Variablen}
-\end{document}
+]]>
+</programlisting>
+</para>
+</sect2>
+<sect2><title>Leerzeichen</title>
+<para>
+</para>
+</sect2>
+<sect2><title>Zeilenl√§nge</title>
+<para>
+</para>
+</sect2>
+<sect2><title>Kommentare</title>
+<para>
+</para>
+</sect2>
+<sect2><title>Funktionsdeklarationen/-definitionen</title>
+<para>
+</para>
+</sect2>
+</sect1>
+<sect1><title>Formulierung</title>
+<sect2><title>Operatoren</title>
+<para>
+</para>
+</sect2>
+<sect2><title>Keine public member Variablen</title>
+<para>
+</para>
+</sect2>
+</sect1>
+</article>
