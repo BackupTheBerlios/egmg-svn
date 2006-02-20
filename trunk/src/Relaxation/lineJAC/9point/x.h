@@ -13,10 +13,11 @@ namespace mg
 		std::valarray<precision> ndiagR(Nx-2);
 		std::valarray<precision> ndiagL(Nx-2);
 
-		if(stencil.is_constant() == true)
+		if(stencil.is_constant())
 		{
 			// get const operator L
-			const std::valarray<precision> L = stencil.get_L_c(2,2,Nx,Ny);
+			const std::val
+			array<precision> L = stencil.get_L_c(2,2,Nx,Ny);
 			const std::valarray<int> J_x = stencil.get_J_x(c);
 			const std::valarray<int> J_y = stencil.get_J_y(c);
 
