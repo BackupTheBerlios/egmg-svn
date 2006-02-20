@@ -1,0 +1,145 @@
+/** \file main.cpp
+ * \author <a href="mailto:mail@jirikraus.de">Jiri Kraus</a>
+ * \brief library test program
+ * \todo Python bindings
+ */
+#include<valarray>
+#include<vector>
+#include<cmath>
+#include<iostream>
+#include "./functions/cycle.h"
+#include "./functions/error.h"
+#include "./functions/f.h"
+#include "./functions/g.h"
+#include "./functions/zero.h"
+#include "./functions/putbval.h"
+#include "./functions/putrhs.h"
+#include "./functions/max_residuum.h"
+#include "./functions/twonorm_residuum.h"
+#include "./functions/output.h"
+#include "./general/parameters.h"
+#include "./Prolongation/Prolongation.h"
+#include "./Prolongation/Bilinear_interpolation.h"
+#include "./Prolongation/Bicubic_interpolation.h"
+#include "./Prolongation/SevenPoint_interpolation.h"
+#include "./Relaxation/Relaxation.h"
+#include "./Relaxation/GS_Lex.h"
+#include "./Relaxation/GS_RB.h"
+#include "./Relaxation/lineGS.h"
+#include "./Relaxation/lineJAC.h"
+#include "./Restriction/Restriction.h"
+#include "./Restriction/Injection.h"
+#include "./Restriction/seven_point_restr.h"
+#include "./Restriction/Half_Weighting.h"
+#include "./Restriction/Full_Weighting.h"
+#include "./Stencil/Stencil.h"
+#include "./Stencil/Laplacian2D2.h"
+#include "./Stencil/Laplacian2D4.h"
+
+
+/** \mainpage Multigrid
+ * 
+ * \section Introduction
+ * The goal of this project is the development of an evaluation and educational multigrid
+ * library. At the moment it is possilbe to solve a pde:
+ * \f[
+ * 	L_hu_h = f_h
+ * \f]
+ * on the domain \f$ [0,1]\times [0,1] \f$. Here \f$L_h\f$ is given with a stencil of with
+ * the maximum size of 2, i.e. nothing lager than a compact 25 point stencil is supported.\n
+ * To sove this problems this library provides multigrid components which work with standart
+ * coarsening.
+ * 
+ * \section Download
+ * The latest development version can be downloaded from:\n
+ * <a href="../mg-files/multigrid.zip">multigrid.zip</a>\n
+ * CAVEAT: To execute all make targes you need to create the subdirs:\n
+ * doc, bin and profiles in the directory Multigrid.
+ * 
+ * \section Naming-Conventions
+ * Here comes a list of comonly used an sometimes not self explaining variable names
+ * <table border="0">
+ * <tr>
+ * <td>Name</td><td>Type</td><td>Meaning</td>
+ * </tr><tr>
+ * <td>Nx</td><td>size_t</td><td>Number of gridpoints in x direction</td>
+ * </tr><tr>
+ * <td>Ny</td><td>size_t</td><td>Number of gridpoints in y direction</td>
+ * </tr><tr>
+ * <td>hx</td><td>precision</td><td>Stepsize in x direction</td>
+ * </tr><tr>
+ * <td>hy</td><td>precision</td><td>Stepsize in y direction</td>
+ * </tr><tr>
+ * <td>i</td><td>size_t</td><td>Number of steps in x direction</td>
+ * </tr><tr>
+ * <td>j</td><td>size_t</td><td>Number of steps in y direction</td>
+ * </tr><tr>
+ * <td>x</td><td>precision</td><td>x coordinate x = i*hx</td>
+ * </tr><tr>
+ * <td>y</td><td>precision</td><td>y coordinate y = j*hy</td>
+ * </tr><tr>
+ * <td>eps</td><td>precision</td><td>wanted residu reduction</td>
+ * </tr><tr>
+ * <td>itmax</td><td>size_t</td><td>Max. number of iterations</td>
+ * </tr><tr>
+ * <td>nreld</td><td>int</td><td>number of presomothing steps</td>
+ * </tr><tr>
+ * <td>nrelu</td><td>int</td><td>number of postsomothing steps</td>
+ * </tr><tr>
+ * <td>resnew</td><td>precision</td><td>the current residuum</td>
+ * </tr><tr>
+ * <td>resold</td><td>precision</td><td>the last residuum</td>
+ * </tr><tr>
+ * <td>resnull</td><td>precision</td><td>the start residuum</td>
+ * </tr><tr>
+ * <td>fv</td><td>valarray\<precision\></td><td>right hand side</td>
+ * </tr></table>
+ */
+
+
+using namespace mg;
+
+int main()
+{
+	const int k = 8;
+	const size_t Nx =static_cast<size_t>(std::pow(2.,k));
+	const size_t Ny = Nx;
+	std::valarray<precision> u(1000.0,(Nx+1)*(Ny+1));
+	std::valarray<precision> fv(0.0,(Nx+1)*(Ny+1));
+	putbval(u,Nx,Ny,zero);
+	putrhs(fv,Nx,Ny,zero);
+	const size_t itmax = 100;
+	size_t iterations = 0;
+	const precision eps = 1e-30;
+	std::cout<<"Genauigkeit : "<<eps<<std::endl;
+	Laplacian2D4 lap;
+	lineGS relaxation(1,1,altline);
+	precision resnull = twonorm_residuum(u,fv,lap,Nx,Ny);
+	precision resnew = resnull;
+	precision resold = resnull;
+	Full_Weighting restriction;
+	Bilinear_interpolation prolongation;
+	//residues is used to store the intermediate residues, there are printed
+	//after the cycle iterations because writing to std out takes a long time
+	std::vector<precision> residues;
+	residues.push_back(resnull);
+	while ((iterations < itmax) && (resnew/resnull > eps))
+	{
+		resold=resnew;
+		cycle(u,fv,lap,prolongation,restriction,relaxation,Nx,Ny,1,1);
+		//cycle(u,fv,lap,prolongation,restriction,relaxation,Nx,Ny);
+		resnew=twonorm_residuum(u,fv,lap,Nx,Ny);
+		residues.push_back(resnew);
+		std::cout<<resnew<<std::endl;
+		if ((resnew > resold) && (iterations > 3))
+		{
+			std::cout<<"No convergence"<<std::endl;
+			break;	
+		}
+		iterations++;
+	}
+	//print out the defects history
+	output(residues,1);
+	std::cout<<"fehler = "<<error(u,Nx,Ny,zero)<<" it = "<<iterations<<std::endl;
+	return 0;
+}
