@@ -69,7 +69,7 @@ public:
 									const Stencil& stencil,
 									const size_t Nx,const size_t Ny) const;
 	const std::valarray<precision>& get_I(const size_t i, const size_t j,
-					      const size_t Nx, const size_t Ny, const Stencil& stencil)
+					      const size_t Nx, const size_t Ny, const Stencil&)
 	{
 		if (j == 1)        // unterer Rand
 		{

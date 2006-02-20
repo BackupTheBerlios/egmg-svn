@@ -63,7 +63,7 @@ public:
 									const Stencil& stencil,
 									const size_t Nx,const size_t Ny) const;
 	const std::valarray<precision>& get_I(const size_t, const size_t,
-									const size_t, const size_t, const Stencil& stencil) const
+									const size_t, const size_t, const Stencil&) const
 	{
 		return I;	
 	}
