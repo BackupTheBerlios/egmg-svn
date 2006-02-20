@@ -1,0 +1,68 @@
+\documentclass[ngerman,11pt]{article}
+\usepackage[paper=a4paper,dvipdfm]{geometry}
+\usepackage{babel}
+\usepackage[T1]{fontenc}
+\begin{document}
+\tableofcontents
+\section{Namensgebung}
+Die Projektsprache im Quelltext ist Englisch.
+\subsection{Dateien}
+Dateinnamen enthalten nur kleinbuchstaben und heißen wie die Klasse bzw. Funktion die sie enthalten.
+Für jede Klasse und jede Funktion wird eine Headerdatei (\texttt{*.h}) mit dem Deklaration und inline Implementierungen, sowie eine Implementierungsdatei (\texttt{*.cpp}).
+\subsection{Namespace}
+Wir benutzen den Namespace mg, d.h. alles was wir implementierun steht in
+\begin{verbatim}
+namespace mg
+{
+}
+\end{verbatim}
+\subsection{\#define}
+In einem \texttt{\#define} verwenden wir nur GROSSBUCHSTABEN\_MIT\_UNTERSTRICHEN.
+\subsubsection{Headerdatei include guard}
+Eine Headerdatei wird umramt von
+\begin{verbatim}
+#ifndef NAMEDERHEADERDATEI_H_
+#define NAMEDERHEADERDATEI_H_
+...
+#endif //NAMEDERHEADERDATEI_H_
+\end{verbatim}
+\subsection{typedefs}
+Wir behandeln Typedefs wie Klassennamen (\ref{sec:class}).
+\subsection{Variablen}\label{sec:var}
+Variablen beginnen mit einem kleinbuchstaben und enthalten kein ``\_'', falls ein neues Wort beginnt, verwenden wir die sogenannte CamelCaseNotation.
+\begin{verbatim}
+std::valarray<Precision> coarsGridCorrection;
+\end{verbatim}
+\subsection{Klassen}\label{sec:class}
+Klassennamen beginen mit einem Großbuchstaben und verwenden wie Variablen die CamelCaseNotation.
+\subsection{Membervariablen}
+Membervariablen werden wie Variablen (\ref{sec:var}) behandelnt und enden mit einem Unterstrich.
+\begin{verbatim}
+int omega_;
+\end{verbatim}
+\subsection{Funktionen / Memberfunktionen}
+Funktionen werden wie Variablen (\ref{sec:var}) benannt.
+\section{Formatierung}
+\subsection{Klammern}
+Geschweifte Klammern gehören untereinander und in eine Eigene Zeile. Falls ein Codeblock nur eine Anweisung enthält lassen wir die geschweiften Klammern weg. Rundeklammern verwenden wir sowenig wie möglich.
+\begin{verbatim}
+if (a<3 && c+d<7)
+\end{verbatim}
+\subsection{Einrücken}
+Codeblöcke werden mit 4 Leerzeichen eingerückt, wir verwenden keine Tabulatoren. Die geschweiften Klammern werden nicht mit eingerückt.
+\begin{verbatim}
+for (size_t i=0; i<u.size(); ++i)
+{
+    u[i]+=i;
+    u[i]-=i;
+}
+\end{verbatim}
+\subsection{Leerzeichen}
+
+\subsection{Zeilenlänge}
+\subsection{Kommentare}
+\subsection{Funktionsdeklarationen/-definitionen}
+\section{Formulierung}
+\subsection{Operatoren}
+\subsection{Keine public member Variablen}
+\end{document}
