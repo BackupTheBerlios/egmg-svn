@@ -50,7 +50,7 @@ public:
 	 * \brief The constructor of a Helmholtz2D2 object
 	 * 
 	 * Helmholtz2D2 constructs a Helmholtz2D2 where \f$a_x\f$ , \f$a_y\f$
-	 * and \f$c_x_y\f$ are given by:
+	 * and \f$c_{xy}\f$ are given by:
 	 * \param[in] a_x	coefficient of the diff. operator (default 1.0)
 	 * \param[in] a_y	coefficient of the diff. operator (default 1.0)
 	 * \param[in] c coefficient of the diff. operator (default 1.0)
