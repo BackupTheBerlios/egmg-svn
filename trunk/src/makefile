@@ -5,7 +5,7 @@ LDFLAGS = $(CXXFLAGS)
 
 Objects = main.o
 Obj = ./functions/*.o ./Prolongation/*.o ./Relaxation/*.o ./Restriction/*.o #./Stencil/*.o
-Exe = main.exe
+Exe = ./main.exe
 
 .PHONY: functions
 functions:
