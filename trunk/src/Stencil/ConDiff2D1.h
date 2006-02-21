@@ -1,5 +1,5 @@
 /** \file ConDiff2D1.h
- * \author André Oeckerath
+ * \author Andrï¿½ Oeckerath
  * \brief Contains the class ConDiff2D1
  */
 #ifndef ConDiff2D1_H_
@@ -20,7 +20,7 @@ namespace mg
  * 
  * ConDiff2D1 is the stencil representing the discrete differential operator
  * \f[
- *	L_hu_h := \epsilon (-(u_h)_{xx}-(u_h)_{yy}) + cos(\beta) u_x + sin(\beta) u_y
+ *	L_h u_h := \epsilon (-(u_h)_{xx}-(u_h)_{yy}) + cos(\beta) u_x + sin(\beta) u_y
  * \f]
  */
 class ConDiff2D1 : public mg::Stencil

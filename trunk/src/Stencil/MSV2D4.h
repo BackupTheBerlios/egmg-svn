@@ -18,7 +18,7 @@ namespace mg
  * 
  * MSV2D4 is the stencil representing the discrete differential operator
  * \f[
- *	L_hu_h := a_x(u_h)_{xx}+a_y(u_h)_{yy}
+ *	L_h u_h := a_x(u_h)_{xx}+a_y(u_h)_{yy}
  * \f]
  */
 class MSV2D4 : public mg::Stencil

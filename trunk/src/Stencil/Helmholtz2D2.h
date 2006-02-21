@@ -1,5 +1,5 @@
 /** \file Helmholtz2D2.h
- * \author André Oeckerath
+ * \author Andrï¿½ Oeckerath
  * \brief Contains the class Helmholtz2D2
  */
 #ifndef Helmholtz2D2_H_
@@ -18,7 +18,7 @@ namespace mg
  * 
  * Helmholtz2D2 is the stencil representing the discrete differential operator
  * \f[
- *	L_hu_h := a_x(u_h)_{xx}+a_y(u_h)_{yy}+c_x_y(u_h)
+ *	L_h u_h := a_x(u_h)_{xx}+a_y(u_h)_{yy}+c_{xy}(u_h)
  * \f]
  */
 class Helmholtz2D2 : public mg::Stencil

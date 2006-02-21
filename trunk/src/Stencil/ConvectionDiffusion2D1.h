@@ -1,5 +1,5 @@
 /** \file ConvectionDiffusion2D1.h
- * \author André Oeckerath
+ * \author Andrï¿½ Oeckerath
  * \brief Contains the class ConvectionDiffusion2D1
  */
 #ifndef ConvectionDiffusion2D1_H_
@@ -19,7 +19,7 @@ namespace mg
  * 
  * ConvectionDiffusion2D1 is the stencil representing the discrete differential operator
  * \f[
- *	L_hu_h := \epsilon (-(u_h)_{xx}-(u_h)_{yy}) + a(x/y) u_x + b(x,y) u_y
+ *	L_h u_h := \epsilon (-(u_h)_{xx}-(u_h)_{yy}) + a(x/y) u_x + b(x,y) u_y
  * \f]
  */
 class ConvectionDiffusion2D1 : public mg::Stencil
@@ -91,7 +91,7 @@ public:
 	 * ConvectionDiffusion2D1 constructs a ConvectionDiffusion2D1 where \f$\epsilon\f$, \f$a_1\f$ and \f$a_2\f$
 	 * are given by:
      * \param[in] \epsilon coefficient of the diffusion part (default 1.0)
-	 * \param[in] a = (2 x_2 - 1)(1 - x²_1)	coefficient of the convection part (default \pi/4)
+	 * \param[in] a = (2 x_2 - 1)(1 - xï¿½_1)	coefficient of the convection part (default \pi/4)
 	 * \param[in] b = 2 x_1 x_2 (x_2 - 1)	coefficient of the convection part (default \pi/4)
 	 */
 	explicit ConvectionDiffusion2D1(precision epsilon_ =1.0, int mode_ = 0) 
