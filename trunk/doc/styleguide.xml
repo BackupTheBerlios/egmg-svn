@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="iso8859-15" ?>
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML v4.2//EN"
 	"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 <article>
@@ -8,15 +8,15 @@ Die Projektsprache im Quelltext ist Englisch.
 </para>
 <sect2><title>Allgemein</title>
 <para>
-Wir verwenden die Buchstaben groÃŸ I (i), groÃŸ O (o) und klein l (L) nicht
-alleine fÃ¼r Bezeichner, da diese zu leicht mit 0 und 1 verwechselt
-werden kÃ¶nnen.
+Wir verwenden die Buchstaben groß I (i), groß O (o) und klein l (L) nicht
+alleine für Bezeichner, da diese zu leicht mit 0 und 1 verwechselt
+werden können.
 </para>
 </sect2>
 <sect2><title>Dateien</title>
 <para>
-Dateinnamen enthalten nur kleinbuchstaben und heiÃŸen wie die Klasse bzw.
-Funktion die sie enthalten. FÃ¼r jede Klasse und jede Funktion wird eine
+Dateinnamen enthalten nur kleinbuchstaben und heißen wie die Klasse bzw.
+Funktion die sie enthalten. Für jede Klasse und jede Funktion wird eine
 Headerdatei <filename class="headerfile">*.h</filename> mit dem Deklaration
 und inline Implementierungen, sowie eine Implementierungsdatei
 <filename>*.cpp</filename>.
@@ -66,7 +66,7 @@ std::valarray<Precision> coarsGridCorrection;
 </sect2>
 <sect2><title>Klassen</title>
 <para>
-Klassennamen beginen mit einem GroÃŸbuchstaben und verwenden wie Variablen die
+Klassennamen beginen mit einem Großbuchstaben und verwenden wie Variablen die
 CamelCaseNotation.
 </para>
 </sect2>
@@ -115,9 +115,9 @@ Die folgenden Namen sollten einheitlich verwendet werden.
 <sect1><title>Formatierung</title>
 <sect2><title>Klammern</title>
 <para>
-Geschweifte Klammern gehÃ¶ren untereinander und in eine eigene Zeile. Falls ein
-Codeblock nur eine Anweisung enthÃ¤lt lassen wir die geschweiften Klammern weg.
-Runde Klammern verwenden wir sowenig wie mÃ¶glich.
+Geschweifte Klammern gehören untereinander und in eine eigene Zeile. Falls ein
+Codeblock nur eine Anweisung enthält lassen wir die geschweiften Klammern weg.
+Runde Klammern verwenden wir sowenig wie möglich.
 <programlisting>
 <![CDATA[
 if (a<3 && c+d<7)
@@ -125,10 +125,10 @@ if (a<3 && c+d<7)
 </programlisting>
 </para>
 </sect2>
-<sect2><title>EinrÃ¼cken</title>
+<sect2><title>Einrücken</title>
 <para>
-CodeblÃ¶cke werden mit 4 Leerzeichen eingerÃ¼ckt, wir verwenden keine Tabulatoren.
-Die geschweiften Klammern werden nicht mit eingerÃ¼ckt.
+Codeblöcke werden mit 4 Leerzeichen eingerückt, wir verwenden keine Tabulatoren.
+Die geschweiften Klammern werden nicht mit eingerückt.
 <programlisting>
 <![CDATA[
 for (size_t i=0; i<u.size(); ++i)
@@ -148,21 +148,21 @@ In jeder Zeile steht nur eine Anweisung.
 Wir verwenden keine Tabulatoren.
 </para>
 <para>
-Um Operatoren werden keine Leerzeichen gesetzt auÃŸer um logisches und
+Um Operatoren werden keine Leerzeichen gesetzt außer um logisches und
 (&amp;&amp;) und um logisches oder (||).
 </para>
 </sect2>
-<sect2><title>ZeilenlÃ¤nge</title>
+<sect2><title>Zeilenlänge</title>
 <para>
-Zeilen haben eine maximale LÃ¤nge von 80 Zeichen.
+Zeilen haben eine maximale Länge von 80 Zeichen.
 </para>
 </sect2>
 <sect2><title>Kommentare</title>
 <para>
-GrundsÃ¤tzlich gilt: Der Quelltext eklÃ¤rt sich ohne Kommentare selbst, ansonsten 
-muss er umgeschrieben werden. FÃ¼r die
-Dokumentation der API benutzen wir Doxygen. D.h. Falls Doxygen Ã¼ber einen
-fehlenden Komentar Warnungen ausgibt mÃ¼ssen diese noch eingefÃ¼gt werden.
+Grundsätzlich gilt: Der Quelltext eklärt sich ohne Kommentare selbst, ansonsten 
+muss er umgeschrieben werden. Für die
+Dokumentation der API benutzen wir Doxygen. D.h. Falls Doxygen über einen
+fehlenden Komentar Warnungen ausgibt müssen diese noch eingefügt werden.
 </para>
 </sect2>
 <sect2><title>Funktionsdeklarationen/-definitionen</title>
@@ -190,12 +190,12 @@ void cycle(
 <sect1><title>Formulierung</title>
 <sect2><title>Deklaration von Variablen</title>
 <para>
-Variablen mÃ¼ssen an der Stelle ihrer Deklaration initialisiert werden.
+Variablen müssen an der Stelle ihrer Deklaration initialisiert werden.
 </para>
 </sect2>
 <sect2><title>Oparatoren</title>
 <para>
-Ist noch zu klÃ¤ren.
+Ist noch zu klären.
 </para>
 </sect2>
 <sect2><title>Keine public member Variablen</title>
