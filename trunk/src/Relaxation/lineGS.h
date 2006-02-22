@@ -23,36 +23,36 @@ namespace mg
 	        int nrelu_;
 			int direction_;
 
-			void ninepointxline(std::valarray<precision> &u, const std::valarray<precision> &fv, 
-		                    std::valarray<precision> &rhs, const Stencil &stencil, const size_t Nx, 
+			void ninepointxline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+		                    std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const;
 
-			void ninepointyline(std::valarray<precision> &u, const std::valarray<precision> &fv, 
-		                    std::valarray<precision> &rhs, const Stencil &stencil, const size_t Nx, 
+			void ninepointyline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+		                    std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const;
 
-			void ninepointxzebra(std::valarray<precision> &u, const std::valarray<precision> &fv, 
-		                    std::valarray<precision> &rhs, const Stencil &stencil, const size_t Nx, 
+			void ninepointxzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+		                    std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const;
 
-			void ninepointyzebra(std::valarray<precision> &u, const std::valarray<precision> &fv, 
-		                    std::valarray<precision> &rhs, const Stencil &stencil, const size_t Nx, 
+			void ninepointyzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+		                    std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const;
 
-			void xline(std::valarray<precision> &u, const std::valarray<precision> &fv, 
-		                    std::valarray<precision> &rhs, const Stencil &stencil, const size_t Nx, 
+			void xline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+		                    std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const;
 
-			void yline(std::valarray<precision> &u, const std::valarray<precision> &fv, 
-		                    std::valarray<precision> &rhs, const Stencil &stencil, const size_t Nx, 
+			void yline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+		                    std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const;
 
-			void xzebra(std::valarray<precision> &u, const std::valarray<precision> &fv, 
-		                    std::valarray<precision> &rhs, const Stencil &stencil, const size_t Nx, 
+			void xzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+		                    std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const;
 
-			void yzebra(std::valarray<precision> &u, const std::valarray<precision> &fv, 
-		                    std::valarray<precision> &rhs, const Stencil &stencil, const size_t Nx, 
+			void yzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+		                    std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const;
 
 		        
@@ -76,14 +76,14 @@ namespace mg
             virtual ~lineGS() {}
 		    
 			/**
-	          * \brief get_nreld() returns the number of pre smoothing steps
+	          * \brief getPreSmoothingSteps() returns the number of pre smoothing steps
 	          * \return the number of pre somthing steps
 	          */
 		    int get_nreld() const {return nreld_;}
             void set_nreld(int nreld) {nreld_=nreld;}
 
 			/**
-	          * \brief get_nrelu() returns the number of post smoothing steps
+	          * \brief getPostSmoothingSteps() returns the number of post smoothing steps
 	          * \return the number of post somthing steps
 	          */
 		    int get_nrelu() const {return nrelu_;}
@@ -112,7 +112,7 @@ namespace mg
 	          * \param Nx	number of steps in x direction
 	          * \param Ny	number of steps in y direction
 			  */
-            void relax(std::valarray<precision> &u, const std::valarray<precision> &fv, 
+            void relax(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
 				const Stencil &stencil, const size_t Nx, const size_t Ny) const;
 		
     };

@@ -10,18 +10,18 @@
 namespace mg
 {
 // This function only works for max. compact 9-point stencils
-std::valarray<precision> DeZeeuw_interpolation::prolong(
-		const std::valarray<precision>& u, const Stencil& stencil, const size_t Nx,const size_t Ny) const
+std::valarray<Precision> DeZeeuw_interpolation::prolongate(
+		const std::valarray<Precision>& u, const Stencil& stencil, const size_t Nx,const size_t Ny) const
 {
 	register const size_t Nx_new = 2*Nx;
 	register const size_t Ny_new = 2*Ny;
-	std::valarray<precision> result((Nx_new+1)*(Ny_new+1));
-	std::valarray<int> J_x = stencil.get_J_x(c);
-	std::valarray<int> J_y = stencil.get_J_y(c);
-	std::valarray<precision> L = stencil.get_L_c(0,0,Nx,Ny);
+	std::valarray<Precision> result((Nx_new+1)*(Ny_new+1));
+	std::valarray<int> J_x = stencil.getJx(c);
+	std::valarray<int> J_y = stencil.getJy(c);
+	std::valarray<Precision> L = stencil.get_L_c(0,0,Nx,Ny);
 	std::valarray<size_t> posi(9);
-	std::valarray<precision> mS(9);
-	std::valarray<precision> mT(9);
+	std::valarray<Precision> mS(9);
+	std::valarray<Precision> mT(9);
 	// posi[0] = No. of the sw-element of the stencil
 	// posi[1] = No. of the s-element of the stencil
 	// posi[2] = No. of the se-element of the stencil
@@ -37,23 +37,23 @@ std::valarray<precision> DeZeeuw_interpolation::prolong(
 		posi[(J_x[j]+1)+3*(J_y[j]+1)] = j;
 	}
 
-	precision scale = 0;
-	precision weight1 = 0;
-	precision weight2 = 0;
-	precision erg = 0;
-	precision symsum;
-	precision d_w;
-	precision d_e;
-	precision d_n;
-	precision d_s;
-	precision sigma1;
-	precision c_1;
-	precision w_w;
-	precision w_e;
-	precision sigma2;
-	precision c_2;
-	precision w_s;
-	precision w_n;
+	Precision scale = 0;
+	Precision weight1 = 0;
+	Precision weight2 = 0;
+	Precision erg = 0;
+	Precision symsum;
+	Precision d_w;
+	Precision d_e;
+	Precision d_n;
+	Precision d_s;
+	Precision sigma1;
+	Precision c_1;
+	Precision w_w;
+	Precision w_e;
+	Precision sigma2;
+	Precision c_2;
+	Precision w_s;
+	Precision w_n;
 
 	//"interpolation" of coarse grid points
 	for (size_t j=0;j<=Ny;j++)

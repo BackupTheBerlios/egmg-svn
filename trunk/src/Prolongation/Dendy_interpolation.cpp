@@ -8,15 +8,15 @@
 namespace mg
 {
 // This function only works for max. compact 9-point stencils
-std::valarray<precision> Dendy_interpolation::prolong(
-		const std::valarray<precision>& u, const Stencil& stencil, const size_t Nx,const size_t Ny) const
+std::valarray<Precision> Dendy_interpolation::prolongate(
+		const std::valarray<Precision>& u, const Stencil& stencil, const size_t Nx,const size_t Ny) const
 {
 	register const size_t Nx_new = 2*Nx;
 	register const size_t Ny_new = 2*Ny;
-	std::valarray<precision> result((Nx_new+1)*(Ny_new+1));
-	std::valarray<int> J_x = stencil.get_J_x(c);
-	std::valarray<int> J_y = stencil.get_J_y(c);
-	std::valarray<precision> L = stencil.get_L_c(0,0,Nx,Ny);
+	std::valarray<Precision> result((Nx_new+1)*(Ny_new+1));
+	std::valarray<int> J_x = stencil.getJx(c);
+	std::valarray<int> J_y = stencil.getJy(c);
+	std::valarray<Precision> L = stencil.get_L_c(0,0,Nx,Ny);
 	std::valarray<size_t> posi(9);
 	// posi[0] = No. of the sw-element of the stencil
 	// posi[1] = No. of the s-element of the stencil
@@ -33,10 +33,10 @@ std::valarray<precision> Dendy_interpolation::prolong(
 		posi[(J_x[j]+1)+3*(J_y[j]+1)] = j;
 	}
 
-	precision scale = 0;
-	precision weight1 = 0;
-	precision weight2 = 0;
-	precision erg = 0;
+	Precision scale = 0;
+	Precision weight1 = 0;
+	Precision weight2 = 0;
+	Precision erg = 0;
 	
 	//"interpolation" of coarse grid points
 	for (size_t j=0;j<=Ny;j++)

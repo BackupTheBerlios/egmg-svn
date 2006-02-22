@@ -6,11 +6,11 @@
 
 namespace mg
 {
-	void putbval(std::valarray<precision>& u,const size_t Nx, const size_t Ny,
+	void putbval(std::valarray<Precision>& u,const size_t Nx, const size_t Ny,
 					const function2D g)
 	{
-		const precision hx = 1.0/Nx;
-		const precision hy = 1.0/Ny;
+		const Precision hx = 1.0/Nx;
+		const Precision hy = 1.0/Ny;
 		for(size_t i=0;i<=Nx;i++)
 		{
 			u[i]=g(i*hx,0);						//first line

@@ -16,11 +16,11 @@
 namespace mg
 {
 			
-	void lineGS::relax(std::valarray<precision> &u, const std::valarray<precision> &fv, 
+	void lineGS::relax(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
 		               const Stencil &stencil, const size_t Nx, const size_t Ny) const
 	{
 		// valarrays needed for LR-decomposition of a tridiagonal matrix
-		std::valarray<precision> rhs(u);
+		std::valarray<Precision> rhs(u);
 		rhs=0;
 		
 		

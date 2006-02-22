@@ -28,7 +28,7 @@ namespace mg
 	 * \param[in] fv				the right hand side of the pde
 	 * \param[in] stencil			the stencil representaion of the discrete
 	 * 								pde
-	 * \param[in] prolong			the prolongation to use
+	 * \param[in] prolongate			the prolongation to use
 	 * \param[in] restriction		the restriction to use
 	 * \param[in] relax				the relaxation to use
 	 * \param[in] Nx				number of steps in x direction
@@ -42,7 +42,7 @@ namespace mg
 	 * 								(implementaion detail)
 	 * \throw std::domain_error		if Nx or Ny is not divedable by 2
 	 */
-	void cycle(std::valarray<precision>& u,const std::valarray<precision>& f,
+	void cycle(std::valarray<Precision>& u,const std::valarray<Precision>& f,
                 Stencil& stencil,
                 const Prolongation& prolong,const Restriction& restriction,
                 Relaxation& relax,

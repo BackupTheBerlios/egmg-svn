@@ -7,12 +7,12 @@
 
 namespace mg
 {
-	void GS_Lex::relax(std::valarray<precision>& u,
-					const std::valarray<precision>& fv,
+	void GS_Lex::relax(std::valarray<Precision>& u,
+					const std::valarray<Precision>& fv,
 					const Stencil& stencil,
 					const size_t Nx,const size_t Ny) const
 	{
-		precision factor = 1.0;
+		Precision factor = 1.0;
 		if (stencil.size() < 2)
 		{
 			for (size_t j=1;j<Ny;j++)

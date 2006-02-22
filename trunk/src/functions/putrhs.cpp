@@ -6,11 +6,11 @@
 
 namespace mg
 {
-	void putrhs(std::valarray<precision>& fv,const size_t Nx, const size_t Ny,
+	void putrhs(std::valarray<Precision>& fv,const size_t Nx, const size_t Ny,
 					const function2D f)
 	{
-		const precision hx=1.0/Nx;
-		const precision hy=1.0/Ny;
+		const Precision hx=1.0/Nx;
+		const Precision hy=1.0/Ny;
 		for (size_t j=0;j<=Ny;j++)
 			for(size_t i=0;i<=Nx;i++)
 				fv[j*(Nx+1)+i]=f(i*hx,j*hy);

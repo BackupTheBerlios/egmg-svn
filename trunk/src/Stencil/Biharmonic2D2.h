@@ -25,9 +25,9 @@ namespace mg
 class Biharmonic2D2 : public mg::Stencil
 {
 private:
-	mutable std::valarray<precision> L_c;
-	mutable std::valarray<precision> L_boarder;
-	mutable std::valarray<precision> L_corner;
+	mutable std::valarray<Precision> L_c;
+	mutable std::valarray<Precision> L_boarder;
+	mutable std::valarray<Precision> L_corner;
 	const std::vector<std::valarray<int> > J_x;
 	const std::vector<std::valarray<int> > J_y;
 	std::vector<std::valarray<int> > init_J_x()
@@ -174,7 +174,7 @@ public:
 	explicit Biharmonic2D2()
 			: L_c(13),L_boarder(12),L_corner(11),J_x(init_J_x()),J_y(init_J_y()) {}
 	virtual ~Biharmonic2D2() {}
-	inline precision apply_c(const std::valarray<precision>& u,
+	inline Precision apply_c(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
@@ -193,12 +193,12 @@ public:
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i-1];
 
 	}
-	inline precision get_center_c(const size_t, const size_t,
+	inline Precision get_center_c(const size_t, const size_t,
 							const size_t Nx, const size_t Ny) const
 	{
 		return (6.0*Nx*Nx*Nx*Nx+6.0*Ny*Ny*Ny*Ny+8.0*Nx*Nx*Ny*Ny);
 	}
-	inline precision apply_w(const std::valarray<precision>& u,
+	inline Precision apply_w(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
@@ -215,12 +215,12 @@ public:
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i+1]
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i-1];
 	}
-	inline precision get_center_w(const size_t, const size_t,
+	inline Precision get_center_w(const size_t, const size_t,
 							const size_t Nx, const size_t Ny) const
 	{
 		return (7.0*Nx*Nx*Nx*Nx+6.0*Ny*Ny*Ny*Ny+8.0*Nx*Nx*Ny*Ny);
 	}
-	inline precision apply_nw(const std::valarray<precision>& u,
+	inline Precision apply_nw(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
@@ -236,7 +236,7 @@ public:
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i+1]
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i-1];
 	}
-	inline precision apply_n(const std::valarray<precision>& u,
+	inline Precision apply_n(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
@@ -253,7 +253,7 @@ public:
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i+1]
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i-1];
 	}
-	inline precision apply_ne(const std::valarray<precision>& u,
+	inline Precision apply_ne(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
@@ -269,7 +269,7 @@ public:
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i+1]
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i-1];
 	}
-	inline precision apply_e(const std::valarray<precision>& u,
+	inline Precision apply_e(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
@@ -286,7 +286,7 @@ public:
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i+1]
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i-1];
 	}
-	inline precision apply_se(const std::valarray<precision>& u,
+	inline Precision apply_se(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
@@ -302,7 +302,7 @@ public:
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i+1]
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i-1];
 	}
-	inline precision apply_s(const std::valarray<precision>& u,
+	inline Precision apply_s(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
@@ -319,7 +319,7 @@ public:
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i+1]
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i-1];
 	}
-	inline precision apply_sw(const std::valarray<precision>& u,
+	inline Precision apply_sw(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
@@ -335,37 +335,37 @@ public:
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i+1]
 				+2.0*Nx*Nx*Ny*Ny*u[(j-1)*(Nx+1)+i-1];
 	}
-	inline precision get_center_nw(const size_t , const size_t ,
+	inline Precision get_center_nw(const size_t , const size_t ,
 							const size_t Nx, const size_t Ny) const
 	{
 		return (7.0*Nx*Nx*Nx*Nx+7.0*Ny*Ny*Ny*Ny+8.0*Nx*Nx*Ny*Ny);	
 	}
-	inline precision get_center_n(const size_t , const size_t ,
+	inline Precision get_center_n(const size_t , const size_t ,
 							const size_t Nx, const size_t Ny) const
 	{
 		return (6.0*Nx*Nx*Nx*Nx+7.0*Ny*Ny*Ny*Ny+8.0*Nx*Nx*Ny*Ny);	
 	}
-	inline precision get_center_ne(const size_t , const size_t ,
+	inline Precision get_center_ne(const size_t , const size_t ,
 							const size_t Nx, const size_t Ny) const
 	{
 		return (7.0*Nx*Nx*Nx*Nx+7.0*Ny*Ny*Ny*Ny+8.0*Nx*Nx*Ny*Ny);	
 	}
-	inline precision get_center_e(const size_t , const size_t ,
+	inline Precision get_center_e(const size_t , const size_t ,
 							const size_t Nx, const size_t Ny) const
 	{
 		return (7.0*Nx*Nx*Nx*Nx+6.0*Ny*Ny*Ny*Ny+8.0*Nx*Nx*Ny*Ny);	
 	}
-	inline precision get_center_se(const size_t , const size_t ,
+	inline Precision get_center_se(const size_t , const size_t ,
 							const size_t Nx, const size_t Ny) const
 	{
 		return (7.0*Nx*Nx*Nx*Nx+7.0*Ny*Ny*Ny*Ny+8.0*Nx*Nx*Ny*Ny);	
 	}
-	inline precision get_center_s(const size_t , const size_t ,
+	inline Precision get_center_s(const size_t , const size_t ,
 							const size_t Nx, const size_t Ny) const
 	{
 		return (6.0*Nx*Nx*Nx*Nx+7.0*Ny*Ny*Ny*Ny+8.0*Nx*Nx*Ny*Ny);	
 	}
-	inline precision get_center_sw(const size_t , const size_t ,
+	inline Precision get_center_sw(const size_t , const size_t ,
 							const size_t Nx, const size_t Ny) const
 	{
 		return (7.0*Nx*Nx*Nx*Nx+7.0*Ny*Ny*Ny*Ny+8.0*Nx*Nx*Ny*Ny);	
@@ -399,7 +399,7 @@ public:
 	 * \param[in] Ny	the step size in y direction
 	 * \return			the coefficients of Biharmonic2D4
 	 */
-	inline const std::valarray<precision>& get_L_c(
+	inline const std::valarray<Precision>& get_L_c(
 							const size_t, const size_t,
 							const size_t Nx, const size_t Ny) const
 	{
@@ -411,7 +411,7 @@ public:
 		L_c[9] = L_c[10] = L_c[11] = L_c[12] = +2.0*Nx*Nx*Ny*Ny;
 		return L_c;
 	}
-	inline const std::valarray<precision>& get_L_w(
+	inline const std::valarray<Precision>& get_L_w(
 							const size_t, const size_t,
 							const size_t Nx, const size_t Ny) const
 	{
@@ -424,7 +424,7 @@ public:
 		L_boarder[10] = L_boarder[11] = +2.0*Nx*Nx*Ny*Ny;
 		return L_boarder;
 	}
-	inline const std::valarray<precision>& get_L_nw(
+	inline const std::valarray<Precision>& get_L_nw(
 							const size_t, const size_t,
 							const size_t Nx, const size_t Ny) const
 	{
@@ -437,7 +437,7 @@ public:
 		L_corner[9] = L_corner[10] = +2.0*Nx*Nx*Ny*Ny;
 		return L_corner;
 	}
-	inline const std::valarray<precision>& get_L_n(
+	inline const std::valarray<Precision>& get_L_n(
 							const size_t , const size_t ,
 							const size_t Nx, const size_t Ny) const
 	{
@@ -450,7 +450,7 @@ public:
 		L_boarder[10] = L_boarder[11] = +2.0*Nx*Nx*Ny*Ny;
 		return L_boarder;
 	}
-	inline const std::valarray<precision>& get_L_ne(
+	inline const std::valarray<Precision>& get_L_ne(
 							const size_t , const size_t ,
 							const size_t Nx, const size_t Ny) const
 	{
@@ -463,7 +463,7 @@ public:
 		L_corner[9] = L_corner[10] = +2.0*Nx*Nx*Ny*Ny;
 		return L_corner;
 	}
-	inline const std::valarray<precision>& get_L_e(
+	inline const std::valarray<Precision>& get_L_e(
 							const size_t , const size_t ,
 							const size_t Nx, const size_t Ny) const
 	{
@@ -476,7 +476,7 @@ public:
 		L_boarder[10] = L_boarder[11] = +2.0*Nx*Nx*Ny*Ny;
 		return L_boarder;
 	}
-	inline const std::valarray<precision>& get_L_se(
+	inline const std::valarray<Precision>& get_L_se(
 							const size_t , const size_t ,
 							const size_t Nx, const size_t Ny) const
 	{
@@ -489,7 +489,7 @@ public:
 		L_corner[9] = L_corner[10] = +2.0*Nx*Nx*Ny*Ny;
 		return L_corner;
 	}
-	inline const std::valarray<precision>& get_L_s(
+	inline const std::valarray<Precision>& get_L_s(
 							const size_t , const size_t ,
 							const size_t Nx, const size_t Ny) const
 	{
@@ -502,7 +502,7 @@ public:
 		L_boarder[10] = L_boarder[11] = +2.0*Nx*Nx*Ny*Ny;
 		return L_boarder;
 	}
-	inline const std::valarray<precision>& get_L_sw(
+	inline const std::valarray<Precision>& get_L_sw(
 							const size_t , const size_t ,
 							const size_t Nx, const size_t Ny) const
 	{
@@ -515,11 +515,11 @@ public:
 		L_corner[9] = L_corner[10] = +2.0*Nx*Nx*Ny*Ny;
 		return L_corner;
 	}
-	inline const std::valarray<int>& get_J_x(const pos p =c) const
+	inline const std::valarray<int>& get_J_x(const Position p =c) const
 	{
 		return J_x[p];
 	}
-	inline const std::valarray<int>& get_J_y(const pos p =c) const
+	inline const std::valarray<int>& get_J_y(const Position p =c) const
 	{
 		return J_y[p];
 	}

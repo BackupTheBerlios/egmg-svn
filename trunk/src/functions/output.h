@@ -26,7 +26,7 @@ namespace mg
  * F2 = ( ||x{i}||/||x{5}||)^(1/(i-5)) for i>5
  * F3 = ( ||x{i}||/||x{i-1}||
  */
-int output(std::vector<precision>& vec, size_t flag);
+int output(std::vector<Precision>& vec, size_t flag);
 
 /**
  * \brief outputvalue outputs a specific point on the grid
@@ -35,7 +35,7 @@ int output(std::vector<precision>& vec, size_t flag);
  * \param Nx	 Number of steps in x direction
  * \param Ny	 Number of steps in y direction
  */
-int outputvalue(std::valarray<precision> u, size_t Nx, size_t Ny);
+int outputvalue(std::valarray<Precision> u, size_t Nx, size_t Ny);
 }
 
 #endif /*OUTPUT_H_*/

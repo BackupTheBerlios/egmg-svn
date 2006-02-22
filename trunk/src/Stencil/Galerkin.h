@@ -60,7 +60,7 @@ private:
 							 			 &&k_==rhs.k_&&l_<rhs.l_);
 		}
 	};
-	std::vector<std::map<Quadruple,std::valarray<precision> > > data;
+	std::vector<std::map<Quadruple,std::valarray<Precision> > > data;
 	std::vector<std::valarray<int> > J_x;
 	std::vector<std::valarray<int> > J_y;
 	const Stencil& stencil;
@@ -76,52 +76,52 @@ public:
 		: J_x(init_J_x(fine_grid_operator)),J_y(init_J_y(fine_grid_operator))
 			,stencil(fine_grid_operator),size_(fine_grid_operator.size()) {}
 	virtual ~Galerkin() {}
-	virtual precision apply_c(const std::valarray<precision>& u,
+	virtual Precision apply_c(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const;
-	virtual precision apply_w(const std::valarray<precision>& u,
+	virtual Precision apply_w(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const;
-	virtual precision apply_nw(const std::valarray<precision>& u,
+	virtual Precision apply_nw(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const;
-	virtual precision apply_n(const std::valarray<precision>& u,
+	virtual Precision apply_n(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const;
-	virtual precision apply_ne(const std::valarray<precision>& u,
+	virtual Precision apply_ne(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const;
-	virtual precision apply_e(const std::valarray<precision>& u,
+	virtual Precision apply_e(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const;
-	virtual precision apply_se(const std::valarray<precision>& u,
+	virtual Precision apply_se(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const;
-	virtual precision apply_s(const std::valarray<precision>& u,
+	virtual Precision apply_s(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const;
-	virtual precision apply_sw(const std::valarray<precision>& u,
+	virtual Precision apply_sw(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const;
-	virtual precision get_center_c(const size_t i, const size_t j,
+	virtual Precision get_center_c(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual precision get_center_w(const size_t i, const size_t j,
+	virtual Precision get_center_w(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual precision get_center_nw(const size_t i, const size_t j,
+	virtual Precision get_center_nw(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual precision get_center_n(const size_t i, const size_t j,
+	virtual Precision get_center_n(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual precision get_center_ne(const size_t i, const size_t j,
+	virtual Precision get_center_ne(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual precision get_center_e(const size_t i, const size_t j,
+	virtual Precision get_center_e(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual precision get_center_se(const size_t i, const size_t j,
+	virtual Precision get_center_se(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual precision get_center_s(const size_t i, const size_t j,
+	virtual Precision get_center_s(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual precision get_center_sw(const size_t i, const size_t j,
+	virtual Precision get_center_sw(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual const std::valarray<precision>& get_L_c(
+	virtual const std::valarray<Precision>& get_L_c(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
@@ -129,35 +129,35 @@ public:
 				data[c].insert(Quadruple(i,j,Nx,Ny),compute_L(c,i,j,Nx,Ny);
 		return data[c][Quadruple(i,j,Nx,Ny)];
 	}
-	virtual const std::valarray<precision>& get_L_w(
+	virtual const std::valarray<Precision>& get_L_w(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual const std::valarray<precision>& get_L_nw(
+	virtual const std::valarray<Precision>& get_L_nw(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual const std::valarray<precision>& get_L_n(
+	virtual const std::valarray<Precision>& get_L_n(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual const std::valarray<precision>& get_L_ne(
+	virtual const std::valarray<Precision>& get_L_ne(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual const std::valarray<precision>& get_L_e(
+	virtual const std::valarray<Precision>& get_L_e(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual const std::valarray<precision>& get_L_se(
+	virtual const std::valarray<Precision>& get_L_se(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual const std::valarray<precision>& get_L_s(
+	virtual const std::valarray<Precision>& get_L_s(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	virtual const std::valarray<precision>& get_L_sw(
+	virtual const std::valarray<Precision>& get_L_sw(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const;
-	inline const std::valarray<int>& get_J_x(const pos p =c) const
+	inline const std::valarray<int>& get_J_x(const Position p =c) const
 	{
 		return J_x[p];
 	}
-	inline const std::valarray<int>& get_J_y(const pos p =c) const
+	inline const std::valarray<int>& get_J_y(const Position p =c) const
 	{
 		return J_y[p];
 	}
@@ -191,7 +191,7 @@ public:
 	}
 	inline bool is_constant() const
 	{
-		return stencil.is_constant();
+		return stencil.isConstant();
 	}
 };
 

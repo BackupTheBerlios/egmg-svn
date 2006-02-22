@@ -21,7 +21,7 @@ namespace mg
 	 * \param[in] y		the y coordinate to evaluate f on
 	 * \return 		the value of f(x,y)
 	 */
-	inline precision f(const precision x, const precision y) throw()
+	inline Precision f(const Precision x, const Precision y) throw()
 	{
 		return -6*(x*x*y*(x*x+2*y*y));
 	}

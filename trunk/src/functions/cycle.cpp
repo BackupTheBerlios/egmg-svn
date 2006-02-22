@@ -10,7 +10,7 @@
 
 namespace mg
 {
-	void cycle(std::valarray<precision>& u,const std::valarray<precision>& fv,
+	void cycle(std::valarray<Precision>& u,const std::valarray<Precision>& fv,
 				Stencil& stencil,
 				const Prolongation& prolong, const Restriction& restriction,
 				Relaxation& relax, const size_t Nx, const size_t Ny,
@@ -41,20 +41,20 @@ namespace mg
 			for(size_t j=1; j<= levelgamma; j++)
 			{
           		//presomthing
-				for(int i=0;i<relax.get_nreld();i++)
+				for(int i=0;i<relax.getPreSmoothingSteps();i++)
 					relax.relax(u,fv,stencil,Nx,Ny);
 				//calculate the residuum
-				std::valarray<precision> residv = residuum(u,fv,stencil,Nx,Ny);
+				std::valarray<Precision> residv = residuum(u,fv,stencil,Nx,Ny);
 				//restrict the residuum to the coars grid
-				std::valarray<precision> coars_residuum
+				std::valarray<Precision> coars_residuum
 						= restriction.restriction(residv,stencil,prolong,Nx,Ny);
 				//we going to a coarser grid so Galerkin Operator needs to know
 				//the transfer operators
-				stencil.push_prolongation(prolong);
-				stencil.push_restriction(restriction);
+				stencil.pushProlongation(prolong);
+				stencil.pushRestriction(restriction);
 				const size_t Nx_new = Nx/2;
 				const size_t Ny_new = Ny/2;
-				std::valarray<precision> coars_grid_cor(
+				std::valarray<Precision> coars_grid_cor(
 													0.0,(Nx_new+1)*(Ny_new+1));
           		//do a multigrid cycle on the coars grid
 				cycle(coars_grid_cor,coars_residuum,stencil,prolong,
@@ -64,12 +64,12 @@ namespace mg
 					gamma =1;
 				//prolongate the coars grid correction to the fine grid
 				//approximation
-				u+= prolong.prolong(coars_grid_cor,stencil,Nx_new,Ny_new);
+				u+= prolong.prolongate(coars_grid_cor,stencil,Nx_new,Ny_new);
 				//we are going to a smaler grid so remove transfer operators
-				stencil.pop_restriction();
-				stencil.pop_prolongation();
+				stencil.popRestriction();
+				stencil.popProlongation();
 				//postsomthing
-				for(int i=0;i<relax.get_nrelu();i++)
+				for(int i=0;i<relax.getPostSmoothingSteps();i++)
 					relax.relax(u,fv,stencil,Nx,Ny);
 			}
 		}

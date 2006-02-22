@@ -4,23 +4,23 @@
  */
 #ifndef RESTRICTION_H_
 #define RESTRICTION_H_
+
 #include<valarray>
 #include "../general/parameters.h"
 #include "../Prolongation/Prolongation.h"
+#include "../Stencil/Stencil.h"
 
 namespace mg
 {
-	
-//forward declaration because Stencil uses Restriction
-class Stencil;
 
 /**
  * \brief Restriction is a 2D restriction operator
  */
-class Restriction : public mg::Transfer_Operator
+class Restriction : public mg::TransferOperator
 {
 public:
 	virtual ~Restriction() {}
+	
 	/**
 	 * \brief restriction() restricts the given vector to a smaller grid
 	 * 
@@ -29,18 +29,20 @@ public:
 	 * \param[in] u					the vector to restrict
 	 * \param[in] stencil			the stencil rep. of the pde needed
 	 * 								for matrix dep. Restrictions
-	 * \param[in] prolong			Prolongation used, needed for matrix dep.
+	 * \param[in] prolongation		Prolongation used, needed for matrix dep.
 	 * 								Restrictions
-	 * \param[in] Nx				number of steps in x direction
-	 * \param[in] Ny				number of steps in y direction
-	 * \throw std::domain_error		if Nx or Ny is not divedable by 2
+	 * \param[in] nx				number of steps in x direction
+	 * \param[in] ny				number of steps in y direction
+	 * \throw std::domain_error		if nx or ny is not divedable by 2
 	 * \return						a vector with the values on the restricted
 	 * 								grid
 	 */
-	virtual std::valarray<precision> restriction(
-					const std::valarray<precision>& u, const Stencil& stencil,
-					const Prolongation& prolong, 
-					const size_t Nx, const size_t Ny) const =0;
+	virtual std::valarray<Precision> restriction(
+		const std::valarray<Precision>& u,
+		const Stencil& stencil,
+		const Prolongation& prolongation, 
+		const size_t nx,
+		const size_t ny) const =0;
 };
 
 }

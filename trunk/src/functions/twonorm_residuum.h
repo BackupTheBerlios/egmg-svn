@@ -22,8 +22,8 @@ namespace mg
  * \param Ny	number of steps in y direction
  * \return		the two norm of the resduum
  */
-precision twonorm_residuum(const std::valarray<precision>& u,
-						const std::valarray<precision>& fv,
+Precision twonorm_residuum(const std::valarray<Precision>& u,
+						const std::valarray<Precision>& fv,
 						const Stencil& stencil,
 						const size_t Nx,const size_t Ny);
 }

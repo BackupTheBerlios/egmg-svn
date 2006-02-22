@@ -7,10 +7,10 @@
 namespace mg
 {
 
-int output(std::vector<precision>& vec, size_t flag){
-  precision temp0; //temp variable for residnull
-  precision tempfive; //temp variable for residuen after 5th cycle.
-  precision temp1, temp2;
+int output(std::vector<Precision>& vec, size_t flag){
+  Precision temp0; //temp variable for residnull
+  Precision tempfive; //temp variable for residuen after 5th cycle.
+  Precision temp1, temp2;
   size_t max=(size_t)vec.size(); //values stored in history
 
   //error check
@@ -20,9 +20,9 @@ int output(std::vector<precision>& vec, size_t flag){
   }
 
   // create three arrays to store the calculated convergence rates
-  std::valarray<precision> F1(0.0,max);
-  std::valarray<precision> F2(0.0,max);
-  std::valarray<precision> F3(0.0,max);
+  std::valarray<Precision> F1(0.0,max);
+  std::valarray<Precision> F2(0.0,max);
+  std::valarray<Precision> F3(0.0,max);
 
   // initializing temp0, tempfive
   temp0 = vec.at(0);
@@ -42,9 +42,9 @@ int output(std::vector<precision>& vec, size_t flag){
     
     F1[i]= pow( (temp1/temp0) , static_cast<double> (1./i));
 	//change by jiri old:
- 	//   if(i>5 && tempfive != -1 ) F2[i]=pow( (temp1/tempfive) , static_cast<precision> (1./(i-5)) );
+ 	//   if(i>5 && tempfive != -1 ) F2[i]=pow( (temp1/tempfive) , static_cast<Precision> (1./(i-5)) );
 	//new:
-	if(i>5 && vec.size() >= 5 ) F2[i]=pow( (temp1/tempfive) , static_cast<precision> (1./(i-5)) );
+	if(i>5 && vec.size() >= 5 ) F2[i]=pow( (temp1/tempfive) , static_cast<Precision> (1./(i-5)) );
     else F2[i]=-1;
 
     F3[i]= temp1/temp2;
@@ -57,7 +57,7 @@ int output(std::vector<precision>& vec, size_t flag){
 
 
 
-int outputvalue(std::valarray<precision> u, size_t Nx, size_t Ny){
+int outputvalue(std::valarray<Precision> u, size_t Nx, size_t Ny){
   size_t x,y;
 
    //error check

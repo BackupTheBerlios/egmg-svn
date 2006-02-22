@@ -18,7 +18,7 @@ namespace mg
 	 * \param[in]	the y coordinate
 	 * \return 		0.0
 	 */
-	inline precision zero(const precision, const precision) throw()
+	inline Precision zero(const Precision, const Precision) throw()
 	{
 		return 0.0;
 	}

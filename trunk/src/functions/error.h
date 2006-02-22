@@ -21,7 +21,7 @@ namespace mg
 	 * \param[in] solu	the exact solution of the contious pde
 	 * \return			the maximum norm of the error
 	 */
-	precision error(const std::valarray<precision>& u,const size_t Nx,
+	Precision error(const std::valarray<Precision>& u,const size_t Nx,
 					const size_t Ny,const function2D solu);
 }
 

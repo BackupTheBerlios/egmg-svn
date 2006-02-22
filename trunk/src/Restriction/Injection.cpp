@@ -7,8 +7,8 @@
 
 namespace mg
 {
-std::valarray<precision> Injection::restriction(
-		const std::valarray<precision>& u, const Stencil&,const Prolongation&,
+std::valarray<Precision> Injection::restriction(
+		const std::valarray<Precision>& u, const Stencil&,const Prolongation&,
 		const size_t Nx, const size_t Ny) const
 {
 	//if it is not possible to do standart coarsening throw an exeption
@@ -16,7 +16,7 @@ std::valarray<precision> Injection::restriction(
 		throw std::domain_error("u");
 	const size_t Nx_new = Nx/2;
 	const size_t Ny_new = Ny/2;
-	std::valarray<precision> result(0.0,(Nx_new+1)*(Ny_new+1));
+	std::valarray<Precision> result(0.0,(Nx_new+1)*(Ny_new+1));
 	for (size_t j=0;j<=Ny_new;j++)
 	{
 		for(size_t i=0;i<=Nx_new;i++)

@@ -33,22 +33,22 @@ public:
 		: nreld_(nreld), nrelu_(nrelu) {}
 	virtual ~GS_RB() {}
 	/**
-	 * \brief get_nreld() returns the number of pre smothing steps
+	 * \brief getPreSmoothingSteps() returns the number of pre smothing steps
 	 * \return the number of pre somthing steps
 	 */
 	int get_nreld() const {return nreld_;};
 	/**
-	 * \brief set_nreld() sets the number of pre smothing steps
+	 * \brief setPreSmoothingSteps() sets the number of pre smothing steps
 	 * \param[in] nreld		the number of pre somthing steps
 	 */
 	void set_nreld(int nreld) {nreld_=nreld;}
 	/**
-	 * \brief get_nrelu() returns the number of post somthing steps
+	 * \brief getPostSmoothingSteps() returns the number of post somthing steps
 	 * \return the number of post somthing steps
 	 */
 	int get_nrelu()	const {return nrelu_;};
 	/**
-	 * \brief set_nrelu() sets the number of post smothing steps
+	 * \brief setPostSmoothingSteps() sets the number of post smothing steps
 	 * \param[in] nrelu		the number of post somthing steps
 	 */
 	void set_nrelu(int nrelu) {nrelu_=nrelu;}
@@ -66,8 +66,8 @@ public:
 	 * \param[in] Nx		number of steps in x direction
 	 * \param[in] Ny		number of steps in y direction
 	 */
-	void relax(std::valarray<precision>& u,
-				const std::valarray<precision>& fv,
+	void relax(std::valarray<Precision>& u,
+				const std::valarray<Precision>& fv,
 				const Stencil& stencil,
 				const size_t Nx,const size_t Ny) const;
 };

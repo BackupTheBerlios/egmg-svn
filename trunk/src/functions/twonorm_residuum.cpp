@@ -7,18 +7,18 @@
 
 namespace mg
 {
-	precision twonorm_residuum(const std::valarray<precision>& u,
-						const std::valarray<precision>& fv,
+	Precision twonorm_residuum(const std::valarray<Precision>& u,
+						const std::valarray<Precision>& fv,
 						const Stencil& stencil,
 						const size_t Nx,const size_t Ny)
 	{
-		precision result=0;
+		Precision result=0;
 		if (stencil.size() < 2)
 		{
 			for (size_t j=1; j<Ny;j++)
 				for(size_t i=1; i<Nx;i++)
 				{
-					precision temp_res=fv[j*(Nx+1)+i]
+					Precision temp_res=fv[j*(Nx+1)+i]
 							-stencil.apply_c(u,i,j,Nx,Ny);
 					temp_res=temp_res*temp_res;
                                         result += temp_res;
@@ -27,7 +27,7 @@ namespace mg
 		else
 		{
 			//south west corner
-			precision temp_res=fv[1*(Nx+1)+1]
+			Precision temp_res=fv[1*(Nx+1)+1]
 					-stencil.apply_sw(u,1,1,Nx,Ny);
 			temp_res=temp_res*temp_res;
 			result += temp_res;

@@ -26,8 +26,8 @@ namespace mg
 	 * \param[in] Ny		number of steps in y direction
 	 * \return				the maximum norm of the residuum
 	 */
-	precision max_residuum(const std::valarray<precision>& u,
-						const std::valarray<precision>& fv,
+	Precision max_residuum(const std::valarray<Precision>& u,
+						const std::valarray<Precision>& fv,
 						const Stencil& stencil,
 						const size_t Nx,const size_t Ny);
 }

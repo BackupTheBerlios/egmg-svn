@@ -21,6 +21,7 @@ class Stencil
 {
 public:
 	virtual ~Stencil() {}
+	
 	/**
 	 * \brief applys the stencil to the given vector u at the given point
 	 *
@@ -32,18 +33,19 @@ public:
 	 * E.g. apply(u,nw,sx,sy,nx,ny) if it is the point in the north west corner.\n
 	 * \see Position
 	 * 
-	 * \param[in] u		the vector to apply the stencil to
-	 * \param[in] pos	relative position in the domain according to the enum Postion
-	 * \param[in] sx	the x position to apply the stencil to 
-	 * \param[in] sy	the y position to apply the stencil to
-	 * \param[in] nx	number of points in x direction (stride)
-	 * \param[in] ny	number of points in y direction
-	 * \return			the value of \f$ L_h u_h \f$
+	 * \param[in] u			the vector to apply the stencil to
+	 * \param[in] pos      	relative position in the domain according to the
+	 * 						enum Postion
+	 * \param[in] sx		the x position to apply the stencil to 
+	 * \param[in] sy		the y position to apply the stencil to
+	 * \param[in] nx		number of points in x direction (stride)
+	 * \param[in] ny		number of points in y direction
+	 * \return				the value of \f$ L_h u_h \f$
 	 */
 	virtual Precision apply(
 		const std::valarray<Precision>& u,
 		const Position pos,
-		const size_t sx,
+        const size_t sx,
 		const size_t sy,
 		const size_t nx,
 		const size_t ny) const =0;
@@ -53,16 +55,17 @@ public:
 	 * 
 	 * getCenter returns the center element of the stencil. Because for some
 	 * stencils it can make a diffrence if they are applied to a point on the
-	 * boarder or the center there is the parameter pos.
+	 * boarder or the center there is the parameter Position.
 	 * \see Position
 	 * \see apply
 	 * 
-	 * \param[in] pos	relative position in the domain according to the enum Postion
-	 * \param[in] sx	the x position 
-	 * \param[in] sy	the y position
-	 * \param[in] nx	number of points in x direction (stride)
-	 * \param[in] ny	number of points in y direction
-	 * \return			the center coefficient
+	 * \param[in] pos      	relative position in the domain according to the
+     *                      enum Postion
+	 * \param[in] sx	    the x position 
+	 * \param[in] sy	    the y position
+	 * \param[in] nx	    number of points in x direction (stride)
+	 * \param[in] ny	    number of points in y direction
+	 * \return			    the center coefficient
 	 */
 	virtual Precision getCenter(
 		const Position pos,
@@ -106,7 +109,7 @@ public:
 	 * if size is one and that all values mentioned in the above matrix are set
 	 * if the size is two.\n
 	 * Because for some stencils it can make a diffrence if they are applied
-	 * to a point on the boarder or the center set the paramter pos correctly.\n
+	 * to a point on the boarder or the center set the paramter Position correctly.\n
 	 * E.g. Laplacian2D2 with the stepsize hx=hy=1 and \f$a_x = a_y =1.0\f$
 	 * looks like:
 	 * \f[
@@ -126,12 +129,13 @@ public:
 	 * \see apply
 	 * \see Laplacian2D2
 	 * 
-	 * \param[in] pos	relative position in the domain according to the enum Postion
-	 * \param[in] sx	the x position
-	 * \param[in] sy	the y position
-	 * \param[in] nx	number of points in x direction (stride)
-	 * \param[in] ny	number of points in y direction
-	 * \return			the coefficients of Laplacian2D2
+	 * \param[in] pos      	relative position in the domain according to the
+     *                      enum Postion
+	 * \param[in] sx	    the x position
+	 * \param[in] sy	    the y position
+	 * \param[in] nx	    number of points in x direction (stride)
+	 * \param[in] ny	    number of points in y direction
+	 * \return			    the coefficients of Laplacian2D2
 	 */
 	virtual const std::valarray<Precision>& getL(
 		const Position pos,
@@ -144,8 +148,8 @@ public:
 	 * \brief returns the coordinate vector in x dir. for the coefficient vector
 	 * \see getL	for a more detailed description
 	 * 
-	 * \param[in] pos	the relative position to get the coordinates vector at
-	 * \return			the coordinates vector in x direction
+	 * \param[in] pos  the relative position to get the coordinates vector at
+	 * \return		   the coordinates vector in x direction
 	 */
 	virtual const std::valarray<int>& getJx(const Position pos) const =0;
 	

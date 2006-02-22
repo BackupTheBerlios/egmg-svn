@@ -18,13 +18,13 @@
 namespace mg
 {
 			
-	void lineJAC::relax(std::valarray<precision> &u, const std::valarray<precision> &fv, 
+	void lineJAC::relax(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
 		               const Stencil &stencil, const size_t Nx, const size_t Ny) const
 	{
 		// valarray needed for LR-decomposition of a tridiagonal matrix
 		
 
-		std::valarray<precision> resid(0.0,(Nx+1)*(Ny+1));
+		std::valarray<Precision> resid(0.0,(Nx+1)*(Ny+1));
 		resid = residuum(u,fv,stencil,Nx,Ny);
 
 		switch (stencil.size())

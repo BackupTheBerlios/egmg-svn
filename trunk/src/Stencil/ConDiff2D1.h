@@ -26,13 +26,13 @@ namespace mg
 class ConDiff2D1 : public mg::Stencil
 {
 private:
-	mutable std::valarray<precision> L;
+	mutable std::valarray<Precision> L;
 	const std::valarray<int> J_x;
 	const std::valarray<int> J_y;
-	const precision epsilon;
-	const precision beta;
-	precision a1;
-	precision a2;
+	const Precision epsilon;
+	const Precision beta;
+	Precision a1;
+	Precision a2;
 	//initilize J_x, makes it possible to make J_x const
 	std::valarray<int> init_J_x() const
 	{
@@ -46,7 +46,7 @@ private:
 		return std::valarray<int>(t,5);
 	}
     //initilize a1 and a2
-	precision init_coeff(precision beta_) 
+	Precision init_coeff(Precision beta_) 
 	{
 		a1 = cos(beta_);
 		a2 = sin(beta_);
@@ -65,10 +65,10 @@ public:
 	 * \param[in] a_1 = cos(\beta)	coefficient of the convection part (default \pi/4)
 	 * \param[in] a_2 = sin(\beta)	coefficient of the convection part (default \pi/4)
 	 */
-	explicit ConDiff2D1(precision epsilon_ =1.0, precision beta_ = 0.78539816339745) 
+	explicit ConDiff2D1(Precision epsilon_ =1.0, Precision beta_ = 0.78539816339745) 
 		: L(5), J_x(init_J_x()), J_y(init_J_y()), epsilon(epsilon_), beta(init_coeff(beta_)) {}
 	virtual ~ConDiff2D1() {}
-	inline precision apply_c(const std::valarray<precision>& u,
+	inline Precision apply_c(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
@@ -78,100 +78,100 @@ public:
 				+(-1.0*epsilon*Ny*Ny+(-a2-fabs(a2))*Ny/2)*u[(j-1)*(Nx+1)+i]
 				+(-1.0*epsilon*Ny*Ny+(a2-fabs(a2))*Ny/2)*u[(j+1)*(Nx+1)+i];
 	}
-	inline precision get_center_c(const size_t, const size_t,
+	inline Precision get_center_c(const size_t, const size_t,
 							const size_t Nx, const size_t Ny) const
 	{
 		return (2.0*epsilon*Nx*Nx+2.0*epsilon*Ny*Ny+fabs(a1)*Nx+fabs(a2)*Ny);
 	}
-	inline precision apply_w(const std::valarray<precision>& u,
+	inline Precision apply_w(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
 		return apply_c(u,i,j,Nx,Ny);
 	}
-	inline precision apply_nw(const std::valarray<precision>& u,
+	inline Precision apply_nw(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
 		return apply_c(u,i,j,Nx,Ny);
 	}
-	inline precision apply_n(const std::valarray<precision>& u,
+	inline Precision apply_n(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
 		return apply_c(u,i,j,Nx,Ny);
 	}
-	inline precision apply_ne(const std::valarray<precision>& u,
+	inline Precision apply_ne(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
 		return apply_c(u,i,j,Nx,Ny);
 	}
-	inline precision apply_e(const std::valarray<precision>& u,
+	inline Precision apply_e(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
 		return apply_c(u,i,j,Nx,Ny);
 	}
-	inline precision apply_se(const std::valarray<precision>& u,
+	inline Precision apply_se(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
 		return apply_c(u,i,j,Nx,Ny);
 	}
-	inline precision apply_s(const std::valarray<precision>& u,
+	inline Precision apply_s(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
 		return apply_c(u,i,j,Nx,Ny);
 	}
-	inline precision apply_sw(const std::valarray<precision>& u,
+	inline Precision apply_sw(const std::valarray<Precision>& u,
 								const size_t i, const size_t j,
 								const size_t Nx, const size_t Ny) const
 	{
 		return apply_c(u,i,j,Nx,Ny);
 	}
-	inline precision get_center_w(const size_t i, const size_t j,
+	inline Precision get_center_w(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_center_c(i,j,Nx,Ny);
 	}
-	inline precision get_center_nw(const size_t i, const size_t j,
+	inline Precision get_center_nw(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_center_c(i,j,Nx,Ny);
 	}
-	inline precision get_center_n(const size_t i, const size_t j,
+	inline Precision get_center_n(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_center_c(i,j,Nx,Ny);
 	}
-	inline precision get_center_ne(const size_t i, const size_t j,
+	inline Precision get_center_ne(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_center_c(i,j,Nx,Ny);
 	}
-	inline precision get_center_e(const size_t i, const size_t j,
+	inline Precision get_center_e(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_center_c(i,j,Nx,Ny);
 	}
-	inline precision get_center_se(const size_t i, const size_t j,
+	inline Precision get_center_se(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_center_c(i,j,Nx,Ny);
 	}
-	inline precision get_center_s(const size_t i, const size_t j,
+	inline Precision get_center_s(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_center_c(i,j,Nx,Ny);
 	}
-	inline precision get_center_sw(const size_t i, const size_t j,
+	inline Precision get_center_sw(const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_center_c(i,j,Nx,Ny);
 	}
-	inline const std::valarray<precision>& get_L_c(
+	inline const std::valarray<Precision>& get_L_c(
 							const size_t, const size_t,
 							const size_t Nx, const size_t Ny) const
 	{
@@ -182,59 +182,59 @@ public:
 		L[4] = -1.0*epsilon*Ny*Ny+(a2-fabs(a2))*Ny/2;
 		return L;
 	}
-	inline const std::valarray<precision>& get_L_w(
+	inline const std::valarray<Precision>& get_L_w(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_L_c(i,j,Nx,Ny);
 	}
-	inline const std::valarray<precision>& get_L_nw(
+	inline const std::valarray<Precision>& get_L_nw(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_L_c(i,j,Nx,Ny);
 	}
-	inline const std::valarray<precision>& get_L_n(
+	inline const std::valarray<Precision>& get_L_n(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_L_c(i,j,Nx,Ny);
 	}
-	inline const std::valarray<precision>& get_L_ne(
+	inline const std::valarray<Precision>& get_L_ne(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_L_c(i,j,Nx,Ny);
 	}
-	inline const std::valarray<precision>& get_L_e(
+	inline const std::valarray<Precision>& get_L_e(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_L_c(i,j,Nx,Ny);
 	}
-	inline const std::valarray<precision>& get_L_se(
+	inline const std::valarray<Precision>& get_L_se(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_L_c(i,j,Nx,Ny);
 	}
-	inline const std::valarray<precision>& get_L_s(
+	inline const std::valarray<Precision>& get_L_s(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_L_c(i,j,Nx,Ny);
 	}
-	inline const std::valarray<precision>& get_L_sw(
+	inline const std::valarray<Precision>& get_L_sw(
 							const size_t i, const size_t j,
 							const size_t Nx, const size_t Ny) const
 	{
 		return get_L_c(i,j,Nx,Ny);
 	}
-	inline const std::valarray<int>& get_J_x(const pos =c) const
+	inline const std::valarray<int>& get_J_x(const Position =c) const
 	{
 		return J_x;
 	}
-	inline const std::valarray<int>& get_J_y(const pos =c) const
+	inline const std::valarray<int>& get_J_y(const Position =c) const
 	{
 		return J_y;
 	}

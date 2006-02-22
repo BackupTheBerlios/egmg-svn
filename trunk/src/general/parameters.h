@@ -13,10 +13,10 @@
 namespace mg
 {
 	/**
-	 * \brief the precision to do the calculations with
+	 * \brief the Precision to do the calculations with
 	 */
 	typedef double Precision;
-	
+		
 	/**
 	 * \enum mg::Postion
 	 * \brief Postion describes relative positions

@@ -18,7 +18,7 @@ namespace mg
 class TransferOperator
 {
 	/**
-	 * \brief getI returns the stencil representation of the Transfer_Operator
+	 * \brief getI returns the stencil representation of the TransferOperator
 	 * 
 	 * Retruns the coefficents of the stencil representation as valarray. For a
 	 * 9 Point Stencil the entries are numbered like this:
@@ -56,7 +56,7 @@ class TransferOperator
 	 * 						dependend TransferOperators
 	 * \return				the coefficients of the TransferOperator
 	 */
-	virtual const std::valarray<Precision>& getI(
+	virtual const std::valarray<Precision>& get_I(
 		const size_t sx,
 		const size_t sy,
 		const size_t nx,

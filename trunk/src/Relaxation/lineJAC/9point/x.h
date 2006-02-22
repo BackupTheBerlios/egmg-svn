@@ -1,24 +1,24 @@
 namespace mg
 {
-	void lineJAC::ninepointxline(std::valarray<precision> &u, const std::valarray<precision> &fv, 
-		                    std::valarray<precision> resid, const Stencil &stencil, const size_t Nx, 
+	void lineJAC::ninepointxline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+		                    std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const
 					   
     { 
-		std::valarray<precision> rhs(0.0,Nx-1);
-		std::valarray<precision> temp(0.0,(Nx+1)*(Ny+1));		
+		std::valarray<Precision> rhs(0.0,Nx-1);
+		std::valarray<Precision> temp(0.0,(Nx+1)*(Ny+1));		
 		
 		//valarrays needed for saving the tridiagonal matrix A of linear system A u = rhs		
-		std::valarray<precision> diagR(Nx-1);
-		std::valarray<precision> ndiagR(Nx-2);
-		std::valarray<precision> ndiagL(Nx-2);
+		std::valarray<Precision> diagR(Nx-1);
+		std::valarray<Precision> ndiagR(Nx-2);
+		std::valarray<Precision> ndiagL(Nx-2);
 
-		if(stencil.is_constant())
+		if(stencil.isConstant())
 		{
 			// get const operator L
-			const std::valarray<precision> L = stencil.get_L_c(2,2,Nx,Ny);
-			const std::valarray<int> J_x = stencil.get_J_x(c);
-			const std::valarray<int> J_y = stencil.get_J_y(c);
+			const std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+			const std::valarray<int> J_x = stencil.getJx(c);
+			const std::valarray<int> J_y = stencil.getJy(c);
 
 			for(size_t i=1; i<Ny ; i++) 
 			{
@@ -55,9 +55,9 @@ namespace mg
 		{
 			//Stencil ist not constant, so L needs to be evaluated in each grid point
 			//no other change in the algorithm			
-			std::valarray<precision> L = stencil.get_L_c(2,2,Nx,Ny);
-			std::valarray<int> J_x = stencil.get_J_x(c);
-			std::valarray<int> J_y = stencil.get_J_y(c);
+			std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+			std::valarray<int> J_x = stencil.getJx(c);
+			std::valarray<int> J_y = stencil.getJy(c);
 			
 			if(Nx > 2)
 			{
@@ -189,7 +189,7 @@ namespace mg
 			
 			else  // if Nx and Ny are too small do one GS_lex step
 			{
-				precision temp=0;
+				Precision temp=0;
 
 				for(size_t k=1; k<Ny; k++)
 				{

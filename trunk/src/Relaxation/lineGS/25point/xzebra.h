@@ -1,32 +1,32 @@
 namespace mg
 {
-	void lineGS::xzebra(std::valarray<precision> &u, const std::valarray<precision> &fv, 
-		                    std::valarray<precision> &rhs, const Stencil &stencil, const size_t Nx, 
+	void lineGS::xzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+		                    std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const
 
 	{
         if((Ny > 4) && (Nx > 4))
 		{	
-			std::valarray<precision> diagR(0.0,Nx-1);
-		    std::valarray<precision> ndiagR1(0.0,Nx-2);
-		    std::valarray<precision> ndiagL1(0.0,Nx-2);
-		    std::valarray<precision> ndiagR2(0.0,Nx-3);
-		    std::valarray<precision> ndiagL2(0.0,Nx-3);
+			std::valarray<Precision> diagR(0.0,Nx-1);
+		    std::valarray<Precision> ndiagR1(0.0,Nx-2);
+		    std::valarray<Precision> ndiagL1(0.0,Nx-2);
+		    std::valarray<Precision> ndiagR2(0.0,Nx-3);
+		    std::valarray<Precision> ndiagL2(0.0,Nx-3);
 
-			if(stencil.is_constant() == true)
+			if(stencil.isConstant() == true)
 			{
 				// get const operator L
-				const std::valarray<precision> L = stencil.get_L_c(2,2,Nx,Ny);
-				const std::valarray<int> J_x = stencil.get_J_x(c);
-				const std::valarray<int> J_y = stencil.get_J_y(c);
+				const std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+				const std::valarray<int> J_x = stencil.getJx(c);
+				const std::valarray<int> J_y = stencil.getJy(c);
 				
-				std::valarray<precision> L_b = stencil.get_L_s(2,1,Nx,Ny);
-				std::valarray<int> J_b_x = stencil.get_J_x(s);
-				std::valarray<int> J_b_y = stencil.get_J_y(s);
+				std::valarray<Precision> L_b = stencil.get_L_s(2,1,Nx,Ny);
+				std::valarray<int> J_b_x = stencil.getJx(s);
+				std::valarray<int> J_b_y = stencil.getJy(s);
                     
-                std::valarray<precision> L_c = stencil.get_L_sw(1,1,Nx,Ny);
-				std::valarray<int> J_c_x = stencil.get_J_x(sw);
-				std::valarray<int> J_c_y = stencil.get_J_y(sw);
+                std::valarray<Precision> L_c = stencil.get_L_sw(1,1,Nx,Ny);
+				std::valarray<int> J_c_x = stencil.getJx(sw);
+				std::valarray<int> J_c_y = stencil.getJy(sw);
 
 
 				// setze rechte Seite für Zeile 1					
@@ -86,8 +86,8 @@ namespace mg
 				}
 					
                 L_c = stencil.get_L_se(Nx-1,1,Nx,Ny);
-				J_c_x = stencil.get_J_x(se);
-				J_c_y = stencil.get_J_y(se);
+				J_c_x = stencil.getJx(se);
+				J_c_y = stencil.getJy(se);
 
 				ndiagL2[Nx-4] = L_c[nw];
 				ndiagL1[Nx-3] = L_c[w];
@@ -136,8 +136,8 @@ namespace mg
 				{
 					// setze rechte Seite					
 					L_b = stencil.get_L_w(1,i,Nx,Ny);
-					J_b_x = stencil.get_J_x(w);
-				    J_b_y = stencil.get_J_y(w);
+					J_b_x = stencil.getJx(w);
+				    J_b_y = stencil.getJy(w);
 
 					diagR[0] = L_b[c];
 		            ndiagR1[0] = L_b[e];
@@ -195,8 +195,8 @@ namespace mg
 					}
 					
                     L_b = stencil.get_L_e(Nx-1,i,Nx,Ny);
-					J_b_x = stencil.get_J_x(e);
-				    J_b_y = stencil.get_J_y(e);
+					J_b_x = stencil.getJx(e);
+				    J_b_y = stencil.getJy(e);
 
 					ndiagL2[Nx-4] = L_b[nw];
 					ndiagL1[Nx-3] = L_b[w];
@@ -245,8 +245,8 @@ namespace mg
 				
                 // setze rechte Seite in oberster Zeile					
 				L_c = stencil.get_L_nw(1,Ny-1,Nx,Ny);
-				J_c_x = stencil.get_J_x(nw);
-				J_c_y = stencil.get_J_y(nw);
+				J_c_x = stencil.getJx(nw);
+				J_c_y = stencil.getJy(nw);
 
 				diagR[0] = L_c[c];
 		        ndiagR1[0] = L_c[e];
@@ -261,8 +261,8 @@ namespace mg
 				}
 				
 				L_b = stencil.get_L_n(2,Ny-1,Nx,Ny);
-				J_b_x = stencil.get_J_x(n);
-				J_b_y = stencil.get_J_y(n);
+				J_b_x = stencil.getJx(n);
+				J_b_y = stencil.getJy(n);
 				
                 ndiagL1[0] = L_b[w];
 				diagR[1] = L_b[c];
@@ -308,8 +308,8 @@ namespace mg
 				}
 					
                 L_c = stencil.get_L_ne(Nx-1,Ny-1,Nx,Ny);
-				J_c_x = stencil.get_J_x(ne);
-				J_c_y = stencil.get_J_y(ne);
+				J_c_x = stencil.getJx(ne);
+				J_c_y = stencil.getJy(ne);
 
 				ndiagL2[Nx-4] = L_c[nw];
 				ndiagL1[Nx-3] = L_c[w];
@@ -358,8 +358,8 @@ namespace mg
 				{
 					// setze rechte Seite					
 					L_b = stencil.get_L_w(1,i,Nx,Ny);
-					J_b_x = stencil.get_J_x(w);
-				    J_b_y = stencil.get_J_y(w);
+					J_b_x = stencil.getJx(w);
+				    J_b_y = stencil.getJy(w);
 
 					diagR[0] = L_b[c];
 		            ndiagR1[0] = L_b[e];
@@ -417,8 +417,8 @@ namespace mg
 					}
 					
                     L_b = stencil.get_L_e(Nx-1,i,Nx,Ny);
-					J_b_x = stencil.get_J_x(e);
-				    J_b_y = stencil.get_J_y(e);
+					J_b_x = stencil.getJx(e);
+				    J_b_y = stencil.getJy(e);
 
 					ndiagL2[Nx-4] = L_b[nw];
 					ndiagL1[Nx-3] = L_b[w];
@@ -467,17 +467,17 @@ namespace mg
                         
 			else // stencil not constant
 			{
-				std::valarray<precision> L = stencil.get_L_c(2,2,Nx,Ny);
-				std::valarray<int> J_x = stencil.get_J_x(c);
-				std::valarray<int> J_y = stencil.get_J_y(c);
+				std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+				std::valarray<int> J_x = stencil.getJx(c);
+				std::valarray<int> J_y = stencil.getJy(c);
 				
-				std::valarray<precision> L_b = stencil.get_L_s(2,1,Nx,Ny);
-				std::valarray<int> J_b_x = stencil.get_J_x(s);
-				std::valarray<int> J_b_y = stencil.get_J_y(s);
+				std::valarray<Precision> L_b = stencil.get_L_s(2,1,Nx,Ny);
+				std::valarray<int> J_b_x = stencil.getJx(s);
+				std::valarray<int> J_b_y = stencil.getJy(s);
                     
-                std::valarray<precision> L_c = stencil.get_L_sw(1,1,Nx,Ny);
-				std::valarray<int> J_c_x = stencil.get_J_x(sw);
-				std::valarray<int> J_c_y = stencil.get_J_y(sw);
+                std::valarray<Precision> L_c = stencil.get_L_sw(1,1,Nx,Ny);
+				std::valarray<int> J_c_x = stencil.getJx(sw);
+				std::valarray<int> J_c_y = stencil.getJy(sw);
 				
 
 				diagR[0] = L_c[c];
@@ -493,8 +493,8 @@ namespace mg
 				}
 				
 				L_b = stencil.get_L_s(2,1,Nx,Ny);
-				J_b_x = stencil.get_J_x(s);
-			    J_b_y = stencil.get_J_y(s);
+				J_b_x = stencil.getJx(s);
+			    J_b_y = stencil.getJy(s);
 
                 ndiagL1[0] = L_b[w];
 				diagR[1] = L_b[c];
@@ -544,8 +544,8 @@ namespace mg
 				}
 					
                 L_c = stencil.get_L_se(Nx-1,1,Nx,Ny);
-				J_c_x = stencil.get_J_x(se);
-				J_c_y = stencil.get_J_y(se);
+				J_c_x = stencil.getJx(se);
+				J_c_y = stencil.getJy(se);
 
 				ndiagL2[Nx-4] = L_c[nw];
 				ndiagL1[Nx-3] = L_c[w];
@@ -594,8 +594,8 @@ namespace mg
 				{
 					// setze rechte Seite					
 					L_b = stencil.get_L_w(1,i,Nx,Ny);
-					J_b_x = stencil.get_J_x(w);
-				    J_b_y = stencil.get_J_y(w);
+					J_b_x = stencil.getJx(w);
+				    J_b_y = stencil.getJy(w);
 
 					diagR[0] = L_b[c];
 		            ndiagR1[0] = L_b[e];
@@ -659,8 +659,8 @@ namespace mg
 					}
 					
                     L_b = stencil.get_L_e(Nx-1,i,Nx,Ny);
-					J_b_x = stencil.get_J_x(e);
-				    J_b_y = stencil.get_J_y(e);
+					J_b_x = stencil.getJx(e);
+				    J_b_y = stencil.getJy(e);
 
 					ndiagL2[Nx-4] = L_b[nw];
 					ndiagL1[Nx-3] = L_b[w];
@@ -709,8 +709,8 @@ namespace mg
 				
                 // setze rechte Seite in oberster Zeile					
 				L_c = stencil.get_L_nw(1,Ny-1,Nx,Ny);
-				J_c_x = stencil.get_J_x(nw);
-				J_c_y = stencil.get_J_y(nw);
+				J_c_x = stencil.getJx(nw);
+				J_c_y = stencil.getJy(nw);
 
 				diagR[0] = L_c[c];
 		        ndiagR1[0] = L_c[e];
@@ -726,8 +726,8 @@ namespace mg
 				
 				L_b = stencil.get_L_n(2,Ny-1,Nx,Ny);
 
-				J_b_x = stencil.get_J_x(n);
-				J_b_y = stencil.get_J_y(n);
+				J_b_x = stencil.getJx(n);
+				J_b_y = stencil.getJy(n);
 				
                 ndiagL1[0] = L_b[w];
 				diagR[1] = L_b[c];
@@ -777,8 +777,8 @@ namespace mg
 				}
 					
                 L_c = stencil.get_L_ne(Nx-1,Ny-1,Nx,Ny);
-				J_c_x = stencil.get_J_x(ne);
-				J_c_y = stencil.get_J_y(ne);
+				J_c_x = stencil.getJx(ne);
+				J_c_y = stencil.getJy(ne);
 
 				ndiagL2[Nx-4] = L_c[nw];
 				ndiagL1[Nx-3] = L_c[w];
@@ -827,8 +827,8 @@ namespace mg
 				{
 					// setze rechte Seite					
 					L_b = stencil.get_L_w(1,i,Nx,Ny);
-					J_b_x = stencil.get_J_x(w);
-				    J_b_y = stencil.get_J_y(w);
+					J_b_x = stencil.getJx(w);
+				    J_b_y = stencil.getJy(w);
 
 					diagR[0] = L_b[c];
 		            ndiagR1[0] = L_b[e];
@@ -892,8 +892,8 @@ namespace mg
 					}
 					
                     L_b = stencil.get_L_e(Nx-1,i,Nx,Ny);
-					J_b_x = stencil.get_J_x(e);
-				    J_b_y = stencil.get_J_y(e);
+					J_b_x = stencil.getJx(e);
+				    J_b_y = stencil.getJy(e);
 
 					ndiagL2[Nx-4] = L_b[nw];
 					ndiagL1[Nx-3] = L_b[w];
@@ -947,7 +947,7 @@ namespace mg
 			  
 			for(int k=0; k<2; k++)
 			{
-				precision factor = 1.0;
+				Precision factor = 1.0;
 
 				/**
 		 * \todo in case of large stencils a four colour RB is needed

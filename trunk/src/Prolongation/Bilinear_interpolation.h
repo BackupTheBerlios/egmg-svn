@@ -19,14 +19,14 @@ namespace mg
 class Bilinear_interpolation : public mg::Prolongation
 {
 private:
-	const std::valarray<precision> I;
+	const std::valarray<Precision> I;
 	const std::valarray<int> J_x;
 	const std::valarray<int> J_y;
 	//initialize I, makes it possible to make I const
-	std::valarray<precision> init_I() const
+	std::valarray<Precision> init_I() const
 	{
-		const precision t[] = {1.0,1.0/2,1.0/2,1.0/2,1.0/2,1.0/4,1.0/4,1.0/4,1.0/4};
-		return std::valarray<precision>(t,9);
+		const Precision t[] = {1.0,1.0/2,1.0/2,1.0/2,1.0/2,1.0/4,1.0/4,1.0/4,1.0/4};
+		return std::valarray<Precision>(t,9);
 	}
 	//initialize J_x, makes it possible to make J_x const
 	std::valarray<int> init_J_x() const
@@ -48,7 +48,7 @@ public:
 		: I(init_I()), J_x(init_J_x()), J_y(init_J_y()) {}
 	virtual ~Bilinear_interpolation() {}
 	/**
-	 * \brief prolong does a bilinear interpolation on the input vector
+	 * \brief prolongate does a bilinear interpolation on the input vector
 	 * 
 	 * \param[in] u			the vector representing a rectangel to prolongate
 	 * \param[in] stencil	the stencil rep. of the pde needed for matrix dep.
@@ -58,10 +58,10 @@ public:
 	 * \return 				a vector representing the prolongated rectangel of 
 	 * 						size 2*(Nx+1)*2*(Ny+1)
 	 */
-	std::valarray<precision> prolong(const std::valarray<precision>& u,
+	std::valarray<Precision> prolong(const std::valarray<Precision>& u,
 									const Stencil& stencil,
 									const size_t Nx,const size_t Ny) const;
-	const std::valarray<precision>& get_I(const size_t, const size_t,
+	const std::valarray<Precision>& get_I(const size_t, const size_t,
 									const size_t, const size_t, const Stencil&) const
 	{
 		return I;	

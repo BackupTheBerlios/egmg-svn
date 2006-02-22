@@ -17,7 +17,7 @@ namespace mg
 	 * \param[in] Ny		number of steps in y direction
 	 * \param[in] g			the diriclet boundry condition
 	 */
-	void putbval(std::valarray<precision>& u,const size_t Nx, const size_t Ny,
+	void putbval(std::valarray<Precision>& u,const size_t Nx, const size_t Ny,
 					const function2D g);
 }
 

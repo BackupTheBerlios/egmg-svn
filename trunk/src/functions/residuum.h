@@ -23,8 +23,8 @@ namespace mg
 	 * \param[in] Ny		number of steps in y direction
 	 * \return				a vector with the resduum
 	 */
-	std::valarray<precision> residuum(const std::valarray<precision>& u,
-								   const std::valarray<precision>& fv,
+	std::valarray<Precision> residuum(const std::valarray<Precision>& u,
+								   const std::valarray<Precision>& fv,
 								   const Stencil& stencil,
 								   const size_t Nx,const size_t Ny);
 }

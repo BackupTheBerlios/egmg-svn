@@ -16,7 +16,7 @@ namespace mg
 	 * \param[in] Ny		number of steps in y direction
 	 * \param[in] f			the right hand side function of the pde	
 	 */
-	void putrhs(std::valarray<precision>& fv,const size_t Nx, const size_t Ny,
+	void putrhs(std::valarray<Precision>& fv,const size_t Nx, const size_t Ny,
 					const function2D f);
 }
 

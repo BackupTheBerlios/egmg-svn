@@ -23,7 +23,7 @@ namespace mg
 class Dendy_interpolation : public mg::Prolongation
 {
 private:
-	std::valarray<precision> t;
+	std::valarray<Precision> t;
 	const std::valarray<int> J_x;
 	const std::valarray<int> J_y;
 	//initialize J_x, makes it possible to make J_x const
@@ -56,7 +56,7 @@ public:
 	Dendy_interpolation() : t(9), J_x(init_J_x()), J_y(init_J_y()) {}
 	virtual ~Dendy_interpolation() {}
 	/**
-	 * \brief prolong does a matrix-dependent interpolation on the input vector
+	 * \brief prolongate does a matrix-dependent interpolation on the input vector
 	 * 
 	 * \param u		the vector representing a rectangle to prolongate
 	 * \param Nx	Number of steps in x direction
@@ -64,25 +64,25 @@ public:
 	 * \return 		a vector representing the prolongated rectangle of 
 	 * 				size 2*(Nx+1)*2*(Ny+1)
 	 */
-	std::valarray<precision> prolong(const std::valarray<precision>& u, const Stencil& stencil, 
+	std::valarray<Precision> prolong(const std::valarray<Precision>& u, const Stencil& stencil, 
 									const size_t Nx,const size_t Ny) const;
 									
-	const std::valarray<precision>& get_I(const size_t i, const size_t j, 
+	const std::valarray<Precision>& get_I(const size_t i, const size_t j, 
 		const size_t Nx, const size_t Ny, const Stencil& stencil)
 	{
-		std::valarray<precision> L = stencil.get_L_c(0,0,Nx,Ny);
-		std::valarray<int> J_x = stencil.get_J_x(c);
-		std::valarray<int> J_y = stencil.get_J_y(c);
+		std::valarray<Precision> L = stencil.get_L_c(0,0,Nx,Ny);
+		std::valarray<int> J_x = stencil.getJx(c);
+		std::valarray<int> J_y = stencil.getJy(c);
 		std::valarray<size_t> posi(9);
 		for (size_t jj=0;jj<J_x.size();jj++)
 		{
 			posi[(J_x[jj]+1)+3*(J_y[jj]+1)] = jj;
 		}
 
-		precision scale = 0;
-		precision weight1 = 0;
-		precision weight2 = 0;
-		precision erg = 0;
+		Precision scale = 0;
+		Precision weight1 = 0;
+		Precision weight2 = 0;
+		Precision erg = 0;
 
 		// C
 		t[0] = 1.0;

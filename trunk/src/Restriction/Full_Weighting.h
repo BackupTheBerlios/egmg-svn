@@ -19,16 +19,16 @@ namespace mg
 class Full_Weighting : public mg::Restriction
 {
 private:
-	const precision weight_;
-	const std::valarray<precision> I;
+	const Precision weight_;
+	const std::valarray<Precision> I;
 	const std::valarray<int> J_x;
 	const std::valarray<int> J_y;
 	//initilize I, makes it possible to make I const
-	std::valarray<precision> init_I(precision weight) const
+	std::valarray<Precision> init_I(Precision weight) const
 	{
-		const precision t[] = {weight/4,weight/8,weight/8,weight/8,weight/8,
+		const Precision t[] = {weight/4,weight/8,weight/8,weight/8,weight/8,
 									weight/16,weight/16,weight/16,weight/16};
-		return std::valarray<precision>(t,9);
+		return std::valarray<Precision>(t,9);
 	}
 	//initilize J_x, makes it possible to make J_x const
 	std::valarray<int> init_J_x() const
@@ -52,7 +52,7 @@ public:
 	 * Full_Weighting constructs a Full_Weighting object with:
 	 * \param[in] weight	the weight to do full weighting with (default 1.0)
 	 */
-	Full_Weighting(precision weight = 1.0)
+	Full_Weighting(Precision weight = 1.0)
 		: weight_(weight),I(init_I(weight)), J_x(init_J_x()), J_y(init_J_y()) {}
 	virtual ~Full_Weighting(){}
 	/**
@@ -65,7 +65,7 @@ public:
 	 * \param[in] u					the vector to restrict
 	 * \param[in] stencil			the stencil rep. of the pde needed
 	 * 								for matrix dep. Restrictions (not used)
-	 * \param[in] prolong			Prolongation used, needed for matrix dep.
+	 * \param[in] prolongate			Prolongation used, needed for matrix dep.
 	 * 								Restrictions (not used)
 	 * \param[in] Nx				number of steps in x direction
 	 * \param[in] Ny				number of steps in y direction
@@ -73,11 +73,11 @@ public:
 	 * \return						a vector with the values on the restricted
 	 * 								grid
 	 */
-	std::valarray<precision> restriction(const std::valarray<precision>& u,
+	std::valarray<Precision> restriction(const std::valarray<Precision>& u,
 					const Stencil& stencil,
 					const Prolongation& prolong,
 					const size_t Nx, const size_t Ny) const;
-	const std::valarray<precision>& get_I(const size_t, const size_t, const size_t, const size_t, const Stencil&) const
+	const std::valarray<Precision>& get_I(const size_t, const size_t, const size_t, const size_t, const Stencil&) const
 	{
 		return I;	
 	}

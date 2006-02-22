@@ -4,21 +4,21 @@
  */
 namespace mg
 {
-	void lineGS::ninepointaltzebra(std::valarray<precision> &u, const std::valarray<precision> &fv, 
-		                    std::valarray<precision> &rhs, const Stencil &stencil, const size_t Nx, 
+	void lineGS::ninepointaltzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+		                    std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const
 					   
     { 
 				
-		std::valarray<precision> diagR(Nx-1);
-		std::valarray<precision> ndiagR(Nx-2);
-		std::valarray<precision> ndiagL(Nx-2);
+		std::valarray<Precision> diagR(Nx-1);
+		std::valarray<Precision> ndiagR(Nx-2);
+		std::valarray<Precision> ndiagL(Nx-2);
 
-		if(stencil.is_constant() == true )
+		if(stencil.isConstant() == true )
 		{
-			const std::valarray<precision> L = stencil.get_L_c(2,2,Nx,Ny);
-			const std::valarray<int> J_x = stencil.get_J_x(c);
-			const std::valarray<int> J_y = stencil.get_J_y(c);
+			const std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+			const std::valarray<int> J_x = stencil.getJx(c);
+			const std::valarray<int> J_y = stencil.getJy(c);
 			
 			// begin linewise relaxation in x-direction
 			// for each odd line correction of the rhs given by rhs = fv + [1  0  1]^t * u and elimination of the 
@@ -226,9 +226,9 @@ namespace mg
 		
 		else
 		{
-			std::valarray<precision> L = stencil.get_L_c(2,2,Nx,Ny);
-			std::valarray<int> J_x = stencil.get_J_x(c);
-			std::valarray<int> J_y = stencil.get_J_y(c);
+			std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+			std::valarray<int> J_x = stencil.getJx(c);
+			std::valarray<int> J_y = stencil.getJy(c);
 
 			// begin linewise relaxation in x-direction
 			// for each odd line correction of the rhs given by rhs = fv + [1  0  1]^t * u and elimination of the 
@@ -593,7 +593,7 @@ namespace mg
 			
 			else
 			{
-				precision temp=0;
+				Precision temp=0;
 
 				for(size_t k=1; k<Ny; k++)
 				{
