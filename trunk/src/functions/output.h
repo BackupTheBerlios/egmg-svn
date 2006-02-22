@@ -4,10 +4,9 @@
  */
 #ifndef OUTPUT_H_
 #define OUTPUT_H_
+
 #include<valarray>
 #include<vector>
-#include<cmath>
-#include<iostream>
 #include "../general/parameters.h"
 
 namespace mg

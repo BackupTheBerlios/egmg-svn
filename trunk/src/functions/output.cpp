@@ -2,8 +2,12 @@
  * \author Matthias Rettenmeier
  * \brief contains the implementation of the functions output and outputvalue
  */
-#include "output.h"
 #include<iomanip>
+#include<cmath>
+#include<iostream>
+
+#include "output.h"
+
 namespace mg
 {
 

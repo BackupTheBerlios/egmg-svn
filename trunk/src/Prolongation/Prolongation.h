@@ -5,7 +5,7 @@
 #ifndef PROLONGATION_H_
 #define PROLONGATION_H_
 
-#include<valarray>
+#include <valarray>
 #include "../general/parameters.h"
 #include "../general/TransferOperator.h"
 #include "../Stencil/Stencil.h"
@@ -19,23 +19,23 @@ namespace mg
 class Prolongation : public TransferOperator
 {
 public:
-	virtual ~Prolongation() {};
+    virtual ~Prolongation() {};
     
-	/**
-	 * \brief prolongate does an interpolation on the input vector
-	 * 
-	 * \param[in] u			the vector that represents a rectangel to prolongate
-	 * \param[in] stencil	the stencil rep. of the pde needed for matrix dep.
-	 * 						Prolongations.
-	 * \param[in] nx		Number of steps in x direction
-	 * \param[in] ny		Number of steps in y direction
-	 * \return 				a vector representing the prolongated rectangel
-	 */
-	virtual std::valarray<Precision> prolongate(
-		const std::valarray<Precision>& u,
-		const Stencil& stencil,
-		const size_t nx,
-		const size_t ny) const =0;
+    /**
+     * \brief prolongate does an interpolation on the input vector
+     * 
+     * \param[in] u         the vector that represents a rectangel to prolongate
+     * \param[in] stencil   the stencil rep. of the pde needed for matrix dep.
+     *                      Prolongations.
+     * \param[in] nx        Number of steps in x direction
+     * \param[in] ny        Number of steps in y direction
+     * \return              a vector representing the prolongated rectangel
+     */
+    virtual std::valarray<Precision> prolongate(
+        const std::valarray<Precision>& u,
+        const Stencil& stencil,
+        const size_t nx,
+        const size_t ny) const =0;
 };
 
 }
