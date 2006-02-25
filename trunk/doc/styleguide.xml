@@ -15,7 +15,7 @@ werden können.
 </sect2>
 <sect2><title>Dateien</title>
 <para>
-Dateinnamen enthalten nur kleinbuchstaben und heißen wie die Klasse bzw.
+Dateinnamen enthalten nur kleinbuchstaben und hei?en wie die Klasse bzw.
 Funktion die sie enthalten. Für jede Klasse und jede Funktion wird eine
 Headerdatei <filename class="headerfile">*.h</filename> mit dem Deklaration
 und inline Implementierungen, sowie eine Implementierungsdatei
@@ -128,7 +128,8 @@ if (a<3 && c+d<7)
 <sect2><title>Einrücken</title>
 <para>
 Codeblöcke werden mit 4 Leerzeichen eingerückt, wir verwenden keine Tabulatoren.
-Die geschweiften Klammern werden nicht mit eingerückt.
+Die geschweiften Klammern werden nicht mit eingerückt. Als Ausnahme gilt: den
+Codeblock von Namespaces rücken wir nicht ein.
 <programlisting>
 <![CDATA[
 for (size_t i=0; i<u.size(); ++i)
@@ -148,7 +149,7 @@ In jeder Zeile steht nur eine Anweisung.
 Wir verwenden keine Tabulatoren.
 </para>
 <para>
-Um Operatoren werden keine Leerzeichen gesetzt außer um logisches und
+Um Operatoren werden keine Leerzeichen gesetzt au?er um logisches und
 (&amp;&amp;) und um logisches oder (||).
 </para>
 </sect2>
@@ -161,13 +162,15 @@ Zeilen haben eine maximale Länge von 80 Zeichen.
 <para>
 Grundsätzlich gilt: Der Quelltext eklärt sich ohne Kommentare selbst, ansonsten 
 muss er umgeschrieben werden. Für die
-Dokumentation der API benutzen wir Doxygen. D.h. Falls Doxygen über einen
+Dokumentation der API benutzen wir Doxygen. D.h. Falls Doxygen ?ber einen
 fehlenden Komentar Warnungen ausgibt müssen diese noch eingefügt werden.
 </para>
 </sect2>
 <sect2><title>Funktionsdeklarationen/-definitionen</title>
 <para>
-Hier verwenden wir pro Parameter eine eigene Zeile.
+Hier verwenden wir pro Parameter eine eigene Zeile. Als Ausnahme gilt:
+Falls der gesammte Funktionskopf inklusive Einrückung in eine Zeile (80 Zeichen)
+passt, so schreiben wir ihn in eine Zeile. 
 <programlisting>
 <![CDATA[
 void cycle(
@@ -188,6 +191,12 @@ void cycle(
 </sect2>
 </sect1>
 <sect1><title>Formulierung</title>
+<sect2><title>Standart Header</title>
+<para>
+Die in einer Headerdatei benötigten Standart Header binden wir alle als erstes
+ein, auch wenn diese schon von einem anderen Header eingebunden werden.
+</para>
+</sect2>
 <sect2><title>Deklaration von Variablen</title>
 <para>
 Variablen müssen an der Stelle ihrer Deklaration initialisiert werden.

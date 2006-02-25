@@ -1,9 +1,9 @@
-/** \file GS_RB.cpp
+/** \file GSRedBlack.cpp
  * \author <a href="mailto:mail@jirikraus.de">Jiri Kraus</a>
- * \brief Contains the implementaion of the class GS_RB.
- * \see GS_RB.h
+ * \brief Contains the implementaion of the class GSRedBlack.
+ * \see GSRedBlack.h
  */
-#include "GS_RB.h"
+#include "GSRedBlack.h"
 
 namespace mg
 {
