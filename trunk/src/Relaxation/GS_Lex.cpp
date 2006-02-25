@@ -7,7 +7,7 @@
 
 namespace mg
 {
-	void GS_Lex::relax(std::valarray<Precision>& u,
+	void GSLexicographic::relax(std::valarray<Precision>& u,
 					const std::valarray<Precision>& fv,
 					const Stencil& stencil,
 					const size_t Nx,const size_t Ny) const

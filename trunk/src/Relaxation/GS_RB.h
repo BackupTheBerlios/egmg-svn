@@ -16,7 +16,7 @@ namespace mg
  * 
  * GS_RB represents a Gauss Seidel relaxation with red-black ordering.
  */
-class GS_RB : public mg::Relaxation
+class GSRedBlack : public mg::Relaxation
 {
 private:
 	int nreld_;
@@ -29,9 +29,9 @@ public:
 	 * \param[in] nreld		number of pre smothing steps (default 1)
 	 * \param[in] nrelu		number of post smothing steps (default 1)
 	 */
-	GS_RB(const int nreld =1,const int nrelu =1)
+	GSRedBlack(const int nreld =1,const int nrelu =1)
 		: nreld_(nreld), nrelu_(nrelu) {}
-	virtual ~GS_RB() {}
+	virtual ~GSRedBlack() {}
 	/**
 	 * \brief getPreSmoothingSteps() returns the number of pre smothing steps
 	 * \return the number of pre somthing steps

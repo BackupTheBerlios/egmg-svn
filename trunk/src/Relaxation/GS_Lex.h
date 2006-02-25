@@ -20,7 +20,7 @@ namespace mg
  * frequently called function. To use stencil.apply() as inline functions it is
  * given as a template parameter.
  */
-class GS_Lex : public mg::Relaxation
+class GSLexicographic : public mg::Relaxation
 {
 private:
 	int nreld_;
@@ -33,9 +33,9 @@ public:
 	 * \param[in] nreld		number of pre smothing steps (default 1)
 	 * \param[in] nrelu		number of post smothing steps (default 1)
 	 */
-	GS_Lex(const int nreld =1,const int nrelu =1)
+	GSLexicographic(const int nreld =1,const int nrelu =1)
 		: nreld_(nreld), nrelu_(nrelu) {}
-	virtual ~GS_Lex() {}
+	virtual ~GSLexicographic() {}
 	
 	/**
 	 * \brief getPreSmoothingSteps() returns the number of pre smothing steps
