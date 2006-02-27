@@ -19,7 +19,7 @@ namespace mg
 class Prolongation : public TransferOperator
 {
 public:
-    virtual ~Prolongation() {};
+    virtual ~Prolongation() {}
     
     /**
      * \brief prolongate does an interpolation on the input vector
