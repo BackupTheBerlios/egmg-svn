@@ -13,7 +13,7 @@ namespace mg
 {
     void cycle(
         std::valarray<Precision>& u,
-        const std::valarray<Precision>& fv,
+        const std::valarray<Precision>& f,
         Stencil& stencil,
         const Prolongation& prolongation,
         const Restriction& restriction,
@@ -46,11 +46,9 @@ namespace mg
                 throw std::domain_error("u");
             for (size_t j=1; j<=levelgamma; j++)
             {
-                //presomthing
-                for (int i=0; i<relaxation.getPreSmoothingSteps(); i++)
-                    relaxation.relax(u,fv,stencil,nx,ny);
+                relaxation.preSmooth(u,f,stencil,nx,ny);
                 //calculate the residuum
-                std::valarray<Precision> residv=residuum(u,fv,stencil,nx,ny);
+                std::valarray<Precision> residv=residuum(u,f,stencil,nx,ny);
                 //restrict the residuum to the coars grid
                 std::valarray<Precision> coarsResiduum=restriction.restriction
                         (residv,stencil,prolongation,nx,ny);
@@ -74,9 +72,7 @@ namespace mg
                 //we are going to a smaler grid so remove transfer operators
                 stencil.popRestriction();
                 stencil.popProlongation();
-                //postsomthing
-                for(int i=0; i<relaxation.getPostSmoothingSteps(); i++)
-                    relaxation.relax(u,fv,stencil,nx,ny);
+                relaxation.postSmooth(u,f,stencil,nx,ny);
             }
         }
         else
@@ -85,7 +81,7 @@ namespace mg
              * \todo implement a direct solver
              */
             for (int i=0; i<std::pow(2.0,static_cast<int>(l)); i++)
-                relaxation.relax(u,fv,stencil,nx,ny);
+                relaxation.relax(u,f,stencil,nx,ny);
         }
     }
 }

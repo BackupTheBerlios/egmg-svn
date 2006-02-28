@@ -8,43 +8,45 @@
 namespace mg
 {
 
-void GSRedBlack::relax(std::valarray<Precision>& u,
-				const std::valarray<Precision>& fv,
-				const Stencil& stencil,
-				const size_t Nx,const size_t Ny) const
+void GSRedBlack::relax(
+    std::valarray<Precision>& u,
+    const std::valarray<Precision>& f,
+    const Stencil& stencil,
+    const size_t nx,
+    const size_t ny) const
 {
     Precision factor = 1.0;
 	if (stencil.size() < 2)
 	{
 		//first do the red points
-		for (size_t j=1;j<Ny;j+=2)
-			for (size_t i=1;i<Nx;i+=2)
+		for (size_t sy=1;sy<ny;sy+=2)
+			for (size_t sx=1;sx<nx;sx+=2)
 			{
-				factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
-				u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
-							-stencil.apply_c(u,i,j,Nx,Ny));
+				factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny);
+				u[sy*(nx+1)+sx]+=factor*(f[sy*(nx+1)+sx]
+							-stencil.apply(u,C,sx,sy,nx,ny));
 			}
-		for (size_t j=2;j<(Ny-1);j+=2)
-			for (size_t i=2;i<(Nx-1);i+=2)
+		for (size_t sy=2;sy<(ny-1);sy+=2)
+			for (size_t sx=2;sx<(nx-1);sx+=2)
 			{
-				factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
-				u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
-							-stencil.apply_c(u,i,j,Nx,Ny));
+				factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny);
+				u[sy*(nx+1)+sx]+=factor*(f[sy*(nx+1)+sx]
+							-stencil.apply(u,C,sx,sy,nx,ny));
 			}
 		//do black points
-		for (size_t j=1;j<Ny;j+=2)
-			for (size_t i=2;i<(Nx-1);i+=2)
+		for (size_t sy=1;sy<ny;sy+=2)
+			for (size_t sx=2;sx<(nx-1);sx+=2)
 			{
-				factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
-				u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
-							-stencil.apply_c(u,i,j,Nx,Ny));
+				factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny);
+				u[sy*(nx+1)+sx]+=factor*(f[sy*(nx+1)+sx]
+							-stencil.apply(u,C,sx,sy,nx,ny));
 			}
-		for (size_t j=2;j<(Ny-1);j+=2)
-			for (size_t i=1;i<Nx;i+=2)
+		for (size_t sy=2;sy<(ny-1);sy+=2)
+			for (size_t sx=1;sx<nx;sx+=2)
 			{
-				factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
-				u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
-							-stencil.apply_c(u,i,j,Nx,Ny));
+				factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny);
+				u[sy*(nx+1)+sx]+=factor*(f[sy*(nx+1)+sx]
+							-stencil.apply(u,C,sx,sy,nx,ny));
 			}
 	}
 	else
@@ -53,116 +55,93 @@ void GSRedBlack::relax(std::valarray<Precision>& u,
 		 * \todo in case of large stencils a four colour RB is needed
 		 */
 		//first do the red points
-		//south west corner
-		factor = 1.0/stencil.get_center_sw(1,1,Nx,Ny);
-		u[1*(Nx+1)+1]+=factor*(fv[1*(Nx+1)+1]
-					-stencil.apply_sw(u,1,1,Nx,Ny));
-		//red points on south boarder
-		for (size_t i=3;i<(Nx-1);i+=2)
+		factor = 1.0/stencil.getCenter(SW,1,1,nx,ny);
+		u[1*(nx+1)+1]+=factor*(f[1*(nx+1)+1]
+					-stencil.apply(u,SW,1,1,nx,ny));
+		for (size_t sx=3;sx<(nx-1);sx+=2)
 		{
-			factor = 1.0/stencil.get_center_s(i,1,Nx,Ny);
-			u[1*(Nx+1)+i]+=factor*(fv[1*(Nx+1)+i]
-					-stencil.apply_s(u,i,1,Nx,Ny));
+			factor = 1.0/stencil.getCenter(S,sx,1,nx,ny);
+			u[1*(nx+1)+sx]+=factor*(f[1*(nx+1)+sx]
+					-stencil.apply(u,S,sx,1,nx,ny));
 		}
-		//south east corner
-		factor = 1.0/stencil.get_center_se((Nx-1),1,Nx,Ny);
-		u[1*(Nx+1)+(Nx-1)]+=factor*(fv[1*(Nx+1)+(Nx-1)]
-					-stencil.apply_se(u,(Nx-1),1,Nx,Ny));
-		for (size_t j=3;j<(Ny-1);j+=2)
+		factor = 1.0/stencil.getCenter(SE,(nx-1),1,nx,ny);
+		u[1*(nx+1)+(nx-1)]+=factor*(f[1*(nx+1)+(nx-1)]
+					-stencil.apply(u,SE,(nx-1),1,nx,ny));
+		for (size_t sy=3;sy<(ny-1);sy+=2)
 		{
-			//west boarder point in j. line
-			factor = 1.0/stencil.get_center_w(1,j,Nx,Ny);
-			u[j*(Nx+1)+1]+=factor*(fv[j*(Nx+1)+1]
-					-stencil.apply_w(u,1,j,Nx,Ny));
-            
-			for (size_t i=3;i<(Nx-1);i+=2)
+			factor = 1.0/stencil.getCenter(W,1,sy,nx,ny);
+			u[sy*(nx+1)+1]+=factor*(f[sy*(nx+1)+1]
+					-stencil.apply(u,W,1,sy,nx,ny));
+			for (size_t sx=3;sx<(nx-1);sx+=2)
 			{
-				factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
-				u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
-						-stencil.apply_c(u,i,j,Nx,Ny));
+				factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny);
+				u[sy*(nx+1)+sx]+=factor*(f[sy*(nx+1)+sx]
+						-stencil.apply(u,C,sx,sy,nx,ny));
 			}
-			
-			//east boarder point in j. line
-		    factor = 1.0/stencil.get_center_e((Nx-1),j,Nx,Ny);
-			u[j*(Nx+1)+(Nx-1)]+=factor*(fv[j*(Nx+1)+(Nx-1)]
-					-stencil.apply_e(u,(Nx-1),j,Nx,Ny));
-		    
+		    factor = 1.0/stencil.getCenter(E,(nx-1),sy,nx,ny);
+			u[sy*(nx+1)+(nx-1)]+=factor*(f[sy*(nx+1)+(nx-1)]
+					-stencil.apply(u,E,(nx-1),sy,nx,ny));    
 		}
-		
 		//the missing red points in the center
-		for (size_t j=2;j<(Ny-1);j+=2)
+		for (size_t sy=2;sy<(ny-1);sy+=2)
 		{
-			for (size_t i=2;i<(Nx-1);i+=2)
+			for (size_t sx=2;sx<(nx-1);sx+=2)
 			{
-				factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
-				u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
-						-stencil.apply_c(u,i,j,Nx,Ny));
+				factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny);
+				u[sy*(nx+1)+sx]+=factor*(f[sy*(nx+1)+sx]
+						-stencil.apply(u,C,sx,sy,nx,ny));
 			}
 		}
-		//north west corner
-		
-		factor = 1.0/stencil.get_center_nw(1,(Ny-1),Nx,Ny);
-		u[(Nx-1)*(Nx+1)+1]+=factor*(fv[(Nx-1)*(Nx+1)+1]
-					-stencil.apply_nw(u,1,(Ny-1),Nx,Ny));
-		//red points on north boarder
-		for (size_t i=3;i<(Nx-1);i+=2)
+		factor = 1.0/stencil.getCenter(NW,1,(ny-1),nx,ny);
+		u[(nx-1)*(nx+1)+1]+=factor*(f[(nx-1)*(nx+1)+1]
+					-stencil.apply(u,NW,1,(ny-1),nx,ny));
+		for (size_t sx=3;sx<(nx-1);sx+=2)
 		{
-			factor = 1.0/stencil.get_center_n(i,(Nx-1),Nx,Ny);
-			u[(Nx-1)*(Nx+1)+i]+=factor*(fv[(Nx-1)*(Nx+1)+i]
-					-stencil.apply_n(u,i,(Ny-1),Nx,Ny));
+			factor = 1.0/stencil.getCenter(N,sx,(nx-1),nx,ny);
+			u[(nx-1)*(nx+1)+sx]+=factor*(f[(nx-1)*(nx+1)+sx]
+					-stencil.apply(u,N,sx,(ny-1),nx,ny));
 		}
-		
-		//north east corner
-		factor = 1.0/stencil.get_center_ne((Nx-1),(Nx-1),Nx,Ny);
-		u[(Nx-1)*(Nx+1)+(Nx-1)]+=factor*(fv[(Nx-1)*(Nx+1)+(Nx-1)]
-				-stencil.apply_ne(u,(Nx-1),(Ny-1),Nx,Ny));
+		factor = 1.0/stencil.getCenter(NE,(nx-1),(nx-1),nx,ny);
+		u[(nx-1)*(nx+1)+(nx-1)]+=factor*(f[(nx-1)*(nx+1)+(nx-1)]
+				-stencil.apply(u,NE,(nx-1),(ny-1),nx,ny));
 		
 		//do black points
-		//black points on south boarder
-		
-		for (size_t i=2;i<(Nx-1);i+=2)
+		for (size_t sx=2;sx<(nx-1);sx+=2)
 		{
-			 factor = 1.0/stencil.get_center_s(i,1,Nx,Ny);
-				u[1*(Nx+1)+i]+=factor*(fv[1*(Nx+1)+i]
-					-stencil.apply_s(u,i,1,Nx,Ny));
+			 factor = 1.0/stencil.getCenter(S,sx,1,nx,ny);
+				u[1*(nx+1)+sx]+=factor*(f[1*(nx+1)+sx]
+					-stencil.apply(u,S,sx,1,nx,ny));
 		}
-		for (size_t j=2;j<(Ny-1);j+=2)
+		for (size_t sy=2;sy<(ny-1);sy+=2)
 		{
-			//west boarder points
-			factor = 1.0/stencil.get_center_w(1,j,Nx,Ny);
-			u[j*(Nx+1)+1]+=factor*(fv[j*(Nx+1)+1]
-					-stencil.apply_w(u,1,j,Nx,Ny));
-			
-			for (size_t i=3;i<(Nx-1);i+=2)
+			factor = 1.0/stencil.getCenter(W,1,sy,nx,ny);
+			u[sy*(nx+1)+1]+=factor*(f[sy*(nx+1)+1]
+					-stencil.apply(u,W,1,sy,nx,ny));	
+			for (size_t sx=3;sx<(nx-1);sx+=2)
 			{
-				factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
-				u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
-						-stencil.apply_c(u,i,j,Nx,Ny));
+				factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny);
+				u[sy*(nx+1)+sx]+=factor*(f[sy*(nx+1)+sx]
+						-stencil.apply(u,C,sx,sy,nx,ny));
 			}
-			
-			//east boarder points
-			factor = 1.0/stencil.get_center_e((Nx-1),j,Nx,Ny);
-			u[j*(Nx+1)+(Nx-1)]+=factor*(fv[j*(Nx+1)+(Nx-1)]
-					-stencil.apply_e(u,(Nx-1),j,Nx,Ny));
+			factor = 1.0/stencil.getCenter(E,(nx-1),sy,nx,ny);
+			u[sy*(nx+1)+(nx-1)]+=factor*(f[sy*(nx+1)+(nx-1)]
+					-stencil.apply(u,E,(nx-1),sy,nx,ny));
 		}
-		for (size_t j=3;j<(Ny-1);j+=2)
+		for (size_t sy=3;sy<(ny-1);sy+=2)
 		{
-			for (size_t i=2;i<(Nx-1);i+=2)
+			for (size_t sx=2;sx<(nx-1);sx+=2)
 			{
-				factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
-				u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
-						-stencil.apply_c(u,i,j,Nx,Ny));
+				factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny);
+				u[sy*(nx+1)+sx]+=factor*(f[sy*(nx+1)+sx]
+						-stencil.apply(u,C,sx,sy,nx,ny));
 			}
 		}
-		//black points on north boarder
-		for (size_t i=2;i<(Nx-1);i+=2)
+		for (size_t sx=2;sx<(nx-1);sx+=2)
 		{
-			factor = 1.0/stencil.get_center_n(i,(Ny-1),Nx,Ny);
-			u[(Nx-1)*(Nx+1)+i]+=factor*(fv[(Nx-1)*(Nx+1)+i]
-					-stencil.apply_n(u,i,(Ny-1),Nx,Ny));
+			factor = 1.0/stencil.getCenter(N,sx,(ny-1),nx,ny);
+			u[(nx-1)*(nx+1)+sx]+=factor*(f[(nx-1)*(nx+1)+sx]
+					-stencil.apply(u,N,sx,(ny-1),nx,ny));
 		}
 	}
 }
-
 }
-

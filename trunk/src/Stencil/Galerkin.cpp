@@ -42,9 +42,9 @@ virtual const std::valarray<Precision>& Galerkin::getL(
     const size_t,
     const size_t) const
 {
-    if (data_[c].find(Quadruple(i,j,Nx,Ny)) == data_[c].end())
-            data_[c].insert(Quadruple(i,j,Nx,Ny),compute_L(c,i,j,Nx,Ny);
-    return data_[c][Quadruple(i,j,Nx,Ny)];
+    if (data_[C].find(Quadruple(i,j,Nx,Ny)) == data_[C].end())
+            data_[C].insert(Quadruple(i,j,Nx,Ny),compute_L(C,i,j,Nx,Ny);
+    return data_[C][Quadruple(i,j,Nx,Ny)];
 }
 
 }

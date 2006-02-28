@@ -22,9 +22,9 @@ std::valarray<Precision> DeZeeuwInterpolation::prolongate(
     register const size_t nxNew=2*nx;
     register const size_t nyNew=2*ny;
     std::valarray<Precision> result((nxNew+1)*(nyNew+1));
-    std::valarray<int> jx=stencil.getJx(c);
-    std::valarray<int> jy=stencil.getJy(c);
-    std::valarray<Precision> stencilL=stencil.getL(c,0,0,nx,ny);
+    std::valarray<int> jx=stencil.getJx(C);
+    std::valarray<int> jy=stencil.getJy(C);
+    std::valarray<Precision> stencilL=stencil.getL(C,0,0,nx,ny);
     std::valarray<size_t> position(9);
     std::valarray<Precision> ms(9);
     std::valarray<Precision> mt(9);
@@ -70,7 +70,7 @@ std::valarray<Precision> DeZeeuwInterpolation::prolongate(
     for (size_t j=0; j<=nyNew; j+=2)
         for (size_t i=1; i<=nxNew; i+=2)
         {
-            stencilL=stencil.getL(c,i,j,nx,ny);
+            stencilL=stencil.getL(C,i,j,nx,ny);
             symsum=0;
             
             // Divide the stencil defined by stencilL und position into a
@@ -109,7 +109,7 @@ std::valarray<Precision> DeZeeuwInterpolation::prolongate(
     for (size_t j=1; j<=nyNew; j+=2)
         for (size_t i=0; i<=nxNew; i+=2)
         {
-            stencilL=stencil.getL(c,i,j,nx,ny);
+            stencilL=stencil.getL(C,i,j,nx,ny);
             symsum=0;
             
             // Divide the stencil defined by stencilL und position into a
@@ -147,7 +147,7 @@ std::valarray<Precision> DeZeeuwInterpolation::prolongate(
     for (size_t j=1; j<=nyNew; j+=2)
         for (size_t i=1; i<=nxNew; i+=2)
         {
-            stencilL=stencil.getL(c,i,j,nx,ny);
+            stencilL=stencil.getL(C,i,j,nx,ny);
             erg=0;
             scale=-stencilL[0];
             if (position[W]!=0)

@@ -50,7 +50,8 @@ public:
 		std::valarray<Precision>& u,
 		const std::valarray<Precision>& f,
 		const Stencil& stencil,
-		const size_t nx,const size_t ny) const;
+		const size_t nx,
+        const size_t ny) const;
 };
 
 }

@@ -37,12 +37,12 @@ private:
         std::vector<std::valarray<int> > jx(13);
 
         const int jxCenter[]={0,-1,0,1,0,-2,0,2,0,-1,1,1,-1};
-        jx[c].resize(13);
-        jx[c]=std::valarray<int>(jxCenter,13);
+        jx[C].resize(13);
+        jx[C]=std::valarray<int>(jxCenter,13);
 
         int jxBorder[]={0,-1,0,1,0,0,2,0,-1,1,1,-1};
-        jx[w].resize(12);
-        jx[w]=std::valarray<int>(jxBorder,12);
+        jx[W].resize(12);
+        jx[W]=std::valarray<int>(jxBorder,12);
 
         jxBorder[5]=-2;
         jxBorder[6]=2;
@@ -51,8 +51,8 @@ private:
         jxBorder[9]=1;
         jxBorder[10]=1;
         jxBorder[11]=-1;
-        jx[n].resize(12);
-        jx[n]=std::valarray<int>(jxBorder,12);
+        jx[N].resize(12);
+        jx[N]=std::valarray<int>(jxBorder,12);
 
         jxBorder[5]=-2;
         jxBorder[6]=0;
@@ -61,8 +61,8 @@ private:
         jxBorder[9]=1;
         jxBorder[10]=1;
         jxBorder[11]=-1;
-        jx[e].resize(12);
-        jx[e]=std::valarray<int>(jxBorder,12);
+        jx[E].resize(12);
+        jx[E]=std::valarray<int>(jxBorder,12);
 
         jxBorder[5]=-2;
         jxBorder[6]=0;
@@ -71,12 +71,12 @@ private:
         jxBorder[9]=1;
         jxBorder[10]=1;
         jxBorder[11]=-1;
-        jx[s].resize(12);
-        jx[s]=std::valarray<int>(jxBorder,12);
+        jx[S].resize(12);
+        jx[S]=std::valarray<int>(jxBorder,12);
 
         int jxCorner[]={0,-1,0,1,0,2,0,-1,1,1,-1};
-        jx[nw].resize(11);
-        jx[nw]=std::valarray<int>(jxCorner,11);
+        jx[NW].resize(11);
+        jx[NW]=std::valarray<int>(jxCorner,11);
 
         jxCorner[5]=-2;
         jxCorner[6]=0;
@@ -84,8 +84,8 @@ private:
         jxBorder[8]=1;
         jxBorder[9]=1;
         jxBorder[10]=-1;
-        jx[ne].resize(11);
-        jx[ne]=std::valarray<int>(jxCorner,11);
+        jx[NE].resize(11);
+        jx[NE]=std::valarray<int>(jxCorner,11);
 
         jxCorner[5]=-2;
         jxCorner[6]=0;
@@ -93,8 +93,8 @@ private:
         jxBorder[8]=1;
         jxBorder[9]=1;
         jxBorder[10]=-1;
-        jx[se].resize(11);
-        jx[se]=std::valarray<int>(jxCorner,11);
+        jx[SE].resize(11);
+        jx[SE]=std::valarray<int>(jxCorner,11);
 
         jxCorner[5]=0;
         jxCorner[6]=2;
@@ -102,8 +102,8 @@ private:
         jxBorder[8]=1;
         jxBorder[9]=1;
         jxBorder[10]=-1;
-        jx[sw].resize(11);
-        jx[sw]=std::valarray<int>(jxCorner,11);
+        jx[SW].resize(11);
+        jx[SW]=std::valarray<int>(jxCorner,11);
 
         return jx;
     }
@@ -114,13 +114,13 @@ private:
 
         const int jyCenter[]={0,0,1,0,-1,0,2,0,-2,1,1,-1,-1};
 
-        jy[c].resize(13);
-        jy[c]=std::valarray<int>(jyCenter,13);
+        jy[C].resize(13);
+        jy[C]=std::valarray<int>(jyCenter,13);
 
         int jyBorder[]={0,0,1,0,-1,2,0,-2,1,1,-1,-1};
 
-        jy[w].resize(12);
-        jy[w]=std::valarray<int>(jyBorder,12);
+        jy[W].resize(12);
+        jy[W]=std::valarray<int>(jyBorder,12);
 
         jyBorder[5]=jyBorder[6]=0;
         jyBorder[7]=-2;
@@ -128,8 +128,8 @@ private:
         jyBorder[9]=1;
         jyBorder[10]=-1;
         jyBorder[11]=-1;
-        jy[n].resize(12);
-        jy[n]=std::valarray<int>(jyBorder,12);
+        jy[N].resize(12);
+        jy[N]=std::valarray<int>(jyBorder,12);
 
         jyBorder[5]=0;
         jyBorder[6]=2;
@@ -138,8 +138,8 @@ private:
         jyBorder[9]=1;
         jyBorder[10]=-1;
         jyBorder[11]=-1;
-        jy[e].resize(12);
-        jy[e]=std::valarray<int>(jyBorder,12);
+        jy[E].resize(12);
+        jy[E]=std::valarray<int>(jyBorder,12);
 
         jyBorder[5]=0;
         jyBorder[6]=2;
@@ -148,13 +148,13 @@ private:
         jyBorder[9]=1;
         jyBorder[10]=-1;
         jyBorder[11]=-1;
-        jy[s].resize(12);
-        jy[s]=std::valarray<int>(jyBorder,12);
+        jy[S].resize(12);
+        jy[S]=std::valarray<int>(jyBorder,12);
 
         int jyCorner[]={0,0,1,0,-1,0,-2,1,1,-1,-1};
 
-        jy[nw].resize(11);
-        jy[nw]=std::valarray<int>(jyCorner,11);
+        jy[NW].resize(11);
+        jy[NW]=std::valarray<int>(jyCorner,11);
 
         jyCorner[5]=0;
         jyCorner[6]=-2;
@@ -162,8 +162,8 @@ private:
         jyBorder[8]=1;
         jyBorder[9]=-1;
         jyBorder[10]=-1;
-        jy[ne].resize(11);
-        jy[ne]=std::valarray<int>(jyCorner,11);
+        jy[NE].resize(11);
+        jy[NE]=std::valarray<int>(jyCorner,11);
 
         jyCorner[5]=0;
         jyCorner[6]=2;
@@ -171,8 +171,8 @@ private:
         jyBorder[8]=1;
         jyBorder[9]=-1;
         jyBorder[10]=-1;
-        jy[se].resize(11);
-        jy[se]=std::valarray<int>(jyCorner,11);
+        jy[SE].resize(11);
+        jy[SE]=std::valarray<int>(jyCorner,11);
 
         jyCorner[5]=2;
         jyCorner[6]=0;
@@ -180,8 +180,8 @@ private:
         jyBorder[8]=1;
         jyBorder[9]=-1;
         jyBorder[10]=-1;
-        jy[sw].resize(11);
-        jy[sw]=std::valarray<int>(jyCorner,11);
+        jy[SW].resize(11);
+        jy[SW]=std::valarray<int>(jyCorner,11);
 
         return jy;
     }
@@ -212,7 +212,7 @@ public:
     {
         switch(pos)
         {
-        case c: return
+        case C: return
             (6.0*nx*nx*nx*nx+6.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx]
             +1.0*nx*nx*nx*nx*u[sy*(nx+1)+sx-2]
             -(4.0*nx*nx*nx*nx+4.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx-1]
@@ -226,7 +226,7 @@ public:
             +2.0*nx*nx*ny*ny*u[(sy+1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx-1];
-        case w: return
+        case W: return
             (7.0*nx*nx*nx*nx+6.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx]
             -(4.0*nx*nx*nx*nx+4.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx-1]
             -(4.0*nx*nx*nx*nx+4.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx+1]
@@ -239,7 +239,7 @@ public:
             +2.0*nx*nx*ny*ny*u[(sy+1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx-1];
-        case nw: return
+        case NW: return
              (7.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx]
             -(4.0*nx*nx*nx*nx+4.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx-1]
             -(4.0*nx*nx*nx*nx+4.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx+1]
@@ -251,7 +251,7 @@ public:
             +2.0*nx*nx*ny*ny*u[(sy+1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx-1];
-        case n: return
+        case N: return
             (6.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx]
             +1.0*nx*nx*nx*nx*u[sy*(nx+1)+sx-2]
             -(4.0*nx*nx*nx*nx+4.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx-1]
@@ -264,7 +264,7 @@ public:
             +2.0*nx*nx*ny*ny*u[(sy+1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx-1];
-        case e: return
+        case E: return
             (7.0*nx*nx*nx*nx+6.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx]
             +1.0*nx*nx*nx*nx*u[sy*(nx+1)+sx-2]
             -(4.0*nx*nx*nx*nx+4.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx-1]
@@ -277,7 +277,7 @@ public:
             +2.0*nx*nx*ny*ny*u[(sy+1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx-1];
-        case ne: return
+        case NE: return
             (7.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx]
             +1.0*nx*nx*nx*nx*u[sy*(nx+1)+sx-2]
             -(4.0*nx*nx*nx*nx+4.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx-1]
@@ -289,7 +289,7 @@ public:
             +2.0*nx*nx*ny*ny*u[(sy+1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx-1];
-        case se: return
+        case SE: return
             (7.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx]
             +1.0*nx*nx*nx*nx*u[sy*(nx+1)+sx-2]
             -(4.0*nx*nx*nx*nx+4.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx-1]
@@ -301,7 +301,7 @@ public:
             +2.0*nx*nx*ny*ny*u[(sy+1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx-1];
-        case s: return
+        case S: return
             (6.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx]
             +1.0*nx*nx*nx*nx*u[sy*(nx+1)+sx-2]
             -(4.0*nx*nx*nx*nx+4.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx-1]
@@ -314,7 +314,7 @@ public:
             +2.0*nx*nx*ny*ny*u[(sy+1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx-1];
-        case sw: return
+        case SW: return
             (7.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx]
             -(4.0*nx*nx*nx*nx+4.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx-1]
             -(4.0*nx*nx*nx*nx+4.0*nx*nx*ny*ny)*u[sy*(nx+1)+sx+1]
@@ -338,18 +338,18 @@ public:
     {
         switch (pos)
         {
-        case c:
+        case C:
             return (6.0*nx*nx*nx*nx+6.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny);
-        case w:
-        case e:
+        case W:
+        case E:
             return (7.0*nx*nx*nx*nx+6.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny);
-        case n:
-        case s:
+        case N:
+        case S:
             return (6.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny);   
-        case nw:
-        case sw:
-        case ne:
-        case se:
+        case NW:
+        case SW:
+        case NE:
+        case SE:
             return (7.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny);   
         }
     }
@@ -392,7 +392,7 @@ public:
     {
         switch (pos)
         {
-        case c:
+        case C:
             lCenter_[0]=6.0*nx*nx*nx*nx+6.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny;
             lCenter_[1]=lCenter_[3]=-4.0*nx*nx*nx*nx-4.0*nx*nx*ny*ny;
             lCenter_[5]=lCenter_[7]=+1.0*nx*nx*nx*nx;
@@ -400,7 +400,7 @@ public:
             lCenter_[6]=lCenter_[8]=+1.0*ny*ny*ny*ny;
             lCenter_[9]=lCenter_[10]=lCenter_[11]=lCenter_[12]=+2.0*nx*nx*ny*ny;
             return lCenter_;
-        case w:
+        case W:
             lBorder_[0]=7.0*nx*nx*nx*nx+6.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny;
             lBorder_[1]=lBorder_[3]=-4.0*nx*nx*nx*nx-4.0*nx*nx*ny*ny;
             lBorder_[2]=lBorder_[4]=-4.0*ny*ny*ny*ny-4.0*nx*nx*ny*ny;
@@ -409,7 +409,7 @@ public:
             lBorder_[8]=lBorder_[9]=+2.0*nx*nx*ny*ny;
             lBorder_[10]=lBorder_[11]=+2.0*nx*nx*ny*ny;
             return lBorder_;
-        case nw:
+        case NW:
             lCorner_[0]=7.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny;
             lCorner_[1]=lCorner_[3]=-4.0*nx*nx*nx*nx-4.0*nx*nx*ny*ny;
             lCorner_[2]=lCorner_[4]=-4.0*ny*ny*ny*ny-4.0*nx*nx*ny*ny;
@@ -418,7 +418,7 @@ public:
             lCorner_[7]=lCorner_[8]=+2.0*nx*nx*ny*ny;
             lCorner_[9]=lCorner_[10]=+2.0*nx*nx*ny*ny;
             return lCorner_;
-        case n:
+        case N:
             lBorder_[0]=6.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny;
             lBorder_[1]=lBorder_[3]=-4.0*nx*nx*nx*nx-4.0*nx*nx*ny*ny;
             lBorder_[2]=lBorder_[4]=-4.0*ny*ny*ny*ny-4.0*nx*nx*ny*ny;
@@ -427,7 +427,7 @@ public:
             lBorder_[8]=lBorder_[9]=+2.0*nx*nx*ny*ny;
             lBorder_[10]=lBorder_[11]=+2.0*nx*nx*ny*ny;
             return lBorder_;
-        case ne:
+        case NE:
             lCorner_[0]=7.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny;
             lCorner_[1]=lCorner_[3]=-4.0*nx*nx*nx*nx-4.0*nx*nx*ny*ny;
             lCorner_[2]=lCorner_[4]=-4.0*ny*ny*ny*ny-4.0*nx*nx*ny*ny;
@@ -436,7 +436,7 @@ public:
             lCorner_[7]=lCorner_[8]=+2.0*nx*nx*ny*ny;
             lCorner_[9]=lCorner_[10]=+2.0*nx*nx*ny*ny;
             return lCorner_;
-        case e:
+        case E:
             lBorder_[0]=7.0*nx*nx*nx*nx+6.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny;
             lBorder_[1]=lBorder_[3]=-4.0*nx*nx*nx*nx-4.0*nx*nx*ny*ny;
             lBorder_[2]=lBorder_[4]=-4.0*ny*ny*ny*ny-4.0*nx*nx*ny*ny;
@@ -445,7 +445,7 @@ public:
             lBorder_[8]=lBorder_[9]=+2.0*nx*nx*ny*ny;
             lBorder_[10]=lBorder_[11]=+2.0*nx*nx*ny*ny;
             return lBorder_;
-        case se:
+        case SE:
             lCorner_[0]=7.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny;
             lCorner_[1]=lCorner_[3]=-4.0*nx*nx*nx*nx-4.0*nx*nx*ny*ny;
             lCorner_[2]=lCorner_[4]=-4.0*ny*ny*ny*ny-4.0*nx*nx*ny*ny;
@@ -454,7 +454,7 @@ public:
             lCorner_[7]=lCorner_[8]=+2.0*nx*nx*ny*ny;
             lCorner_[9]=lCorner_[10]=+2.0*nx*nx*ny*ny;
             return lCorner_;
-        case s:
+        case S:
             lBorder_[0]=7.0*nx*nx*nx*nx+6.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny;
             lBorder_[1]=lBorder_[3]=-4.0*nx*nx*nx*nx-4.0*nx*nx*ny*ny;
             lBorder_[2]=lBorder_[4]=-4.0*ny*ny*ny*ny-4.0*nx*nx*ny*ny;
@@ -463,7 +463,7 @@ public:
             lBorder_[8]=lBorder_[9]=+2.0*nx*nx*ny*ny;
             lBorder_[10]=lBorder_[11]=+2.0*nx*nx*ny*ny;
             return lBorder_;
-        case sw:
+        case SW:
             lCorner_[0]=7.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny;
             lCorner_[1]=lCorner_[3]=-4.0*nx*nx*nx*nx-4.0*nx*nx*ny*ny;
             lCorner_[2]=lCorner_[4]=-4.0*ny*ny*ny*ny-4.0*nx*nx*ny*ny;

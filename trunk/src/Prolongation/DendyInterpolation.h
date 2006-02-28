@@ -12,6 +12,7 @@
 #define DENDY_INTERPOLATION_H_
 
 #include "Prolongation.h"
+#include "../general/parameters.h"
 #include "../Stencil/Stencil.h"
 
 namespace mg
@@ -48,16 +49,6 @@ private:
     DendyInterpolation(const DendyInterpolation& rhs);
     DendyInterpolation& operator=(const DendyInterpolation& rhs);
 
-    static const size_t SW=0;
-    static const size_t S=1;
-    static const size_t SE=2;
-    static const size_t W=3;
-    static const size_t C=4;
-    static const size_t E=5;
-    static const size_t NW=6;
-    static const size_t N=7;
-    static const size_t NE=8;
-
 public:                                                              
     DendyInterpolation() : t_(9), jx_(initJx_()), jy_(initJy_()) {}
 
@@ -85,8 +76,8 @@ public:
         const size_t ny,
         const Stencil& stencil)
     {
-        std::valarray<int> jx=stencil.getJx(c);
-        std::valarray<int> jy=stencil.getJy(c);
+        std::valarray<int> jx=stencil.getJx(C);
+        std::valarray<int> jy=stencil.getJy(C);
         std::valarray<size_t> position(9);
 
         for (size_t i=0; i<jx.size(); ++i)
@@ -101,7 +92,7 @@ public:
         t_[0]=1.0;
 
         // W
-        std::valarray<Precision> stencilL=stencil.getL(c,sx-1,sy,nx,ny);
+        std::valarray<Precision> stencilL=stencil.getL(C,sx-1,sy,nx,ny);
         scale=-stencilL[0];
         weight2=0;
         if (position[S]!=0)
@@ -117,7 +108,7 @@ public:
         t_[1]=weight2/scale; 
 
         // N
-        stencilL=stencil.getL(c,sx,sy+1,nx,ny);
+        stencilL=stencil.getL(C,sx,sy+1,nx,ny);
         scale=-stencilL[0];
         weight1=0;
         if (position[W]!=0)
@@ -133,7 +124,7 @@ public:
         t_[2]=weight1/scale;
 
         // E
-        stencilL=stencil.getL(c,sx+1,sy,nx,ny);
+        stencilL=stencil.getL(C,sx+1,sy,nx,ny);
         scale=-stencilL[0];
         weight1=0;
         if (position[S]!=0)
@@ -149,7 +140,7 @@ public:
         t_[3]=weight1/scale;      
 
         // S
-        stencilL=stencil.getL(c,sx,sy-1,nx,ny);
+        stencilL=stencil.getL(C,sx,sy-1,nx,ny);
         scale=-stencilL[0];
         weight2=0;
         if (position[W]!=0)
@@ -165,7 +156,7 @@ public:
         t_[4]=weight2/scale;
 
         // NW
-        stencilL=stencil.getL(c,sx-1,sy+1,nx,ny);
+        stencilL=stencil.getL(C,sx-1,sy+1,nx,ny);
         scale=-stencilL[0];
         erg=0;
         if (position[E]!=0)
@@ -177,7 +168,7 @@ public:
         t_[5]=erg/scale;
 
         // NE
-        stencilL=stencil.getL(c,sx+1,sy+1,nx,ny);
+        stencilL=stencil.getL(C,sx+1,sy+1,nx,ny);
         scale=-stencilL[0];
         erg=0;
         if (position[W]!=0)
@@ -189,7 +180,7 @@ public:
         t_[6]=erg/scale;
 
         // SE
-        stencilL=stencil.getL(c,sx+1,sy-1,nx,ny);
+        stencilL=stencil.getL(C,sx+1,sy-1,nx,ny);
         scale=-stencilL[0];
         erg=0;
         if (position[W]!=0)
@@ -201,7 +192,7 @@ public:
         t_[7]=erg/scale;
 
         // SW
-        stencilL=stencil.getL(c,sx-1,sy-1,nx,ny);
+        stencilL=stencil.getL(C,sx-1,sy-1,nx,ny);
         scale=-stencilL[0];
         erg=0;
         if (position[E]!=0)

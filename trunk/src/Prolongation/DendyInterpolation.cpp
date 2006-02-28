@@ -17,8 +17,8 @@ std::valarray<Precision> DendyInterpolation::prolongate(
     const size_t nxNew=2*nx;
     const size_t nyNew=2*ny;
     std::valarray<Precision> result((nxNew+1)*(nyNew+1));
-    std::valarray<int> jx=stencil.getJx(c);
-    std::valarray<int> jy=stencil.getJy(c);
+    std::valarray<int> jx=stencil.getJx(C);
+    std::valarray<int> jy=stencil.getJy(C);
     std::valarray<Precision> stencilL=std::valarray<Precision>();
     std::valarray<size_t> position(9);
     // position[0]=No. of the sw-element of the stencil
@@ -48,7 +48,7 @@ std::valarray<Precision> DendyInterpolation::prolongate(
     for (size_t j=0; j<=nyNew; j+=2)
         for (size_t i=1; i<=nxNew; i+=2)
         {
-            stencilL=stencil.getL(c,i,j,nx,ny);
+            stencilL=stencil.getL(C,i,j,nx,ny);
             scale=-stencilL[0];
             weight1=0;
             weight2=0;
@@ -75,7 +75,7 @@ std::valarray<Precision> DendyInterpolation::prolongate(
     for (size_t j=1; j<=nyNew; j+=2)
         for (size_t i=0; i<=nxNew; i+=2)
         {
-            stencilL=stencil.getL(c,i,j,nx,ny);
+            stencilL=stencil.getL(C,i,j,nx,ny);
             scale=-stencilL[0];
             weight1=0;
             weight2=0;
@@ -102,7 +102,7 @@ std::valarray<Precision> DendyInterpolation::prolongate(
     for (size_t j=1; j<=nyNew; j+=2)
         for (size_t i=1; i<=nxNew; i+=2)
         {
-            stencilL=stencil.getL(c,i,j,nx,ny);
+            stencilL=stencil.getL(C,i,j,nx,ny);
             erg=0;
             scale=-stencilL[0];
             if (position[W]!=0)

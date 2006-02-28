@@ -40,51 +40,51 @@ private:
 
         const int jxCenter[]={0,-1,0,1,0,-2,0,2,0};
 
-        jx[c].resize(9);
-        jx[c]=std::valarray<int>(jxCenter,9);
+        jx[C].resize(9);
+        jx[C]=std::valarray<int>(jxCenter,9);
 
         int jxBorder[]={0,-1,0,1,0,0,2,0};
 
-        jx[w].resize(8);
-        jx[w]=std::valarray<int>(jxBorder,8);
+        jx[W].resize(8);
+        jx[W]=std::valarray<int>(jxBorder,8);
 
         jxBorder[5]=-2;
         jxBorder[6]=2;
         jxBorder[7]=0;
-        jx[n].resize(8);
-        jx[n]=std::valarray<int>(jxBorder,8);
+        jx[N].resize(8);
+        jx[N]=std::valarray<int>(jxBorder,8);
 
         jxBorder[5]=-2;
         jxBorder[6]=0;
         jxBorder[7]=0;
-        jx[e].resize(8);
-        jx[e]=std::valarray<int>(jxBorder,8);
+        jx[E].resize(8);
+        jx[E]=std::valarray<int>(jxBorder,8);
 
         jxBorder[5]=-2;
         jxBorder[6]=0;
         jxBorder[7]=2;
-        jx[s].resize(8);
-        jx[s]=std::valarray<int>(jxBorder,8);
+        jx[S].resize(8);
+        jx[S]=std::valarray<int>(jxBorder,8);
 
         int jxCorner[]={0,-1,0,1,0,2,0};
 
-        jx[nw].resize(7);
-        jx[nw]=std::valarray<int>(jxCorner,7);
+        jx[NW].resize(7);
+        jx[NW]=std::valarray<int>(jxCorner,7);
 
         jxCorner[5]=-2;
         jxCorner[6]=0;
-        jx[ne].resize(7);
-        jx[ne]=std::valarray<int>(jxCorner,7);
+        jx[NE].resize(7);
+        jx[NE]=std::valarray<int>(jxCorner,7);
 
         jxCorner[5]=-2;
         jxCorner[6]=0;
-        jx[se].resize(7);
-        jx[se]=std::valarray<int>(jxCorner,7);
+        jx[SE].resize(7);
+        jx[SE]=std::valarray<int>(jxCorner,7);
 
         jxCorner[5]=0;
         jxCorner[6]=2;
-        jx[sw].resize(7);
-        jx[sw]=std::valarray<int>(jxCorner,7);
+        jx[SW].resize(7);
+        jx[SW]=std::valarray<int>(jxCorner,7);
 
         return jx;
     }
@@ -95,50 +95,50 @@ private:
 
         const int jyCenter[]={0,0,1,0,-1,0,2,0,-2};
 
-        jy[c].resize(9);
-        jy[c]=std::valarray<int>(jyCenter,9);
+        jy[C].resize(9);
+        jy[C]=std::valarray<int>(jyCenter,9);
 
         int jyBorder[]={0,0,1,0,-1,2,0,-2};
 
-        jy[w].resize(8);
-        jy[w]=std::valarray<int>(jyBorder,8);
+        jy[W].resize(8);
+        jy[W]=std::valarray<int>(jyBorder,8);
 
         jyBorder[5]=jyBorder[6]=0;
         jyBorder[7]=-2;
-        jy[n].resize(8);
-        jy[n]=std::valarray<int>(jyBorder,8);
+        jy[N].resize(8);
+        jy[N]=std::valarray<int>(jyBorder,8);
 
         jyBorder[5]=0;
         jyBorder[6]=2;
         jyBorder[7]=-2;
-        jy[e].resize(8);
-        jy[e]=std::valarray<int>(jyBorder,8);
+        jy[E].resize(8);
+        jy[E]=std::valarray<int>(jyBorder,8);
 
         jyBorder[5]=0;
         jyBorder[6]=2;
         jyBorder[7]=0;
-        jy[s].resize(8);
-        jy[s]=std::valarray<int>(jyBorder,8);
+        jy[S].resize(8);
+        jy[S]=std::valarray<int>(jyBorder,8);
 
         int jyCorner[]={0,0,1,0,-1,0,-2};
 
-        jy[nw].resize(7);
-        jy[nw]=std::valarray<int>(jyCorner,7);
+        jy[NW].resize(7);
+        jy[NW]=std::valarray<int>(jyCorner,7);
 
         jyCorner[5]=0;
         jyCorner[6]=-2;
-        jy[ne].resize(7);
-        jy[ne]=std::valarray<int>(jyCorner,7);
+        jy[NE].resize(7);
+        jy[NE]=std::valarray<int>(jyCorner,7);
 
         jyCorner[5]=0;
         jyCorner[6]=2;
-        jy[se].resize(7);
-        jy[se]=std::valarray<int>(jyCorner,7);
+        jy[SE].resize(7);
+        jy[SE]=std::valarray<int>(jyCorner,7);
 
         jyCorner[5]=2;
         jyCorner[6]=0;
-        jy[sw].resize(7);
-        jy[sw]=std::valarray<int>(jyCorner,7);
+        jy[SW].resize(7);
+        jy[SW]=std::valarray<int>(jyCorner,7);
 
         return jy;
     }
@@ -173,7 +173,7 @@ public:
     {
         switch(position)
         {
-        case c:
+        case C:
             return 
                  (30.0*ax_*nx*nx/12.0+30.0*ay_*ny*ny/12.0)*u[sy*(nx+1)+sx]
                 +1.0*ax_*nx*nx/12.0*u[sy*(nx+1)+sx-2]
@@ -204,7 +204,7 @@ public:
 
         switch(position)
         {
-        case c:
+        case C:
             return 30.0*ax_*nx*nx/12.0+30.0*ay_*ny*ny/12.0;
         default:
             return 2.0*ax_*nx*nx+2.0*ay_*ny*ny;
@@ -249,26 +249,26 @@ public:
     {
         switch (position)
         {
-        case c:
+        case C:
             lCenter_[0] =30.0*ax_*nx*nx/12.0+30.0*ay_*ny*ny/12.0;
             lCenter_[1]=lCenter_[3]=-16.0*ax_*nx*nx/12.0;
             lCenter_[5]=lCenter_[7]=+1.0*ax_*nx*nx/12.0;
             lCenter_[2]=lCenter_[4]=-16.0*ay_*ny*ny/12.0;
             lCenter_[6]=lCenter_[8]=+1.0*ay_*ny*ny/12.0;
             return lCenter_;
-        case n:
-        case e:
-        case s:
-        case w:
+        case N:
+        case E:
+        case S:
+        case W:
             lBorder_[0]=2.0*ax_*nx*nx+2.0*ay_*ny*ny;
             lBorder_[1]=lBorder_[3]=-1.0*ax_*nx*nx;
             lBorder_[2]=lBorder_[4]=-1.0*ay_*ny*ny;
             lBorder_[5]=lBorder_[6]=lBorder_[7]=0.0;
             return lBorder_;
-        case nw:
-        case ne:
-        case se:
-        case sw:
+        case NW:
+        case NE:
+        case SE:
+        case SW:
             lCorner_[0]=2.0*ax_*nx*nx+2.0*ay_*ny*ny;
             lCorner_[1]=lCorner_[3]=-1.0*ax_*nx*nx;
             lCorner_[2]=lCorner_[4]=-1.0*ay_*ny*ny;

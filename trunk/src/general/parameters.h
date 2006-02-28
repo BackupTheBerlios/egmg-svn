@@ -24,26 +24,43 @@ namespace mg
 	 * The meaning of the constants are:
 	 * <table border="0">
 	 * <tr>
-	 * <td>c</td><td>center</td>
+	 * <td>C</td><td>center</td>
 	 * </tr><tr>
-	 * <td>w</td><td>west</td>
+	 * <td>W</td><td>west</td>
 	 * </tr><tr>
-	 * <td>nw</td><td>north west</td>
+	 * <td>NW</td><td>north west</td>
 	 * </tr><tr>
-	 * <td>n</td><td>north</td>
+	 * <td>N</td><td>north</td>
 	 * </tr><tr>
-	 * <td>ne</td><td>north east</td>
+	 * <td>NE</td><td>north east</td>
 	 * </tr><tr>
-	 * <td>e</td><td>east</td>
+	 * <td>E</td><td>east</td>
 	 * </tr><tr>
-	 * <td>se</td><td>south east</td>
+	 * <td>SE</td><td>south east</td>
 	 * </tr><tr>
-	 * <td>s</td><td>south</td>
+	 * <td>S</td><td>south</td>
 	 * </tr><tr>
-	 * <td>sw</td><td>south west</td>
+	 * <td>SW</td><td>south west</td>
 	 * </table>
 	 */
-	enum Position{c=0,w=1,n=2,e=3,s=4,nw=5,ne=6,se=7,sw=8};
+	enum Position{C=0,W=1,N=2,E=3,S=4,NW=5,NE=6,SE=7,SW=8};
+    
+    /**
+     * \enum mg::Direction
+     * \brief Direction describes direction of line relaxation
+     * 
+     * The meaning of the constants are:
+     * <table border="0">
+     * <tr>
+     * <td>ALTDIR</td><td>alternating directions</td>
+     * </tr><tr>
+     * <td>XDIR</td><td>x direction</td>
+     * </tr><tr>
+     * <td>YDIR</td><td>y direction</td>
+     * </tr><tr>
+     * </table>
+     */
+    enum Direction{ALTDIR=0,XDIR=1,YDIR=2};
 	
 	/**
 	 * \brief a function pointer to a function \f$ f: K^2 \rightarrow K \f$

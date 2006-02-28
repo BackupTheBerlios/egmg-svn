@@ -4,7 +4,7 @@
  */
 namespace mg
 {
-	void lineGS::ninepointaltzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+	void ZebraLineGS::ninepointaltzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
 		                    std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const
 					   
@@ -17,8 +17,8 @@ namespace mg
 		if(stencil.isConstant() == true )
 		{
 			const std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
-			const std::valarray<int> J_x = stencil.getJx(c);
-			const std::valarray<int> J_y = stencil.getJy(c);
+			const std::valarray<int> J_x = stencil.getJx(C);
+			const std::valarray<int> J_y = stencil.getJy(C);
 			
 			// begin linewise relaxation in x-direction
 			// for each odd line correction of the rhs given by rhs = fv + [1  0  1]^t * u and elimination of the 
@@ -227,8 +227,8 @@ namespace mg
 		else
 		{
 			std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
-			std::valarray<int> J_x = stencil.getJx(c);
-			std::valarray<int> J_y = stencil.getJy(c);
+			std::valarray<int> J_x = stencil.getJx(C);
+			std::valarray<int> J_y = stencil.getJy(C);
 
 			// begin linewise relaxation in x-direction
 			// for each odd line correction of the rhs given by rhs = fv + [1  0  1]^t * u and elimination of the 
@@ -242,8 +242,8 @@ namespace mg
 			{
 				L = stencil.get_L_sw(1,1,Nx,Ny);
 					
-				diagR[0] = L[c];
-				ndiagR[0] = L[e];
+				diagR[0] = L[C];
+				ndiagR[0] = L[E];
 
 				rhs[1+Nx+1] = fv[1+Nx+1] - L[2] * u[1+(1+J_y[2])*(Nx+1)] - L[4] * u[1+(1+J_y[4])*(Nx+1)] 
 						- L[1] * u[Nx+1];
@@ -255,9 +255,9 @@ namespace mg
 				for(size_t j=2; j<Nx-1; j++)
 				{
 					L = stencil.get_L_s(j,1,Nx,Ny);
-					diagR[j-1] = L[c];
-					ndiagR[j-1] = L[e];
-					ndiagL[j-2] = L[w];
+					diagR[j-1] = L[C];
+					ndiagR[j-1] = L[E];
+					ndiagL[j-2] = L[W];
 					rhs[j+Nx+1] = fv[j+Nx+1] - L[2] * u[j+(1+J_y[2])*(Nx+1)] - L[4] * u[j+(1+J_y[4])*(Nx+1)];
 					for(size_t sum=5; sum<L.size(); sum++)
 					{
@@ -267,8 +267,8 @@ namespace mg
 
 				L = stencil.get_L_se(Nx-1,1,Nx,Ny);
 				
-				diagR[Nx-2] = L[c];
-				ndiagL[Nx-3] = L[w];
+				diagR[Nx-2] = L[C];
+				ndiagL[Nx-3] = L[W];
 					
 				rhs[(Nx-1)+(Nx+1)] = fv[Nx-1+(Nx+1)] - L[2] * u[Nx-1+(1+J_y[2])*(Nx+1)] - L[4] * u[Nx-1+(1+J_y[4])*(Nx+1)] 
 						- L[3] * u[Nx+(Nx+1)];
@@ -603,8 +603,8 @@ namespace mg
 					{
 						temp -= L[sum] * u[1+J_x[sum]+(k+J_y[sum])*(Nx+1)];
 					}
-					u[1+k*(Nx+1)] = 1/L[c] * ( fv[1+k*(Nx+1)] - L[w] * u[1+J_x[w]+k*(Nx+1)] - L[e] * u[1+J_x[e]+k*(Nx+1)] 
-						          - L[n] * u[1+(k+J_y[n])*(Nx+1)] - L[s] * u[1+(k+J_y[s])*(Nx+1)] - temp );
+					u[1+k*(Nx+1)] = 1/L[C] * ( fv[1+k*(Nx+1)] - L[W] * u[1+J_x[W]+k*(Nx+1)] - L[E] * u[1+J_x[E]+k*(Nx+1)] 
+						          - L[N] * u[1+(k+J_y[N])*(Nx+1)] - L[S] * u[1+(k+J_y[S])*(Nx+1)] - temp );
 				}
 			}
 		 }

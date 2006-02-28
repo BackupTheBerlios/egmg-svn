@@ -20,54 +20,54 @@ namespace mg
                 for (size_t i=1; i<nx; ++i)
                 {
                     Precision temp_res=
-                            fv[j*(nx+1)+i]-stencil.apply(u,c,i,j,nx,ny);
+                            fv[j*(nx+1)+i]-stencil.apply(u,C,i,j,nx,ny);
                     result+=temp_res*temp_res;
                 }
         else
         {
             //south west corner
-            Precision temp_res=fv[1*(nx+1)+1]-stencil.apply(u,sw,1,1,nx,ny);
+            Precision temp_res=fv[1*(nx+1)+1]-stencil.apply(u,SW,1,1,nx,ny);
             result+=temp_res*temp_res;
             //south east corner
-            temp_res=fv[1*(nx+1)+(nx-1)]-stencil.apply(u,se,nx-1,1,nx,ny);
+            temp_res=fv[1*(nx+1)+(nx-1)]-stencil.apply(u,SE,nx-1,1,nx,ny);
             result+=temp_res*temp_res;
             //north west corner
-            temp_res=fv[(nx-1)*(nx+1)+1]-stencil.apply(u,nw,1,ny-1,nx,ny);
+            temp_res=fv[(nx-1)*(nx+1)+1]-stencil.apply(u,NW,1,ny-1,nx,ny);
             result+=temp_res*temp_res;
             //north east corner
             temp_res=
                     fv[(nx-1)*(nx+1)+(nx-1)]
-                    -stencil.apply(u,ne,nx-1,ny-1,nx,ny);
+                    -stencil.apply(u,NE,nx-1,ny-1,nx,ny);
             result+=temp_res*temp_res;
             //south boarder
             for (size_t i=2; i<nx-1; i++)
             {
-                temp_res=fv[1*(nx+1)+i]-stencil.apply(u,s,i,1,nx,ny);
+                temp_res=fv[1*(nx+1)+i]-stencil.apply(u,S,i,1,nx,ny);
                 result+=temp_res*temp_res;
             }
             //north boarder
             for (size_t i=2; i<nx-1; i++)
             {
-                temp_res=fv[(nx-1)*(nx+1)+i]-stencil.apply(u,n,i,ny-1,nx,ny);
+                temp_res=fv[(nx-1)*(nx+1)+i]-stencil.apply(u,N,i,ny-1,nx,ny);
                 result+=temp_res*temp_res;
             }
             //west boarder
             for (size_t j=2; j<ny-1; j++)
             {
-                temp_res=fv[j*(nx+1)+1]-stencil.apply(u,w,1,j,nx,ny);
+                temp_res=fv[j*(nx+1)+1]-stencil.apply(u,W,1,j,nx,ny);
                 result+=temp_res*temp_res;
             }
             //east boarder
             for (size_t j=2; j<ny-1; j++)
             {
-                temp_res=fv[j*(nx+1)+(nx-1)]-stencil.apply(u,e,nx-1,j,nx,ny);
+                temp_res=fv[j*(nx+1)+(nx-1)]-stencil.apply(u,E,nx-1,j,nx,ny);
                 result+=temp_res*temp_res;
             }
             //the center
             for (size_t j=2; j<ny-1; j++)
                 for (size_t i=2; i<nx-1; i++)
                 {
-                    temp_res=fv[j*(nx+1)+i]-stencil.apply(u,c,i,j,nx,ny);
+                    temp_res=fv[j*(nx+1)+i]-stencil.apply(u,C,i,j,nx,ny);
                     result+=temp_res*temp_res;
                 }
         }

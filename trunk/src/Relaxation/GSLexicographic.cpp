@@ -1,79 +1,74 @@
-/** \file GS_Lex.cpp
+/** \file GSLexicographic.cpp
  * \author <a href="mailto:mail@jirikraus.de">Jiri Kraus</a>
- * \brief Contains the implementaion of the class GS_Lex.
- * \see GS_Lex.h
+ * \brief Contains the implementaion of the class GSLexicographic.
+ * \see GSLexicographic.h
  */
-#include "GS_Lex.h"
+ 
+#include<valarray>
+#include "GSLexicographic.h"
 
 namespace mg
 {
-	void GSLexicographic::relax(std::valarray<Precision>& u,
-					const std::valarray<Precision>& fv,
-					const Stencil& stencil,
-					const size_t Nx,const size_t Ny) const
+void GSLexicographic::relax(
+    std::valarray<Precision>& u,
+    const std::valarray<Precision>& f,
+    const Stencil& stencil,
+    const size_t nx,
+    const size_t ny) const
+{
+	Precision factor = 1.0;
+	if (stencil.size() < 2)
 	{
-		Precision factor = 1.0;
-		if (stencil.size() < 2)
-		{
-			for (size_t j=1;j<Ny;j++)
-				for (size_t i=1;i<Nx;i++)
-				{
-					factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
-					u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
-							-stencil.apply_c(u,i,j,Nx,Ny));
-				}
-		}
-		else
-		{
-			//south west corner
-			factor = 1.0/stencil.get_center_sw(1,1,Nx,Ny);
-			u[1*(Nx+1)+1]+=factor*(fv[1*(Nx+1)+1]
-					-stencil.apply_sw(u,1,1,Nx,Ny));
-			//south boarder
-			for (size_t i=2;i<(Nx-1);i++)
+		for (size_t sy=1;sy<ny;sy++)
+			for (size_t sx=1;sx<nx;sx++)
 			{
-				factor = 1.0/stencil.get_center_s(i,1,Nx,Ny);
-				u[1*(Nx+1)+i]+=factor*(fv[1*(Nx+1)+i]
-					-stencil.apply_s(u,i,1,Nx,Ny));
+				factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny);
+				u[sy*(nx+1)+sx]+=factor*(f[sy*(nx+1)+sx]
+						-stencil.apply(u,C,sx,sy,nx,ny));
 			}
-			//south east corner
-			factor = 1.0/stencil.get_center_se((Nx-1),1,Nx,Ny);
-			u[1*(Nx+1)+(Nx-1)]+=factor*(fv[1*(Nx+1)+(Nx-1)]
-					-stencil.apply_se(u,(Nx-1),1,Nx,Ny));
-			//everything up to north west corner
-			for (size_t j=2;j<(Ny-1);j++)
-			{
-				//west boarder point in j. line
-				factor = 1.0/stencil.get_center_w(1,j,Nx,Ny);
-				u[j*(Nx+1)+1]+=factor*(fv[j*(Nx+1)+1]
-					-stencil.apply_w(u,1,j,Nx,Ny));
-				//center points
-				for (size_t i=2;i<(Nx-1);i++)
-				{
-					factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
-					u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
-						-stencil.apply_c(u,i,j,Nx,Ny));
-				}
-				//east boarder point in j. line
-				factor = 1.0/stencil.get_center_e((Nx-1),j,Nx,Ny);
-				u[j*(Nx+1)+(Nx-1)]+=factor*(fv[j*(Nx+1)+(Nx-1)]
-					-stencil.apply_e(u,(Nx-1),j,Nx,Ny));
-			}
-			//north west corner
-			factor = 1.0/stencil.get_center_nw(1,(Nx-1),Nx,Ny);
-			u[(Nx-1)*(Nx+1)+1]+=factor*(fv[(Nx-1)*(Nx+1)+1]
-					-stencil.apply_nw(u,1,(Ny-1),Nx,Ny));
-			//north boarder
-			for (size_t i=2;i<(Nx-1);i++)
-			{
-				factor = 1.0/stencil.get_center_n(i,(Nx-1),Nx,Ny);
-				u[(Nx-1)*(Nx+1)+i]+=factor*(fv[(Nx-1)*(Nx+1)+i]
-					-stencil.apply_n(u,i,(Ny-1),Nx,Ny));
-			}
-			//north east corner
-			factor = 1.0/stencil.get_center_ne((Nx-1),(Nx-1),Nx,Ny);
-			u[(Nx-1)*(Nx+1)+(Nx-1)]+=factor*(fv[(Nx-1)*(Nx+1)+(Nx-1)]
-				-stencil.apply_ne(u,(Nx-1),(Ny-1),Nx,Ny));
-		}	
 	}
+	else
+	{
+		factor = 1.0/stencil.getCenter(SW,1,1,nx,ny);
+		u[1*(nx+1)+1]+=factor*(f[1*(nx+1)+1]
+				-stencil.apply(u,SW,1,1,nx,ny));
+		for (size_t sx=2;sx<(nx-1);sx++)
+		{
+			factor = 1.0/stencil.getCenter(S,sx,1,nx,ny);
+			u[1*(nx+1)+sx]+=factor*(f[1*(nx+1)+sx]
+				-stencil.apply(u,S,sx,1,nx,ny));
+		}
+		factor = 1.0/stencil.getCenter(SE,(nx-1),1,nx,ny);
+		u[1*(nx+1)+(nx-1)]+=factor*(f[1*(nx+1)+(nx-1)]
+				-stencil.apply(u,SE,(nx-1),1,nx,ny));
+		//everything up to north west corner
+		for (size_t sy=2;sy<(ny-1);sy++)
+		{
+			factor = 1.0/stencil.getCenter(W,1,sy,nx,ny);
+			u[sy*(nx+1)+1]+=factor*(f[sy*(nx+1)+1]
+				-stencil.apply(u,W,1,sy,nx,ny));
+			for (size_t sx=2;sx<(nx-1);sx++)
+			{
+				factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny);
+				u[sy*(nx+1)+sx]+=factor*(f[sy*(nx+1)+sx]
+					-stencil.apply(u,C,sx,sy,nx,ny));
+			}
+			factor = 1.0/stencil.getCenter(E,(nx-1),sy,nx,ny);
+			u[sy*(nx+1)+(nx-1)]+=factor*(f[sy*(nx+1)+(nx-1)]
+				-stencil.apply(u,E,(nx-1),sy,nx,ny));
+		}
+		factor = 1.0/stencil.getCenter(NW,1,(nx-1),nx,ny);
+		u[(nx-1)*(nx+1)+1]+=factor*(f[(nx-1)*(nx+1)+1]
+				-stencil.apply(u,NW,1,(ny-1),nx,ny));
+		for (size_t sx=2;sx<(nx-1);sx++)
+		{
+			factor = 1.0/stencil.getCenter(N,sx,(nx-1),nx,ny);
+			u[(nx-1)*(nx+1)+sx]+=factor*(f[(nx-1)*(nx+1)+sx]
+				-stencil.apply(u,N,sx,(ny-1),nx,ny));
+		}
+		factor = 1.0/stencil.getCenter(NE,(nx-1),(nx-1),nx,ny);
+		u[(nx-1)*(nx+1)+(nx-1)]+=factor*(f[(nx-1)*(nx+1)+(nx-1)]
+			-stencil.apply(u,NE,(nx-1),(ny-1),nx,ny));
+	}	
+}
 }

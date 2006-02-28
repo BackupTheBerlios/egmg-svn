@@ -86,9 +86,9 @@ public:
         const size_t ny,
         const Stencil& stencil)
     {
-        std::valarray<Precision> stencilL=stencil.getL(c,0,0,nx,ny);
-        std::valarray<int> jx=stencil.getJx(c);
-        std::valarray<int> jy=stencil.getJy(c);
+        std::valarray<Precision> stencilL=stencil.getL(C,0,0,nx,ny);
+        std::valarray<int> jx=stencil.getJx(C);
+        std::valarray<int> jy=stencil.getJy(C);
         std::valarray<size_t> position(9);
         for (size_t jj=0;jj<jx.size();jj++)
         {
@@ -119,7 +119,7 @@ public:
         t_[0]=1.0;
 
         // W
-        stencilL=stencil.getL(c,sx-1,sy,nx,ny);
+        stencilL=stencil.getL(C,sx-1,sy,nx,ny);
         symsum=0;
         
         // Divide the stencil defined by stencilL und position into a symmetric 
@@ -150,7 +150,7 @@ public:
         t_[1]=weight2; 
 
         // N
-        stencilL=stencil.getL(c,sx,sy+1,nx,ny);
+        stencilL=stencil.getL(C,sx,sy+1,nx,ny);
         symsum=0;
         
         // Divide the stencil defined by stencilL und position into a symmetric 
@@ -182,7 +182,7 @@ public:
         t_[2]=weight1;
 
         // E
-        stencilL=stencil.getL(c,sx+1,sy,nx,ny);
+        stencilL=stencil.getL(C,sx+1,sy,nx,ny);
         symsum=0;
         
         // Divide the stencil defined by stencilL und position into a symmetric 
@@ -213,7 +213,7 @@ public:
         t_[3]=weight1; 
 
         // S
-        stencilL=stencil.getL(c,sx,sy-1,nx,ny);
+        stencilL=stencil.getL(C,sx,sy-1,nx,ny);
         symsum=0;
         
         // Divide the stencil defined by stencilL und position into a symmetric 
@@ -244,7 +244,7 @@ public:
         t_[4]=weight2;
 
         // NW
-        stencilL=stencil.getL(c,sx-1,sy+1,nx,ny);
+        stencilL=stencil.getL(C,sx-1,sy+1,nx,ny);
         scale=-stencilL[0];
         erg=0;
         if (position[E]!=0)
@@ -256,7 +256,7 @@ public:
         t_[5]=erg/scale;
 
         // NE
-        stencilL=stencil.getL(c,sx+1,sy+1,nx,ny);
+        stencilL=stencil.getL(C,sx+1,sy+1,nx,ny);
         scale=-stencilL[0];
         erg=0;
         if (position[W]!=0)
@@ -268,7 +268,7 @@ public:
         t_[6]=erg/scale;
 
         // SE
-        stencilL=stencil.getL(c,sx+1,sy-1,nx,ny);
+        stencilL=stencil.getL(C,sx+1,sy-1,nx,ny);
         scale=-stencilL[0];
         erg=0;
         if (position[W]!=0)
@@ -280,7 +280,7 @@ public:
         t_[7]=erg/scale;
 
         // SW
-        stencilL=stencil.getL(c,sx-1,sy-1,nx,ny);
+        stencilL=stencil.getL(C,sx-1,sy-1,nx,ny);
         scale=-stencilL[0];
         erg=0;
         if (position[E]!=0)

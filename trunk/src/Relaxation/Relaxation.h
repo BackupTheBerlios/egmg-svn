@@ -99,7 +99,11 @@ public:
         const std::valarray<Precision>& f,
         const Stencil& stencil,
         const size_t nx,
-        const size_t ny) const;
+        const size_t ny) const
+    {
+        for(int i=0; i<preSmoothingSteps_; ++i)
+            relax(u,f,stencil,nx,ny);
+    }
     
     /**
      * \brief does the postSmooth() ing
@@ -116,7 +120,11 @@ public:
         const std::valarray<Precision>& f,
         const Stencil& stencil,
         const size_t nx,
-        const size_t ny) const;
+        const size_t ny) const
+    {
+        for(int i=0; i<postSmoothingSteps_; ++i)
+            relax(u,f,stencil,nx,ny);
+    }
 };
 
 }

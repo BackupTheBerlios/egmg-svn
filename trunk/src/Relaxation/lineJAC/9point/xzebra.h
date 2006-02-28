@@ -1,6 +1,6 @@
 namespace mg
 {
-	void lineJAC::ninepointxzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+	void ZebraLineJAC::ninepointxzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
 		                    std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const
 					   
@@ -17,8 +17,8 @@ namespace mg
 		{
 			// get const operator L
 			const std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
-			const std::valarray<int> J_x = stencil.getJx(c);
-			const std::valarray<int> J_y = stencil.getJy(c);
+			const std::valarray<int> J_x = stencil.getJx(C);
+			const std::valarray<int> J_y = stencil.getJy(C);
 			
 			// for each line: correction of the rhs given by rhs = fv - [L[n]  0  L[s]]^t * u and elimination of the 
 			// boundary condition in first and last inner point
@@ -31,9 +31,9 @@ namespace mg
 												
 				// set tridiagonalmatrix for solving A u = rhs
 				// A[i][i] = L[c]; A[i-1][i] = L[w]; A[i+1][i] = L[e]
-				diagR = L[c];
-				ndiagR = L[e];
-				ndiagL = L[w];
+				diagR = L[C];
+				ndiagR = L[E];
+				ndiagL = L[W];
 
 				// LR-decomposition + transformation of the rhs vector
 				for(size_t k=1; k<Nx-1; k++)  
@@ -66,9 +66,9 @@ namespace mg
 					rhs[j] = resid[i*(Nx+1)+j+1];
 				}	
 
-				diagR = L[c];
-				ndiagR = L[e];
-				ndiagL = L[w];
+				diagR = L[C];
+				ndiagR = L[E];
+				ndiagL = L[W];
 
 				// LR-decomposition + transformation of the rhs vector
 				for(size_t k=1; k<Nx-1; k++)  
@@ -97,32 +97,32 @@ namespace mg
 			//Stencil ist not constant, so L needs to be evaluated in each grid point
 			//no other change in the algorithm	
 			std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
-			std::valarray<int> J_x = stencil.getJx(c);
-			std::valarray<int> J_y = stencil.getJy(c);
+			std::valarray<int> J_x = stencil.getJx(C);
+			std::valarray<int> J_y = stencil.getJy(C);
 
 			if(Nx > 2)
 			{
 				L = stencil.get_L_sw(1,1,Nx,Ny);
 					
-				diagR[0] = L[c];
-				ndiagR[0] = L[e];
+				diagR[0] = L[C];
+				ndiagR[0] = L[E];
 
 				rhs[0] = resid[Nx+1+1];
 
 				for(size_t j=2; j<Nx-1; j++)
 				{
 					L = stencil.get_L_s(j,1,Nx,Ny);
-					diagR[j-1] = L[c];
-					ndiagR[j-1] = L[e];
-					ndiagL[j-2] = L[w];
+					diagR[j-1] = L[C];
+					ndiagR[j-1] = L[E];
+					ndiagL[j-2] = L[W];
 					 
 					rhs[j-1] = resid[Nx+1+j];
 				}
 
 				L = stencil.get_L_se(Nx-1,1,Nx,Ny);
 				
-				diagR[Nx-2] = L[c];
-				ndiagL[Nx-3] = L[w];
+				diagR[Nx-2] = L[C];
+				ndiagL[Nx-3] = L[W];
 					
 				rhs[Nx-2] = resid[Nx+1+Nx-1];
 
@@ -147,25 +147,25 @@ namespace mg
 				{
 					L = stencil.get_L_w(1,i,Nx,Ny);
 					
-					diagR[0] = L[c];
-					ndiagR[0] = L[e];
+					diagR[0] = L[C];
+					ndiagR[0] = L[E];
 
 					rhs[0] = resid[i*(Nx+1)+1];
 
 					for(size_t j=2; j<Nx-1; j++)
 					{
 						L = stencil.get_L_c(j,i,Nx,Ny);
-						diagR[j-1] = L[c];
-						ndiagR[j-1] = L[e];
-						ndiagL[j-2] = L[w];
+						diagR[j-1] = L[C];
+						ndiagR[j-1] = L[E];
+						ndiagL[j-2] = L[W];
 						
 						rhs[j-1] = resid[i*(Nx+1)+j];
 					}
 
 					L = stencil.get_L_e(Nx-1,i,Nx,Ny);
 					
-					diagR[Nx-2] = L[c];
-					ndiagL[Nx-3] = L[w];
+					diagR[Nx-2] = L[C];
+					ndiagL[Nx-3] = L[W];
 					
 					rhs[Nx-2] = resid[i*(Nx+1)+Nx-1];
 
@@ -189,25 +189,25 @@ namespace mg
 
 				L = stencil.get_L_nw(1,Ny-1,Nx,Ny);
 					
-				diagR[0] = L[c];
-				ndiagR[0] = L[e];
+				diagR[0] = L[C];
+				ndiagR[0] = L[E];
 
 				rhs[0] = resid[(Ny-1)*(Nx+1)+1];
 
 				for(size_t j=2; j<Nx-1; j++)
 				{
 					L = stencil.get_L_n(j,Ny-1,Nx,Ny);
-					diagR[j-1] = L[c];
-					ndiagR[j-1] = L[e];
-					ndiagL[j-2] = L[w];
+					diagR[j-1] = L[C];
+					ndiagR[j-1] = L[E];
+					ndiagL[j-2] = L[W];
 					
 					rhs[j-1] = resid[(Ny-1)*(Nx+1)+j];
 				}
 
 				L = stencil.get_L_ne(Nx-1,Ny-1,Nx,Ny);
 					
-				diagR[Nx-2] = L[c];
-				ndiagL[Nx-3] = L[w];
+				diagR[Nx-2] = L[C];
+				ndiagL[Nx-3] = L[W];
 				
 				rhs[Nx-2] = resid[(Ny-1)*(Nx+1)+Nx-1];
 
@@ -239,8 +239,8 @@ namespace mg
 				{					
 					L = stencil.get_L_w(1,i,Nx,Ny);
 					
-					diagR[0] = L[c];
-					ndiagR[0] = L[e];
+					diagR[0] = L[C];
+					ndiagR[0] = L[E];
 
 					rhs[0] = resid[i*(Nx+1)+1];
 					
@@ -248,17 +248,17 @@ namespace mg
 					for(size_t j=2; j<Nx-1; j++)  
 					{
 						L = stencil.get_L_c(j,i,Nx,Ny);
-						diagR[j-1] = L[c];
-						ndiagR[j-1] = L[e];
-						ndiagL[j-2] = L[w];
+						diagR[j-1] = L[C];
+						ndiagR[j-1] = L[E];
+						ndiagL[j-2] = L[W];
 
 						rhs[j-1] = resid[i*(Nx+1)+j];
 					}
 					
 					L = stencil.get_L_e(Nx-1,i,Nx,Ny);
 					
-					diagR[Nx-2] = L[c];
-					ndiagL[Nx-3] = L[w];
+					diagR[Nx-2] = L[C];
+					ndiagL[Nx-3] = L[W];
 
 					rhs[Nx-2] = resid[i*(Nx+1)+Nx-1];
 
@@ -294,8 +294,8 @@ namespace mg
 					{
 						temp -= L[sum] * u[1+J_x[sum]+(k+J_y[sum])*(Nx+1)];
 					}
-					u[1+k*(Nx+1)] = 1/L[c] * ( fv[1+k*(Nx+1)] - L[w] * u[1+J_x[w]+k*(Nx+1)] - L[e] * u[1+J_x[e]+k*(Nx+1)] 
-						          - L[n] * u[1+(k+J_y[n])*(Nx+1)] - L[s] * u[1+(k+J_y[s])*(Nx+1)] - temp );
+					u[1+k*(Nx+1)] = 1/L[C] * ( fv[1+k*(Nx+1)] - L[W] * u[1+J_x[W]+k*(Nx+1)] - L[E] * u[1+J_x[E]+k*(Nx+1)] 
+						          - L[N] * u[1+(k+J_y[N])*(Nx+1)] - L[S] * u[1+(k+J_y[S])*(Nx+1)] - temp );
 				}
 			}
         }						

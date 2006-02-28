@@ -1,6 +1,6 @@
 namespace mg
 {
-	void lineJAC::xline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+	void ZebraLineJAC::xline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
 		                    std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
 					        const size_t Ny) const
 
@@ -21,56 +21,56 @@ namespace mg
 			{
 				// get const operator L
 				const std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
-				const std::valarray<int> J_x = stencil.getJx(c);
-				const std::valarray<int> J_y = stencil.getJy(c);
+				const std::valarray<int> J_x = stencil.getJx(C);
+				const std::valarray<int> J_y = stencil.getJy(C);
 				
 				std::valarray<Precision> L_b = stencil.get_L_s(2,1,Nx,Ny);
-				std::valarray<int> J_b_x = stencil.getJx(s);
-				std::valarray<int> J_b_y = stencil.getJy(s);
+				std::valarray<int> J_b_x = stencil.getJx(S);
+				std::valarray<int> J_b_y = stencil.getJy(S);
  
                 std::valarray<Precision> L_c = stencil.get_L_sw(1,1,Nx,Ny);
-				std::valarray<int> J_c_x = stencil.getJx(sw);
-				std::valarray<int> J_c_y = stencil.getJy(sw);
+				std::valarray<int> J_c_x = stencil.getJx(SW);
+				std::valarray<int> J_c_y = stencil.getJy(SW);
 
 				// setze rechte Seite für Zeile 1					
-				diagR[0] = L_c[c];
-	            ndiagR1[0] = L_c[e];
-	            ndiagR2[0] = L_c[ne];
+				diagR[0] = L_c[C];
+	            ndiagR1[0] = L_c[E];
+	            ndiagR2[0] = L_c[NE];
 		            				
 				rhs[0] = resid[Nx+1+1];
 				
-				ndiagL1[0] = L_b[w];
-				diagR[1] = L_b[c];
-	            ndiagR1[1] = L_b[e];		            
-		        ndiagR2[1] = L_b[se];
+				ndiagL1[0] = L_b[W];
+				diagR[1] = L_b[C];
+	            ndiagR1[1] = L_b[E];		            
+		        ndiagR2[1] = L_b[SE];
 
                 rhs[1] = resid[Nx+1+2];
 
 				for(size_t j=3; j<Nx-2; j++)  
 				{
-					ndiagL2[j-3] = L_b[nw];
-					ndiagL1[j-2] = L_b[w];
-				    diagR[j-1] = L_b[c];
-		            ndiagR1[j-1] = L_b[e];		            
-			        ndiagR2[j-1] = L_b[se];
+					ndiagL2[j-3] = L_b[NW];
+					ndiagL1[j-2] = L_b[W];
+				    diagR[j-1] = L_b[C];
+		            ndiagR1[j-1] = L_b[E];		            
+			        ndiagR2[j-1] = L_b[SE];
 						
 					rhs[j-1] = resid[Nx+1+j];
 				}
 					
-				ndiagL2[Nx-5] = L_b[nw];
-				ndiagL1[Nx-4] = L_b[w];
-				diagR[Nx-3] = L_b[c];
-		        ndiagR1[Nx-3] = L_b[e];
+				ndiagL2[Nx-5] = L_b[NW];
+				ndiagL1[Nx-4] = L_b[W];
+				diagR[Nx-3] = L_b[C];
+		        ndiagR1[Nx-3] = L_b[E];
 
 				rhs[Nx-3] = resid[Nx+1+Nx-2];
 					
                 L_c = stencil.get_L_se(Nx-1,1,Nx,Ny);
-				J_c_x = stencil.getJx(se);
-				J_c_y = stencil.getJy(se);
+				J_c_x = stencil.getJx(SE);
+				J_c_y = stencil.getJy(SE);
 
-				ndiagL2[Nx-4] = L_c[nw];
-				ndiagL1[Nx-3] = L_c[w];
-				diagR[Nx-2] = L_c[c];
+				ndiagL2[Nx-4] = L_c[NW];
+				ndiagL1[Nx-3] = L_c[W];
+				diagR[Nx-2] = L_c[C];
 
 				rhs[Nx-2] = resid[Nx+1+Nx-1];
 
@@ -109,47 +109,47 @@ namespace mg
 				{
 					// setze rechte Seite					
 					L_b = stencil.get_L_w(1,i,Nx,Ny);
-					J_b_x = stencil.getJx(w);
-				    J_b_y = stencil.getJy(w);
+					J_b_x = stencil.getJx(W);
+				    J_b_y = stencil.getJy(W);
 
-					diagR[0] = L_b[c];
-		            ndiagR1[0] = L_b[e];
-		            ndiagR2[0] = L_b[ne];
+					diagR[0] = L_b[C];
+		            ndiagR1[0] = L_b[E];
+		            ndiagR2[0] = L_b[NE];
 		            				
 					rhs[0] = resid[i*(Nx+1)+1];
                     					
-					ndiagL1[0] = L[w];
-					diagR[1] = L[c];
-		            ndiagR1[1] = L[e];		            
-			        ndiagR2[1] = L[se];
+					ndiagL1[0] = L[W];
+					diagR[1] = L[C];
+		            ndiagR1[1] = L[E];		            
+			        ndiagR2[1] = L[SE];
 
                     rhs[1] = resid[i*(Nx+1)+2];
 
 					for(size_t j=3; j<Nx-2; j++)  
 					{
-						ndiagL2[j-3] = L[nw];
-						ndiagL1[j-2] = L[w];
-					    diagR[j-1] = L[c];
-		                ndiagR1[j-1] = L[e];		            
-			            ndiagR2[j-1] = L[se];
+						ndiagL2[j-3] = L[NW];
+						ndiagL1[j-2] = L[W];
+					    diagR[j-1] = L[C];
+		                ndiagR1[j-1] = L[E];		            
+			            ndiagR2[j-1] = L[SE];
 						
 						rhs[j-1] = resid[i*(Nx+1)+j];
 					}
 					
-					ndiagL2[Nx-5] = L[nw];
-					ndiagL1[Nx-4] = L[w];
-					diagR[Nx-3] = L[c];
-		            ndiagR1[Nx-3] = L[e];
+					ndiagL2[Nx-5] = L[NW];
+					ndiagL1[Nx-4] = L[W];
+					diagR[Nx-3] = L[C];
+		            ndiagR1[Nx-3] = L[E];
 
 					rhs[Nx-3] = resid[i*(Nx+1)+Nx-2];
 					
                     L_b = stencil.get_L_e(Nx-1,i,Nx,Ny);
-					J_b_x = stencil.getJx(e);
-				    J_b_y = stencil.getJy(e);
+					J_b_x = stencil.getJx(E);
+				    J_b_y = stencil.getJy(E);
 
-					ndiagL2[Nx-4] = L_b[nw];
-					ndiagL1[Nx-3] = L_b[w];
-					diagR[Nx-2] = L_b[c];
+					ndiagL2[Nx-4] = L_b[NW];
+					ndiagL1[Nx-3] = L_b[W];
+					diagR[Nx-2] = L_b[C];
 
 					rhs[Nx-2] = resid[i*(Nx+1)+Nx-1];
 					
@@ -183,51 +183,51 @@ namespace mg
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				// setze rechte Seite in oberster Zeile					
 				L_c = stencil.get_L_nw(1,Ny-1,Nx,Ny);
-				J_c_x = stencil.getJx(nw);
-				J_c_y = stencil.getJy(nw);
+				J_c_x = stencil.getJx(NW);
+				J_c_y = stencil.getJy(NW);
 
-				diagR[0] = L_c[c];
-		        ndiagR1[0] = L_c[e];
-		        ndiagR2[0] = L_c[nw];
+				diagR[0] = L_c[C];
+		        ndiagR1[0] = L_c[E];
+		        ndiagR2[0] = L_c[NW];
 		            				
 				rhs[0] = resid[(Ny-1)*(Nx+1)+1];
 				
 				L_b = stencil.get_L_n(2,Ny-1,Nx,Ny);
-				J_b_x = stencil.getJx(n);
-				J_b_y = stencil.getJy(n);
+				J_b_x = stencil.getJx(N);
+				J_b_y = stencil.getJy(N);
 				
-                ndiagL1[0] = L_b[w];
-				diagR[1] = L_b[c];
-		        ndiagR1[1] = L_b[e];		            
-			    ndiagR2[1] = L_b[ne];
+                ndiagL1[0] = L_b[W];
+				diagR[1] = L_b[C];
+		        ndiagR1[1] = L_b[E];		            
+			    ndiagR2[1] = L_b[NE];
 
                 rhs[1] = resid[(Ny-1)*(Nx+1)+2];
 
 				for(size_t j=3; j<Nx-2; j++)  
 				{
-					ndiagL2[j-3] = L_b[nw];
-					ndiagL1[j-2] = L_b[w];
-				    diagR[j-1] = L_b[c];
-		            ndiagR1[j-1] = L_b[e];		            
-			        ndiagR2[j-1] = L_b[ne];
+					ndiagL2[j-3] = L_b[NW];
+					ndiagL1[j-2] = L_b[W];
+				    diagR[j-1] = L_b[C];
+		            ndiagR1[j-1] = L_b[E];		            
+			        ndiagR2[j-1] = L_b[NE];
 						
 					rhs[j-1] = resid[(Ny-1)*(Nx+1)+j];
 				}
 					
-				ndiagL2[Nx-5] = L_b[nw];
-				ndiagL1[Nx-4] = L_b[w];
-				diagR[Nx-3] = L_b[c];
-		        ndiagR1[Nx-3] = L_b[e];
+				ndiagL2[Nx-5] = L_b[NW];
+				ndiagL1[Nx-4] = L_b[W];
+				diagR[Nx-3] = L_b[C];
+		        ndiagR1[Nx-3] = L_b[E];
 
 				rhs[Nx-3] = resid[(Ny-1)*(Nx+1)+Nx-2];
 					
                 L_c = stencil.get_L_ne(Nx-1,Ny-1,Nx,Ny);
-				J_c_x = stencil.getJx(ne);
-				J_c_y = stencil.getJy(ne);
+				J_c_x = stencil.getJx(NE);
+				J_c_y = stencil.getJy(NE);
 
-				ndiagL2[Nx-4] = L_c[nw];
-				ndiagL1[Nx-3] = L_c[w];
-				diagR[Nx-2] = L_c[c];
+				ndiagL2[Nx-4] = L_c[NW];
+				ndiagL1[Nx-3] = L_c[W];
+				diagR[Nx-2] = L_c[C];
 
 				rhs[Nx-2] = resid[(Ny-1)*(Nx+1)+Nx-1];
 
@@ -263,28 +263,28 @@ namespace mg
 			else // not constant
 			{
 				std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
-				std::valarray<int> J_x = stencil.getJx(c);
-				std::valarray<int> J_y = stencil.getJy(c);
+				std::valarray<int> J_x = stencil.getJx(C);
+				std::valarray<int> J_y = stencil.getJy(C);
 				
 				std::valarray<Precision> L_b = stencil.get_L_s(2,1,Nx,Ny);
-				std::valarray<int> J_b_x = stencil.getJx(s);
-				std::valarray<int> J_b_y = stencil.getJy(s);
+				std::valarray<int> J_b_x = stencil.getJx(S);
+				std::valarray<int> J_b_y = stencil.getJy(S);
  
                 std::valarray<Precision> L_c = stencil.get_L_sw(1,1,Nx,Ny);
-				std::valarray<int> J_c_x = stencil.getJx(sw);
-				std::valarray<int> J_c_y = stencil.getJy(sw);
+				std::valarray<int> J_c_x = stencil.getJx(SW);
+				std::valarray<int> J_c_y = stencil.getJy(SW);
 
 				
-				diagR[0] = L_c[c];
-	            ndiagR1[0] = L_c[e];
-	            ndiagR2[0] = L_c[ne];
+				diagR[0] = L_c[C];
+	            ndiagR1[0] = L_c[E];
+	            ndiagR2[0] = L_c[NE];
 		            				
 				rhs[0] = resid[Nx+1+1];
 				
-				ndiagL1[0] = L_b[w];
-				diagR[1] = L_b[c];
-	            ndiagR1[1] = L_b[e];		            
-		        ndiagR2[1] = L_b[se];
+				ndiagL1[0] = L_b[W];
+				diagR[1] = L_b[C];
+	            ndiagR1[1] = L_b[E];		            
+		        ndiagR2[1] = L_b[SE];
 
                 rhs[1] = resid[Nx+1+2];
 
@@ -293,31 +293,31 @@ namespace mg
 					
 					L_b = stencil.get_L_s(j,1,Nx,Ny);
 					
-					ndiagL2[j-3] = L_b[nw];
-					ndiagL1[j-2] = L_b[w];
-				    diagR[j-1] = L_b[c];
-		            ndiagR1[j-1] = L_b[e];		            
-			        ndiagR2[j-1] = L_b[se];
+					ndiagL2[j-3] = L_b[NW];
+					ndiagL1[j-2] = L_b[W];
+				    diagR[j-1] = L_b[C];
+		            ndiagR1[j-1] = L_b[E];		            
+			        ndiagR2[j-1] = L_b[SE];
 						
 					rhs[j-1] = resid[Nx+1+j];
 				}
 					
 				L_b = stencil.get_L_s(Nx-2,1,Nx,Ny);
 
-				ndiagL2[Nx-5] = L_b[nw];
-				ndiagL1[Nx-4] = L_b[w];
-				diagR[Nx-3] = L_b[c];
-		        ndiagR1[Nx-3] = L_b[e];
+				ndiagL2[Nx-5] = L_b[NW];
+				ndiagL1[Nx-4] = L_b[W];
+				diagR[Nx-3] = L_b[C];
+		        ndiagR1[Nx-3] = L_b[E];
 
 				rhs[Nx-3] = resid[Nx+1+Nx-2];
 					
                 L_c = stencil.get_L_se(Nx-1,1,Nx,Ny);
-				J_c_x = stencil.getJx(se);
-				J_c_y = stencil.getJy(se);
+				J_c_x = stencil.getJx(SE);
+				J_c_y = stencil.getJy(SE);
 
-				ndiagL2[Nx-4] = L_c[nw];
-				ndiagL1[Nx-3] = L_c[w];
-				diagR[Nx-2] = L_c[c];
+				ndiagL2[Nx-4] = L_c[NW];
+				ndiagL1[Nx-3] = L_c[W];
+				diagR[Nx-2] = L_c[C];
 
 				rhs[Nx-2] = resid[Nx+1+Nx-1];
 
@@ -356,21 +356,21 @@ namespace mg
 				{
 					// setze rechte Seite					
 					L_b = stencil.get_L_w(1,i,Nx,Ny);
-					J_b_x = stencil.getJx(w);
-				    J_b_y = stencil.getJy(w);
+					J_b_x = stencil.getJx(W);
+				    J_b_y = stencil.getJy(W);
 
-					diagR[0] = L_b[c];
-		            ndiagR1[0] = L_b[e];
-		            ndiagR2[0] = L_b[ne];
+					diagR[0] = L_b[C];
+		            ndiagR1[0] = L_b[E];
+		            ndiagR2[0] = L_b[NE];
 		            				
 					rhs[0] = resid[i*(Nx+1)+1];
                     					
 					L = stencil.get_L_c(2,i,Nx,Ny);
 					
-					ndiagL1[0] = L[w];
-					diagR[1] = L[c];
-		            ndiagR1[1] = L[e];		            
-			        ndiagR2[1] = L[se];
+					ndiagL1[0] = L[W];
+					diagR[1] = L[C];
+		            ndiagR1[1] = L[E];		            
+			        ndiagR2[1] = L[SE];
 
                     rhs[1] = resid[i*(Nx+1)+2];
 
@@ -378,31 +378,31 @@ namespace mg
 					{
 						L = stencil.get_L_c(j,i,Nx,Ny);
 						
-						ndiagL2[j-3] = L[nw];
-						ndiagL1[j-2] = L[w];
-					    diagR[j-1] = L[c];
-		                ndiagR1[j-1] = L[e];		            
-			            ndiagR2[j-1] = L[se];
+						ndiagL2[j-3] = L[NW];
+						ndiagL1[j-2] = L[W];
+					    diagR[j-1] = L[C];
+		                ndiagR1[j-1] = L[E];		            
+			            ndiagR2[j-1] = L[SE];
 						
 						rhs[j-1] = resid[i*(Nx+1)+j];
 					}
 					
                     L = stencil.get_L_c(Nx-2,i,Nx,Ny);
 
-					ndiagL2[Nx-5] = L[nw];
-					ndiagL1[Nx-4] = L[w];
-					diagR[Nx-3] = L[c];
-		            ndiagR1[Nx-3] = L[e];
+					ndiagL2[Nx-5] = L[NW];
+					ndiagL1[Nx-4] = L[W];
+					diagR[Nx-3] = L[C];
+		            ndiagR1[Nx-3] = L[E];
 
 					rhs[Nx-3] = resid[i*(Nx+1)+Nx-2];
 					
                     L_b = stencil.get_L_e(Nx-1,i,Nx,Ny);
-					J_b_x = stencil.getJx(e);
-				    J_b_y = stencil.getJy(e);
+					J_b_x = stencil.getJx(E);
+				    J_b_y = stencil.getJy(E);
 
-					ndiagL2[Nx-4] = L_b[nw];
-					ndiagL1[Nx-3] = L_b[w];
-					diagR[Nx-2] = L_b[c];
+					ndiagL2[Nx-4] = L_b[NW];
+					ndiagL1[Nx-3] = L_b[W];
+					diagR[Nx-2] = L_b[C];
 
 					rhs[Nx-2] = resid[i*(Nx+1)+Nx-1];
 					
@@ -436,23 +436,23 @@ namespace mg
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				// setze rechte Seite in oberster Zeile					
 				L_c = stencil.get_L_nw(1,Ny-1,Nx,Ny);
-				J_c_x = stencil.getJx(nw);
-				J_c_y = stencil.getJy(nw);
+				J_c_x = stencil.getJx(NW);
+				J_c_y = stencil.getJy(NW);
 
-				diagR[0] = L_c[c];
-		        ndiagR1[0] = L_c[e];
-		        ndiagR2[0] = L_c[nw];
+				diagR[0] = L_c[C];
+		        ndiagR1[0] = L_c[E];
+		        ndiagR2[0] = L_c[NW];
 		            				
 				rhs[0] = resid[(Ny-1)*(Nx+1)+1];
 				
 				L_b = stencil.get_L_n(2,Ny-1,Nx,Ny);
-				J_b_x = stencil.getJx(n);
-				J_b_y = stencil.getJy(n);
+				J_b_x = stencil.getJx(N);
+				J_b_y = stencil.getJy(N);
 				
-                ndiagL1[0] = L_b[w];
-				diagR[1] = L_b[c];
-		        ndiagR1[1] = L_b[e];		            
-			    ndiagR2[1] = L_b[ne];
+                ndiagL1[0] = L_b[W];
+				diagR[1] = L_b[C];
+		        ndiagR1[1] = L_b[E];		            
+			    ndiagR2[1] = L_b[NE];
 
                 rhs[1] = resid[(Ny-1)*(Nx+1)+2];
 
@@ -460,31 +460,31 @@ namespace mg
 				{
 					L_b = stencil.get_L_n(j,Ny-1,Nx,Ny);
 					
-					ndiagL2[j-3] = L_b[nw];
-					ndiagL1[j-2] = L_b[w];
-				    diagR[j-1] = L_b[c];
-		            ndiagR1[j-1] = L_b[e];		            
-			        ndiagR2[j-1] = L_b[ne];
+					ndiagL2[j-3] = L_b[NW];
+					ndiagL1[j-2] = L_b[W];
+				    diagR[j-1] = L_b[C];
+		            ndiagR1[j-1] = L_b[E];		            
+			        ndiagR2[j-1] = L_b[NE];
 						
 					rhs[j-1] = resid[(Ny-1)*(Nx+1)+j];
 				}
 					
 				L_b = stencil.get_L_n(Nx-2,Ny-1,Nx,Ny);
 
-				ndiagL2[Nx-5] = L_b[nw];
-				ndiagL1[Nx-4] = L_b[w];
-				diagR[Nx-3] = L_b[c];
-		        ndiagR1[Nx-3] = L_b[e];
+				ndiagL2[Nx-5] = L_b[NW];
+				ndiagL1[Nx-4] = L_b[W];
+				diagR[Nx-3] = L_b[C];
+		        ndiagR1[Nx-3] = L_b[E];
 
 				rhs[Nx-3] = resid[(Ny-1)*(Nx+1)+Nx-2];
 					
                 L_c = stencil.get_L_ne(Nx-1,Ny-1,Nx,Ny);
-				J_c_x = stencil.getJx(ne);
-				J_c_y = stencil.getJy(ne);
+				J_c_x = stencil.getJx(NE);
+				J_c_y = stencil.getJy(NE);
 
-				ndiagL2[Nx-4] = L_c[nw];
-				ndiagL1[Nx-3] = L_c[w];
-				diagR[Nx-2] = L_c[c];
+				ndiagL2[Nx-4] = L_c[NW];
+				ndiagL1[Nx-3] = L_c[W];
+				diagR[Nx-2] = L_c[C];
 
 				rhs[Nx-2] = resid[(Ny-1)*(Nx+1)+Nx-1];
 

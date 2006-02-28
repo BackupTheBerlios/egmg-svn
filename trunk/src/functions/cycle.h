@@ -26,7 +26,7 @@ namespace mg
      * gamma = 1. Mode is an implementation detail used for recursive calls.
      * \param[in,out] u             the vector represantation of the unknown
      *                              function to solve on a rectangular grid.
-     * \param[in] fv                the right hand side of the pde
+     * \param[in] f                 the right hand side of the pde
      * \param[in] stencil           the stencil representaion of the discrete
      *                              pde
      * \param[in] prolongation      the prolongation to use
