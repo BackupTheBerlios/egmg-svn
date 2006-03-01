@@ -1,3 +1,8 @@
+/** \file LineGS.cpp
+ * \author Andre Oeckerath
+ * \brief LineGS.cpp contains the implementation of the class LineGS.
+ * \see LineGS.h
+ */
 #include "LineGS.h"
 
 namespace mg
@@ -73,6 +78,2177 @@ void ZebraLineGS::relax(
         {
             std::cerr << "Stencil is too big (size>2)!" << std::endl;
             break;
+        }
+    }
+}
+void ZebraLineGS::ninepointxline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+                        std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
+                        const size_t Ny) const
+                   
+{ 
+    //valarrays needed for saving the tridiagonal matrix A of linear system A u = rhs       
+    std::valarray<Precision> diagR(Nx-1);
+    std::valarray<Precision> ndiagR(Nx-2);
+    std::valarray<Precision> ndiagL(Nx-2);
+
+    if(stencil.isConstant() == true)
+    {
+        // get const operator L
+        const std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+        const std::valarray<int> J_x = stencil.getJx(C);
+        const std::valarray<int> J_y = stencil.getJy(C);
+        
+        // for each line: correction of the rhs given by rhs = fv - [L[n]  0  L[s]]^t * u and elimination of the 
+        // boundary condition in first and last inner point
+        for(size_t i=1; i<Ny ; i++) 
+        {
+            rhs[1+i*(Nx+1)] = fv[1+i*(Nx+1)] - L[N] * u[1+(i+J_y[N])*(Nx+1)] - L[S] * u[1+(i+J_y[S])*(Nx+1)]
+                - L[W] * u[i*(Nx+1)];
+            
+            for(size_t sum=5; sum<L.size(); sum++)
+            {
+                rhs[1+i*(Nx+1)] -= L[sum] * u[1+J_x[sum]+(i+J_y[sum])*(Nx+1)];
+            }
+            
+
+            for(size_t j=2; j<Nx-1; j++)  
+            {
+                rhs[j+i*(Nx+1)] = fv[j+i*(Nx+1)] - L[N] * u[j+(i+J_y[N])*(Nx+1)] - L[S] * u[j+(i+J_y[S])*(Nx+1)];
+
+                for(size_t sum=5; sum<L.size(); sum++)
+                {
+                    rhs[j+i*(Nx+1)] -= L[sum] * u[j+J_x[sum]+(i+J_y[sum])*(Nx+1)];
+                }
+
+            }
+            
+            rhs[(Nx-1)+i*(Nx+1)] = fv[Nx-1+i*(Nx+1)] - L[N] * u[Nx-1+(i+J_y[N])*(Nx+1)] 
+                - L[S] * u[Nx-1+(i+J_y[S])*(Nx+1)] - L[E] * u[Nx+i*(Nx+1)];
+
+            for(size_t sum=5; sum<L.size(); sum++)
+            {
+                rhs[Nx-1+i*(Nx+1)] -= L[sum] * u[Nx-1+J_x[sum]+(i+J_y[sum])*(Nx+1)];
+            }
+            
+            // set tridiagonalmatrix for solving A u = rhs
+            // A[i][i] = L[c]; A[i-1][i] = L[w]; A[i+1][i] = L[e]
+            diagR = L[C];
+            ndiagR = L[E];
+            ndiagL = L[W];
+
+            
+            // LR-decomposition + transformation of the rhs vector
+            for(size_t k=1; k<Nx-1; k++)  
+            {
+                ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
+                diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
+                rhs[i*(Nx+1) + 1 + k] = rhs[i*(Nx+1) + 1 + k] - ndiagL[k-1] * rhs[i*(Nx+1)+k];  
+            }
+
+            // solve the linear system of equations R u = rhs
+            u[i*(Nx+1)+(Nx-1)] = rhs[i*(Nx+1)+(Nx-1)] / diagR[Nx-2];
+            
+            for(size_t j=Nx-2; j>0; j--)
+            {
+                u[i*(Nx+1)+j] = 1/diagR[j-1] * ( rhs[i*(Nx+1)+j] - ndiagR[j-1] * u[i*(Nx+1)+j+1] );
+            }
+        }
+    }   
+
+    else
+    {
+        //Stencil ist not constant, so L needs to be evaluated in each grid point
+        //no other change in the algorithm          
+        std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+        std::valarray<int> J_x = stencil.getJx(C);
+        std::valarray<int> J_y = stencil.getJy(C);
+
+        
+        if(Nx > 2)
+        {
+            L = stencil.get_L_sw(1,1,Nx,Ny);
+            diagR[0] = L[C];
+            ndiagR[0] = L[E];
+
+            rhs[1+Nx+1] = fv[1+Nx+1] - L[N] * u[1+(1+J_y[N])*(Nx+1)] - L[S] * u[1+(1+J_y[S])*(Nx+1)]
+                    - L[W] * u[Nx+1];
+            for(size_t sum=5; sum<L.size(); sum++)
+            {
+                rhs[1+Nx+1] -= L[sum] * u[1+J_x[sum]+(1+J_y[sum])*(Nx+1)];
+            }
+                
+            for(size_t j=2; j<Nx-1; j++)
+            {
+                L = stencil.get_L_s(j,1,Nx,Ny);
+                diagR[j-1] = L[C];
+                ndiagR[j-1] = L[E];
+                ndiagL[j-2] = L[W];
+                rhs[j+Nx+1] = fv[j+Nx+1] - L[N] * u[j+(1+J_y[N])*(Nx+1)] - L[S] * u[j+(1+J_y[S])*(Nx+1)];
+                    
+                for(size_t sum=5; sum<L.size(); sum++)
+                {
+                    rhs[j+Nx+1] -= L[sum] * u[j+J_x[sum]+(1+J_y[sum])*(Nx+1)];
+                }
+            }
+
+            L = stencil.get_L_se(Nx-1,1,Nx,Ny);
+                
+            diagR[Nx-2] = L[C];
+            ndiagL[Nx-3] = L[W];
+                
+            rhs[(Nx-1)+(Nx+1)] = fv[Nx-1+(Nx+1)] - L[N] * u[Nx-1+(1+J_y[N])*(Nx+1)] 
+                    - L[S] * u[Nx-1+(1+J_y[S])*(Nx+1)] - L[E] * u[Nx+(Nx+1)];
+            
+            for(size_t sum=5; sum<L.size(); sum++)
+            {
+                rhs[Nx-1+(Nx+1)] -= L[sum] * u[Nx-1+J_x[sum]+(1+J_y[sum])*(Nx+1)];
+            }
+
+            
+            for(size_t k=1; k<Nx-1; k++)  
+            {
+                ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
+                diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
+                rhs[(Nx+1) + 1 + k] = rhs[(Nx+1) + 1 + k] - ndiagL[k-1] * rhs[(Nx+1)+k];  
+            }
+                
+            
+            u[(Nx+1)+(Nx-1)] = rhs[(Nx+1)+(Nx-1)] / diagR[Nx-2];
+
+            for(size_t j=Nx-2; j>0; j--)
+            {
+                u[(Nx+1)+j] = 1/diagR[j-1] * ( rhs[(Nx+1)+j] - ndiagR[j-1] * u[(Nx+1)+j+1] );
+            }
+            
+            
+            for(size_t i=2; i<Ny-1 ; i++)
+            {
+                L = stencil.get_L_w(1,i,Nx,Ny);
+                diagR[0] = L[C];
+                ndiagR[0] = L[E];
+
+                rhs[1+i*(Nx+1)] = fv[1+i*(Nx+1)] - L[N] * u[1+(i+J_y[N])*(Nx+1)] - L[S] * u[1+(i+J_y[S])*(Nx+1)]
+                    - L[W] * u[i*(Nx+1)];
+                for(size_t sum=5; sum<L.size(); sum++)
+                {
+                    rhs[1+i*(Nx+1)] -= L[sum] * u[1+J_x[sum]+(i+J_y[sum])*(Nx+1)];
+                }
+                
+                for(size_t j=2; j<Nx-1; j++)
+                {
+                    L = stencil.get_L_c(j,i,Nx,Ny);
+                    diagR[j-1] = L[C];
+                    ndiagR[j-1] = L[E];
+                    ndiagL[j-2] = L[W];
+                    rhs[j+i*(Nx+1)] = fv[j+i*(Nx+1)] - L[N] * u[j+(i+J_y[N])*(Nx+1)] - L[S] * u[j+(i+J_y[S])*(Nx+1)];
+                    
+                    for(size_t sum=5; sum<L.size(); sum++)
+                    {
+                        rhs[j+i*(Nx+1)] -= L[sum] * u[j+J_x[sum]+(i+J_y[sum])*(Nx+1)];
+                    }
+                }
+
+                L = stencil.get_L_e(Nx-1,i,Nx,Ny);
+                
+                diagR[Nx-2] = L[C];
+                ndiagL[Nx-3] = L[W];
+                
+                rhs[(Nx-1)+i*(Nx+1)] = fv[Nx-1+i*(Nx+1)] - L[N] * u[Nx-1+(i+J_y[N])*(Nx+1)] 
+                    - L[S] * u[Nx-1+(i+J_y[S])*(Nx+1)] - L[E] * u[Nx+i*(Nx+1)];
+                for(size_t sum=5; sum<L.size(); sum++)
+                {
+                    rhs[Nx-1+i*(Nx+1)] -= L[sum] * u[Nx-1+J_x[sum]+(i+J_y[sum])*(Nx+1)];
+                }
+
+                
+                for(size_t k=1; k<Nx-1; k++)  
+                {
+                    ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
+                    diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
+                    rhs[i*(Nx+1) + 1 + k] = rhs[i*(Nx+1) + 1 + k] - ndiagL[k-1] * rhs[i*(Nx+1)+k];  
+                }
+                
+                u[i*(Nx+1)+(Nx-1)] = rhs[i*(Nx+1)+(Nx-1)] / diagR[Nx-2];
+
+                for(size_t j=Nx-2; j>0; j--)
+                {
+                    u[i*(Nx+1)+j] = 1/diagR[j-1] * ( rhs[i*(Nx+1)+j] - ndiagR[j-1] * u[i*(Nx+1)+j+1] );
+                }
+            }
+
+            L = stencil.get_L_nw(1,Ny-1,Nx,Ny);
+            diagR[0] = L[C];
+            ndiagR[0] = L[E];
+
+            rhs[1+(Ny-1)*(Nx+1)] = fv[1+(Ny-1)*(Nx+1)] - L[N] * u[1+(Ny-1+J_y[N])*(Nx+1)] - L[S] * u[1+(Ny-1+J_y[S])*(Nx+1)]
+                    - L[W] * u[(Ny-1)*(Nx+1)];
+            for(size_t sum=5; sum<L.size(); sum++)
+            {
+                rhs[1+(Ny-1)*(Nx+1)] -= L[sum] * u[1+J_x[sum]+(Ny-1+J_y[sum])*(Nx+1)];
+            }
+                
+            for(size_t j=2; j<Nx-1; j++)
+            {
+                L = stencil.get_L_n(j,Ny-1,Nx,Ny);
+                diagR[j-1] = L[C];
+                ndiagR[j-1] = L[E];
+                ndiagL[j-2] = L[W];
+                rhs[j+(Ny-1)*(Nx+1)] = fv[j+(Ny-1)*(Nx+1)] - L[N] * u[j+(Ny-1+J_y[N])*(Nx+1)] - L[S] * u[j+(Ny-1+J_y[S])*(Nx+1)];
+                    
+                for(size_t sum=5; sum<L.size(); sum++)
+                {
+                    rhs[j+(Ny-1)*(Nx+1)] -= L[sum] * u[j+J_x[sum]+(Ny-1+J_y[sum])*(Nx+1)];
+                }
+            }
+
+            L = stencil.get_L_ne(Nx-1,Ny-1,Nx,Ny);
+                
+            diagR[Nx-2] = L[C];
+            ndiagL[Nx-3] = L[W];
+                
+            rhs[(Nx-1)+(Ny-1)*(Nx+1)] = fv[Nx-1+(Ny-1)*(Nx+1)] - L[N] * u[Nx-1+(Ny-1+J_y[N])*(Nx+1)] 
+                    - L[S] * u[Nx-1+(Ny-1+J_y[S])*(Nx+1)] - L[E] * u[Nx+(Ny-1)*(Nx+1)];
+            for(size_t sum=5; sum<L.size(); sum++)
+            {
+                rhs[Nx-1+(Ny-1)*(Nx+1)] -= L[sum] * u[Nx-1+J_x[sum]+(Ny-1+J_y[sum])*(Nx+1)];
+            }
+
+            
+            for(size_t k=1; k<Nx-1; k++)  
+            {
+                ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
+                diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
+                rhs[(Ny-1)*(Nx+1) + 1 + k] = rhs[(Ny-1)*(Nx+1) + 1 + k] - ndiagL[k-1] * rhs[(Ny-1)*(Nx+1)+k];  
+            }
+                
+            
+            u[(Ny-1)*(Nx+1)+(Nx-1)] = rhs[(Ny-1)*(Nx+1)+(Nx-1)] / diagR[Nx-2];
+
+            for(size_t j=Nx-2; j>0; j--)
+            {
+                u[(Ny-1)*(Nx+1)+j] = 1/diagR[j-1] * ( rhs[(Ny-1)*(Nx+1)+j] - ndiagR[j-1] * u[(Ny-1)*(Nx+1)+j+1] );
+            }
+        }
+        
+        
+        else  // if Nx and Ny are too small do one GS_lex step
+        {
+            Precision temp=0;
+
+            for(size_t k=1; k<Ny; k++)
+            {
+                L = stencil.get_L_c(1,k,Nx,Ny);
+
+                temp=0;
+
+                for(size_t sum=5; sum < L.size(); sum++)
+                {
+                    temp -= L[sum] * u[1+J_x[sum]+(k+J_y[sum])*(Nx+1)];
+                }
+                u[1+k*(Nx+1)] = 1/L[C] * ( fv[1+k*(Nx+1)] - L[W] * u[1+J_x[W]+k*(Nx+1)] - L[E] * u[1+J_x[E]+k*(Nx+1)] 
+                              - L[N] * u[1+(k+J_y[N])*(Nx+1)] - L[S] * u[1+(k+J_y[S])*(Nx+1)] - temp );
+            }
+        }
+    }       
+}
+void ZebraLineGS::ninepointyline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+                        std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
+                        const size_t Ny) const
+                   
+{ 
+    //valarrays needed for saving the tridiagonal matrix A of linear system A u = rhs
+    std::valarray<Precision> diagR(Ny-1);
+    std::valarray<Precision> ndiagR(Ny-2);
+    std::valarray<Precision> ndiagL(Ny-2);
+
+    if(stencil.isConstant() == true)
+    {
+        // get const operator L
+        const std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+        const std::valarray<int> J_x = stencil.getJx(C);
+        const std::valarray<int> J_y = stencil.getJy(C);
+
+        // for each line: correction of the rhs given by rhs = fv - [L[w]  0  L[e]] * u and elimination of the 
+        // boundary condition in first and last inner point
+        for(size_t i=1; i<Nx ; i++) 
+        {
+            rhs[i+(Nx+1)] = fv[i+(Nx+1)] - L[W] * u[i+J_x[W]+(Nx+1)] - L[E] * u[i+J_x[E]+(Nx+1)] 
+                - L[S] * u[i+(1+J_y[S])*(Nx+1)];
+            
+            for(size_t sum=5; sum<L.size(); sum++)
+            {
+                rhs[i+Nx+1] -= L[sum] * u[i+J_x[sum]+(1+J_y[sum])*(Nx+1)];
+            }
+            
+            for(size_t j=2; j<Ny-1; j++)  
+            {
+                rhs[i+j*(Nx+1)] = fv[i+j*(Nx+1)] - L[W] * u[i+J_x[W]+j*(Nx+1)] - L[E] * u[i+J_x[E]+j*(Nx+1)];
+
+                for(size_t sum=5; sum<L.size(); sum++)
+                {
+                    rhs[i+j*(Nx+1)] -= L[sum] * u[i+J_x[sum]+(j+J_y[sum])*(Nx+1)];
+                }
+            }
+            rhs[i+(Ny-1)*(Nx+1)] = fv[i+(Ny-1)*(Nx+1)] - L[W] * u[i+J_x[W]+(Ny-1)*(Nx+1)] 
+                - L[E] * u[i+J_x[E]+(Ny-1)*(Nx+1)] - L[N] * u[i+(Ny-1+J_y[N])*(Nx+1)];
+            for(size_t sum=5; sum<L.size(); sum++)
+            {
+                rhs[i+(Ny-1)*(Nx+1)] -= L[sum] * u[i+J_x[sum]+(Ny-1+J_y[sum])*(Nx+1)];
+            }
+
+            // set tridiagonalmatrix for solving A u = rhs
+            // A[i][i] = L[c]; A[i-1][i] = L[s]; A[i+1][i] = L[n]
+            diagR = L[C];
+            ndiagR = L[N];
+            ndiagL = L[S];
+
+            // LR-decomposition + transformation of the rhs vector
+            for(size_t j=1; j<Ny-1; j++)  
+            {
+                ndiagL[j-1] = ndiagL[j-1]/diagR[j-1];  
+                diagR[j] -= ndiagL[j-1] * ndiagR[j-1]; 
+                rhs[(j+1)*(Nx+1) + i] = rhs[(j+1)*(Nx+1) + i] - ndiagL[j-1] * rhs[j*(Nx+1)+i];  
+            }
+            
+            // solve the linear system of equations R u = rhs
+            u[i+(Nx+1)*(Ny-1)] = rhs[i+(Nx+1)*(Ny-1)] / diagR[Ny-2];
+
+            for(size_t k=Ny-2; k>0; k--)
+            {
+                u[i+k*(Nx+1)] = 1/diagR[k-1] * ( rhs[i+k*(Nx+1)] - ndiagR[k-1] * u[i+(k+1)*(Nx+1)] );
+            }
+        }
+    }
+
+    else
+    {
+        //Stencil ist not constant, so L needs to be evaluated in each grid point
+        //no other change in the algorithm  
+        std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+        std::valarray<int> J_x = stencil.getJx(C);
+        std::valarray<int> J_y = stencil.getJy(C);
+
+        if(Ny > 2)
+        {
+            L = stencil.get_L_sw(1,1,Nx,Ny);
+                
+            diagR[0] = L[C];
+            ndiagR[0] = L[N];   
+            
+            rhs[1+(Nx+1)] = fv[1+(Nx+1)] - L[W] * u[1+J_x[W]+(Nx+1)] - L[E] * u[1+J_x[E]+(Nx+1)] 
+                    - L[S] * u[1+(1+J_y[S])*(Nx+1)];
+            for(size_t sum=5; sum<L.size(); sum++)
+            {
+                rhs[1+Nx+1] -= L[sum] * u[1+J_x[sum]+(1+J_y[sum])*(Nx+1)];
+            }
+            
+            for(size_t j=2; j<Ny-1; j++) 
+            {
+                L = stencil.get_L_w(1,j,Nx,Ny);
+                diagR[j-1] = L[C];
+                ndiagR[j-1] = L[N];
+                ndiagL[j-2] = L[S];
+
+                rhs[1+j*(Nx+1)] = fv[1+j*(Nx+1)] - L[W] * u[1+J_x[W]+j*(Nx+1)] - L[E] * u[1+J_x[E]+j*(Nx+1)];
+                for(size_t sum=5; sum<L.size(); sum++)
+                {
+                    rhs[1+j*(Nx+1)] -= L[sum] * u[1+J_x[sum]+(j+J_y[sum])*(Nx+1)];
+                }
+            }
+                
+            L = stencil.get_L_nw(1,Ny-1,Nx,Ny);
+                
+            diagR[Ny-2] = L[C];
+            ndiagL[Ny-3] = L[S];
+
+            rhs[1+(Ny-1)*(Nx+1)] = fv[1+(Ny-1)*(Nx+1)] - L[W] * u[1+J_x[W]+(Ny-1)*(Nx+1)] 
+                    - L[E] * u[1+J_x[E]+(Ny-1)*(Nx+1)] - L[N] * u[1+(Ny-1+J_y[N])*(Nx+1)];
+                
+            for(size_t sum=5; sum<L.size(); sum++)
+            {
+                rhs[1+(Ny-1)*(Nx+1)] -= L[sum] * u[1+J_x[sum]+(Ny-1+J_y[sum])*(Nx+1)];
+            }
+                
+            for(size_t j=1; j<Ny-1; j++)  
+            {
+                ndiagL[j-1] = ndiagL[j-1]/diagR[j-1];  
+                diagR[j] -= ndiagL[j-1] * ndiagR[j-1];
+                rhs[(j+1)*(Nx+1) + 1] = rhs[(j+1)*(Nx+1) + 1] - ndiagL[j-1] * rhs[j*(Nx+1)+1];  
+            }
+
+            u[1+(Nx+1)*(Ny-1)] = rhs[1+(Nx+1)*(Ny-1)] / diagR[Ny-2];
+            
+            for(size_t k=Ny-2; k>0; k--)
+            {
+                u[1+k*(Nx+1)] = 1/diagR[k-1] * ( rhs[1+k*(Nx+1)] - ndiagR[k-1] * u[1+(k+1)*(Nx+1)] );
+            }
+            
+            
+            for(size_t i=2; i<Nx-1 ; i++)
+            {
+                L = stencil.get_L_s(i,1,Nx,Ny);
+                
+                diagR[0] = L[C];
+                ndiagR[0] = L[N];   
+                
+                rhs[i+(Nx+1)] = fv[i+(Nx+1)] - L[W] * u[i+J_x[W]+(Nx+1)] - L[E] * u[i+J_x[E]+(Nx+1)] 
+                    - L[S] * u[i+(1+J_y[S])*(Nx+1)];
+                for(size_t sum=5; sum<L.size(); sum++)
+                {
+                    rhs[i+Nx+1] -= L[sum] * u[i+J_x[sum]+(1+J_y[sum])*(Nx+1)];
+                }
+                
+                for(size_t j=2; j<Ny-1; j++) 
+                {
+                    L = stencil.get_L_c(i,j,Nx,Ny);
+                    diagR[j-1] = L[C];
+                    ndiagR[j-1] = L[N];
+                    ndiagL[j-2] = L[S];
+
+                    rhs[i+j*(Nx+1)] = fv[i+j*(Nx+1)] - L[W] * u[i+J_x[W]+j*(Nx+1)] - L[E] * u[i+J_x[E]+j*(Nx+1)];
+                    for(size_t sum=5; sum<L.size(); sum++)
+                    {
+                        rhs[i+j*(Nx+1)] -= L[sum] * u[i+J_x[sum]+(j+J_y[sum])*(Nx+1)];
+                    }
+                }
+                
+                L = stencil.get_L_n(i,Ny-1,Nx,Ny);
+                
+                diagR[Ny-2] = L[C];
+                ndiagL[Ny-3] = L[S];
+
+                rhs[i+(Ny-1)*(Nx+1)] = fv[i+(Ny-1)*(Nx+1)] - L[W] * u[i+J_x[W]+(Ny-1)*(Nx+1)] 
+                    - L[E] * u[i+J_x[E]+(Ny-1)*(Nx+1)] - L[N] * u[i+(Ny-1+J_y[N])*(Nx+1)];
+                
+                for(size_t sum=5; sum<L.size(); sum++)
+                {
+                    rhs[i+(Ny-1)*(Nx+1)] -= L[sum] * u[i+J_x[sum]+(Ny-1+J_y[sum])*(Nx+1)];
+                }
+                
+                for(size_t j=1; j<Ny-1; j++)  
+                {
+                    ndiagL[j-1] = ndiagL[j-1]/diagR[j-1];  
+                    diagR[j] -= ndiagL[j-1] * ndiagR[j-1];
+                    rhs[(j+1)*(Nx+1) + i] = rhs[(j+1)*(Nx+1) + i] - ndiagL[j-1] * rhs[j*(Nx+1)+i];  
+                }
+
+                u[i+(Nx+1)*(Ny-1)] = rhs[i+(Nx+1)*(Ny-1)] / diagR[Ny-2];
+                
+                for(size_t k=Ny-2; k>0; k--)
+                {
+                    u[i+k*(Nx+1)] = 1/diagR[k-1] * ( rhs[i+k*(Nx+1)] - ndiagR[k-1] * u[i+(k+1)*(Nx+1)] );
+                }
+            }
+
+            L = stencil.get_L_se(Nx-1,1,Nx,Ny);
+                
+            diagR[0] = L[C];
+            ndiagR[0] = L[N];   
+                
+            rhs[Nx-1+(Nx+1)] = fv[Nx-1+(Nx+1)] - L[W] * u[Nx-1+J_x[W]+(Nx+1)] - L[E] * u[Nx-1+J_x[E]+(Nx+1)] 
+                    - L[S] * u[Nx-1+(1+J_y[S])*(Nx+1)];
+            for(size_t sum=5; sum<L.size(); sum++)
+            {
+                rhs[Nx-1+Nx+1] -= L[sum] * u[Nx-1+J_x[sum]+(1+J_y[sum])*(Nx+1)];
+            }
+                
+            for(size_t j=2; j<Ny-1; j++) 
+            {
+                L = stencil.get_L_e(Nx-1,j,Nx,Ny);
+                diagR[j-1] = L[C];
+                ndiagR[j-1] = L[N];
+                ndiagL[j-2] = L[S];
+
+                rhs[Nx-1+j*(Nx+1)] = fv[Nx-1+j*(Nx+1)] - L[W] * u[Nx-1+J_x[W]+j*(Nx+1)] - L[E] * u[Nx-1+J_x[E]+j*(Nx+1)];
+                for(size_t sum=5; sum<L.size(); sum++)
+                {
+                    rhs[Nx-1+j*(Nx+1)] -= L[sum] * u[Nx-1+J_x[sum]+(j+J_y[sum])*(Nx+1)];
+                }
+            }
+                
+            L = stencil.get_L_ne(Nx-1,Ny-1,Nx,Ny);
+                
+            diagR[Ny-2] = L[C];
+            ndiagL[Ny-3] = L[S];
+
+            rhs[Nx-1+(Ny-1)*(Nx+1)] = fv[Nx-1+(Ny-1)*(Nx+1)] - L[W] * u[Nx-1+J_x[W]+(Ny-1)*(Nx+1)] 
+                    - L[E] * u[Nx-1+J_x[E]+(Ny-1)*(Nx+1)] - L[N] * u[Nx-1+(Ny-1+J_y[N])*(Nx+1)];
+                
+            for(size_t sum=5; sum<L.size(); sum++)
+            {
+                rhs[Nx-1+(Ny-1)*(Nx+1)] -= L[sum] * u[Nx-1+J_x[sum]+(Ny-1+J_y[sum])*(Nx+1)];
+            }
+                
+            for(size_t j=1; j<Ny-1; j++)  
+            {
+                ndiagL[j-1] = ndiagL[j-1]/diagR[j-1];  
+                diagR[j] -= ndiagL[j-1] * ndiagR[j-1];
+                rhs[(j+1)*(Nx+1) + Nx-1] = rhs[(j+1)*(Nx+1) + Nx-1] - ndiagL[j-1] * rhs[j*(Nx+1)+Nx-1];  
+            }
+
+            u[Nx-1+(Nx+1)*(Ny-1)] = rhs[Nx-1+(Nx+1)*(Ny-1)] / diagR[Ny-2];
+                
+            for(size_t k=Ny-2; k>0; k--)
+            {
+                u[Nx-1+k*(Nx+1)] = 1/diagR[k-1] * ( rhs[Nx-1+k*(Nx+1)] - ndiagR[k-1] * u[Nx-1+(k+1)*(Nx+1)] );
+            }
+        }
+
+        else // if Nx and Ny are too small do one GS_lex step
+        {
+            for(size_t k=1; k<Nx; k++)
+            {
+                Precision temp=0;
+
+                L = stencil.get_L_c(1,k,Nx,Ny);
+
+                for(size_t sum=5; sum < L.size(); sum++)
+                {
+                    temp -= L[sum] * u[1+J_x[sum]+(k+J_y[sum])*(Nx+1)];
+                }
+                u[1+k*(Nx+1)] = 1/L[C] * ( fv[1+k*(Nx+1)] - L[W] * u[1+J_x[W]+k*(Nx+1)] - L[E] * u[1+J_x[E]+k*(Nx+1)] 
+                              - L[N] * u[1+(k+J_y[N])*(Nx+1)] - L[S] * u[1+(k+J_y[S])*(Nx+1)] - temp );
+            }
+        }
+    }       
+}
+void ZebraLineGS::xline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+                        std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
+                        const size_t Ny) const
+
+{
+    if((Ny > 4) && (Nx > 4))
+    {
+      std::valarray<Precision> diagR(0.0,Nx-1);
+      std::valarray<Precision> ndiagR1(0.0,Nx-2);
+      std::valarray<Precision> ndiagL1(0.0,Nx-2);
+      std::valarray<Precision> ndiagR2(0.0,Nx-3);
+      std::valarray<Precision> ndiagL2(0.0,Nx-3);
+
+        if(stencil.isConstant() == true)
+        {
+            // get const operator L
+                const std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+                const std::valarray<int> J_x = stencil.getJx(C);
+                const std::valarray<int> J_y = stencil.getJy(C);
+                
+                std::valarray<Precision> L_b = stencil.get_L_s(2,1,Nx,Ny);
+                std::valarray<int> J_b_x = stencil.getJx(S);
+                std::valarray<int> J_b_y = stencil.getJy(S);
+ 
+                std::valarray<Precision> L_c = stencil.get_L_sw(1,1,Nx,Ny);
+                std::valarray<int> J_c_x = stencil.getJx(SW);
+                std::valarray<int> J_c_y = stencil.getJy(SW);
+
+                // setze rechte Seite für Zeile 1                   
+            diagR[0] = L_c[C];
+            ndiagR1[0] = L_c[E];
+            ndiagR2[0] = L_c[NE];
+                                
+            rhs[1+Nx+1] = fv[1+Nx+1] - L_c[N] * u[1+(1+J_c_y[N])*(Nx+1)] - L_c[S] * u[1+(1+J_c_y[S])*(Nx+1)]
+                - L_c[W] * u[Nx+1] - L_c[NW] * u[1+(1+J_c_y[NW])*(Nx+1)];
+                
+            for(size_t sum=7; sum<L_c.size(); sum++)
+            {
+                rhs[1+Nx+1] -= L_c[sum] * u[1+J_c_x[sum]+(1+J_c_y[sum])*(Nx+1)];
+            }
+            
+            ndiagL1[0] = L_b[W];
+            diagR[1] = L_b[C];
+            ndiagR1[1] = L_b[E];                    
+            ndiagR2[1] = L_b[SE];
+
+            rhs[2+Nx+1] = fv[2+Nx+1] - L_b[N] * u[2+(1+J_b_y[N])*(Nx+1)] - L_b[S] * u[2+(1+J_b_y[S])*(Nx+1)]
+                            -L_b[NE] * u[2+(1+J_b_y[NE])*(Nx+1)] - L_b[NW] * u[2+J_b_x[NW]+Nx+1];
+
+            for(size_t sum=8; sum<L_b.size(); sum++)
+            {
+                rhs[2+Nx+1] -= L_b[sum] * u[2+J_b_x[sum]+(1+J_b_y[sum])*(Nx+1)];
+            }
+
+            for(size_t j=3; j<Nx-2; j++)  
+            {
+                ndiagL2[j-3] = L_b[NW];
+                ndiagL1[j-2] = L_b[W];
+                diagR[j-1] = L_b[C];
+                ndiagR1[j-1] = L_b[E];                  
+                ndiagR2[j-1] = L_b[SE];
+                    
+                rhs[j+Nx+1] = fv[j+Nx+1] - L_b[N] * u[j+(1+J_b_y[N])*(Nx+1)] - L_b[S] * u[j+(1+J_b_y[S])*(Nx+1)]
+                        -L_b[NE] * u[j+(1+J_b_y[NE])*(Nx+1)];
+
+                for(size_t sum=8; sum<L_b.size(); sum++)
+                {
+                    rhs[j+Nx+1] -= L_b[sum] * u[j+J_b_x[sum]+(1+J_b_y[sum])*(Nx+1)];
+                }
+            }
+                
+            ndiagL2[Nx-5] = L_b[NW];
+            ndiagL1[Nx-4] = L_b[W];
+            diagR[Nx-3] = L_b[C];
+            ndiagR1[Nx-3] = L_b[E];
+
+            rhs[Nx-2+Nx+1] = fv[Nx-2+Nx+1] - L_b[N] * u[Nx-2+(1+J_b_y[N])*(Nx+1)] - L_b[S] * u[Nx-2+(1+J_b_y[S])*(Nx+1)]
+                        -L_b[NE] * u[Nx-2+(1+J_b_y[NE])*(Nx+1)] - L_b[SE] * u[Nx-2+J_b_x[SE]+Nx+1];
+
+            for(size_t sum=8; sum<L_b.size(); sum++)
+            {
+                rhs[Nx-2+Nx+1] -= L_b[sum] * u[Nx-2+J_b_x[sum]+(1+J_b_y[sum])*(Nx+1)];
+            }
+                
+            L_c = stencil.get_L_se(Nx-1,1,Nx,Ny);
+            J_c_x = stencil.getJx(SE);
+            J_c_y = stencil.getJy(SE);
+
+            ndiagL2[Nx-4] = L_c[NW];
+            ndiagL1[Nx-3] = L_c[W];
+            diagR[Nx-2] = L_c[C];
+
+            rhs[(Nx-1)+(Nx+1)] = fv[Nx-1+Nx+1] - L_c[N] * u[Nx-1+(1+J_c_y[N])*(Nx+1)] 
+                    - L_c[S] * u[Nx-1+(1+J_c_y[S])*(Nx+1)] - L_c[E] * u[Nx+Nx+1] - L_c[NE] * u[Nx-1+(1+J_c_y[NE])*(Nx+1)];
+
+            for(size_t sum=7; sum<L_c.size(); sum++)
+            {
+                rhs[Nx-1+(Nx+1)] -= L_c[sum] * u[Nx-1+J_c_x[sum]+(1+J_c_y[sum])*(Nx+1)];
+            }
+
+            // LR-decomposition + transformation of the rhs
+            for(size_t k=1; k<Nx-2; k++)  
+            {
+                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
+                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
+                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
+                rhs[(Nx+1) + 1 + k] = rhs[(Nx+1) + 1 + k] - ndiagL1[k-1] * rhs[(Nx+1)+k]; 
+
+                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
+                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
+                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
+                rhs[(Nx+1) + 1 + k+1] = rhs[(Nx+1) + 1 + k+1] - ndiagL2[k-1] * rhs[(Nx+1)+k];
+            }
+
+            ndiagL1[Nx-2-1] = ndiagL1[Nx-2-1]/diagR[Nx-2-1];
+            diagR[Nx-2] -= ndiagL1[Nx-2-1] * ndiagR1[Nx-2-1];
+            rhs[(Nx+1) + 1 + Nx-2] = rhs[(Nx+1) + 1 + Nx-2] - ndiagL1[Nx-2-1] * rhs[(Nx+1)+ Nx-2];
+
+            // solve the linear system of equations R u = rhs
+            u[(Nx+1)+(Nx-1)] = rhs[(Nx+1)+(Nx-1)] / diagR[Nx-2];
+        
+            for(size_t j=Nx-2; j>1; j--)
+            {
+               u[(Nx+1)+j] = 1/diagR[j-1] * ( rhs[(Nx+1)+j] - ndiagR1[j-1] * u[(Nx+1)+j+1] );
+
+               rhs[(Nx+1)+j-1] -= ndiagR2[j-2] * u[(Nx+1)+j+1];
+            }
+            u[(Nx+1)+1] = 1/diagR[0] * ( rhs[(Nx+1)+1] - ndiagR1[0] * u[(Nx+1)+1+1] );
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////           
+            // durchlaufe alle inneren Zeilen, Zeilenindex i                
+            for(size_t i=2; i < Ny-1; i++)
+            {
+                // setze rechte Seite                   
+                L_b = stencil.get_L_w(1,i,Nx,Ny);
+                J_b_x = stencil.getJx(W);
+                J_b_y = stencil.getJy(W);
+
+                diagR[0] = L_b[C];
+                ndiagR1[0] = L_b[E];
+                ndiagR2[0] = L_b[NE];
+                                
+                rhs[1+i*(Nx+1)] = fv[1+i*(Nx+1)] - L_b[N] * u[1+(i+J_b_y[N])*(Nx+1)] - L_b[S] * u[1+(i+J_b_y[S])*(Nx+1)]
+                - L_b[W] * u[i*(Nx+1)] - L_b[NW] * u[1+(i+J_b_y[NW])*(Nx+1)] - L_b[SE] * u[1+(i+J_b_y[SE])*(Nx+1)];
+                
+                for(size_t sum=8; sum<L_b.size(); sum++)
+                {
+                    rhs[1+i*(Nx+1)] -= L_b[sum] * u[1+J_b_x[sum]+(i+J_b_y[sum])*(Nx+1)];
+                }
+                                    
+                ndiagL1[0] = L[W];
+                diagR[1] = L[C];
+                ndiagR1[1] = L[E];                  
+                ndiagR2[1] = L[SE];
+
+                rhs[2+i*(Nx+1)] = fv[2+i*(Nx+1)] - L[N] * u[2+(i+J_y[N])*(Nx+1)] - L[S] * u[2+(i+J_y[S])*(Nx+1)]
+                            -L[NE] * u[2+(i+J_y[NE])*(Nx+1)] - L[SW] * u[2+(i+J_y[SW])*(Nx+1)] - L[NW] * u[2+J_x[NW]+i*(Nx+1)];
+
+                for(size_t sum=9; sum<L.size(); sum++)
+                {
+                    rhs[2+i*(Nx+1)] -= L[sum] * u[2+J_x[sum]+(i+J_y[sum])*(Nx+1)];
+                }
+
+                for(size_t j=3; j<Nx-2; j++)  
+                {
+                    ndiagL2[j-3] = L[NW];
+                    ndiagL1[j-2] = L[W];
+                    diagR[j-1] = L[C];
+                    ndiagR1[j-1] = L[E];                    
+                    ndiagR2[j-1] = L[SE];
+                    
+                    rhs[j+i*(Nx+1)] = fv[j+i*(Nx+1)] - L[N] * u[j+(i+J_y[N])*(Nx+1)] - L[S] * u[j+(i+J_y[S])*(Nx+1)]
+                        -L[NE] * u[j+(i+J_y[NE])*(Nx+1)] - L[SW] * u[j+(i+J_y[SW])*(Nx+1)];
+
+                    for(size_t sum=9; sum<L.size(); sum++)
+                    {
+                        rhs[j+i*(Nx+1)] -= L[sum] * u[j+J_x[sum]+(i+J_y[sum])*(Nx+1)];
+                    }
+                }
+                
+                ndiagL2[Nx-5] = L[NW];
+                ndiagL1[Nx-4] = L[W];
+                diagR[Nx-3] = L[C];
+                ndiagR1[Nx-3] = L[E];
+
+                rhs[Nx-2+i*(Nx+1)] = fv[Nx-2+i*(Nx+1)] - L[N] * u[Nx-2+(i+J_y[N])*(Nx+1)] - L[S] * u[Nx-2+(i+J_y[S])*(Nx+1)]
+                        -L[NE] * u[Nx-2+(i+J_y[NE])*(Nx+1)] - L[SW] * u[Nx-2+(i+J_y[SW])*(Nx+1)] - L[SE] * u[Nx-2+J_x[SE]+i*(Nx+1)];
+
+                for(size_t sum=9; sum<L.size(); sum++)
+                {
+                    rhs[Nx-2+i*(Nx+1)] -= L[sum] * u[Nx-2+J_x[sum]+(i+J_y[sum])*(Nx+1)];
+                }
+                
+                L_b = stencil.get_L_e(Nx-1,i,Nx,Ny);
+                J_b_x = stencil.getJx(E);
+                J_b_y = stencil.getJy(E);
+
+                ndiagL2[Nx-4] = L_b[NW];
+                ndiagL1[Nx-3] = L_b[W];
+                diagR[Nx-2] = L_b[C];
+
+                rhs[(Nx-1)+i*(Nx+1)] = fv[Nx-1+i*(Nx+1)] - L_b[N] * u[Nx-1+(i+J_b_y[N])*(Nx+1)] 
+                    - L_b[S] * u[Nx-1+(i+J_b_y[S])*(Nx+1)] - L_b[E] * u[Nx+i*(Nx+1)] - L_b[NE] * u[Nx-1+(i+J_b_y[NE])*(Nx+1)]
+                    - L_b[SE] * u[Nx-1+(i+J_b_y[SE])*(Nx+1)];
+
+                for(size_t sum=9; sum<L_b.size(); sum++)
+                {
+                    rhs[Nx-1+i*(Nx+1)] -= L_b[sum] * u[Nx-1+J_b_x[sum]+(i+J_b_y[sum])*(Nx+1)];
+                }
+                
+                // LR-decomposition + transformation of the rhs
+                for(size_t k=1; k<Nx-2; k++)  
+                {
+                    ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
+                    diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
+                    ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
+                    rhs[i*(Nx+1) + 1 + k] = rhs[i*(Nx+1) + 1 + k] - ndiagL1[k-1] * rhs[i*(Nx+1)+k]; 
+
+                    ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
+                    ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
+                    diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
+                    rhs[i*(Nx+1) + 1 + k+1] = rhs[i*(Nx+1) + 1 + k+1] - ndiagL2[k-1] * rhs[i*(Nx+1)+k];
+                }
+
+                ndiagL1[Nx-2-1] = ndiagL1[Nx-2-1]/diagR[Nx-2-1];
+                diagR[Nx-2] -= ndiagL1[Nx-2-1] * ndiagR1[Nx-2-1];
+                rhs[i*(Nx+1) + 1 + Nx-2] = rhs[i*(Nx+1) + 1 + Nx-2] - ndiagL1[Nx-2-1] * rhs[i*(Nx+1)+ Nx-2];
+
+                // solve the linear system of equations R u = rhs
+                u[i*(Nx+1)+(Nx-1)] = rhs[i*(Nx+1)+(Nx-1)] / diagR[Nx-2];
+            
+                for(size_t j=Nx-2; j>1; j--)
+                {
+                   u[i*(Nx+1)+j] = 1/diagR[j-1] * ( rhs[i*(Nx+1)+j] - ndiagR1[j-1] * u[i*(Nx+1)+j+1] );
+
+                   rhs[i*(Nx+1)+j-1] -= ndiagR2[j-2] * u[i*(Nx+1)+j+1];
+                }
+                u[i*(Nx+1)+1] = 1/diagR[0] * ( rhs[i*(Nx+1)+1] - ndiagR1[0] * u[i*(Nx+1)+1+1] );
+            }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // setze rechte Seite in oberster Zeile                 
+            L_c = stencil.get_L_nw(1,Ny-1,Nx,Ny);
+            J_c_x = stencil.getJx(NW);
+            J_c_y = stencil.getJy(NW);
+
+            diagR[0] = L_c[C];
+            ndiagR1[0] = L_c[E];
+            ndiagR2[0] = L_c[NW];
+                                
+            rhs[1+(Ny-1)*(Nx+1)] = fv[1+(Ny-1)*(Nx+1)] - L_c[N] * u[1+(Ny-1+J_c_y[N])*(Nx+1)] - L_c[S] * u[1+(Ny-1+J_c_y[S])*(Nx+1)]
+                - L_c[W] * u[(Ny-1)*(Nx+1)]  - L_c[NE] * u[1+(Ny-1+J_c_y[NE])*(Nx+1)];
+                
+            for(size_t sum=7; sum<L_c.size(); sum++)
+            {
+                rhs[1+(Ny-1)*(Nx+1)] -= L_c[sum] * u[1+J_c_x[sum]+(Ny-1+J_c_y[sum])*(Nx+1)];
+            }
+            
+            L_b = stencil.get_L_n(2,Ny-1,Nx,Ny);
+            J_b_x = stencil.getJx(N);
+            J_b_y = stencil.getJy(N);
+            
+            ndiagL1[0] = L_b[W];
+            diagR[1] = L_b[C];
+            ndiagR1[1] = L_b[E];                    
+            ndiagR2[1] = L_b[NE];
+
+            rhs[2+(Ny-1)*(Nx+1)] = fv[2+(Ny-1)*(Nx+1)] - L_b[N] * u[2+(Ny-1+J_b_y[N])*(Nx+1)] - L_b[S] * u[2+(Ny-1+J_b_y[S])*(Nx+1)]
+                    - L_b[SE] * u[2+(Ny-1+J_b_y[SE])*(Nx+1)] - L_b[NW] * u[2+J_b_x[NW]+(Ny-1)*(Nx+1)];
+
+            for(size_t sum=8; sum<L_b.size(); sum++)
+            {
+                rhs[2+(Ny-1)*(Nx+1)] -= L_b[sum] * u[2+J_b_x[sum]+(Ny-1+J_b_y[sum])*(Nx+1)];
+            }
+
+            for(size_t j=3; j<Nx-2; j++)  
+            {
+                ndiagL2[j-3] = L_b[NW];
+                ndiagL1[j-2] = L_b[W];
+                diagR[j-1] = L_b[C];
+                ndiagR1[j-1] = L_b[E];                  
+                ndiagR2[j-1] = L_b[NE];
+                    
+                rhs[j+(Ny-1)*(Nx+1)] = fv[j+(Ny-1)*(Nx+1)] - L_b[N] * u[j+(Ny-1+J_b_y[N])*(Nx+1)] - L_b[S] * u[j+(Ny-1+J_b_y[S])*(Nx+1)]
+                        -L_b[SE] * u[j+(Ny-1+J_b_y[SE])*(Nx+1)];
+
+                for(size_t sum=8; sum<L_b.size(); sum++)
+                {
+                    rhs[j+(Ny-1)*(Nx+1)] -= L_b[sum] * u[j+J_b_x[sum]+(Ny-1+J_b_y[sum])*(Nx+1)];
+                }
+            }
+                
+            ndiagL2[Nx-5] = L_b[NW];
+            ndiagL1[Nx-4] = L_b[W];
+            diagR[Nx-3] = L_b[C];
+            ndiagR1[Nx-3] = L_b[E];
+
+            rhs[Nx-2+(Ny-1)*(Nx+1)] = fv[Nx-2+(Ny-1)*(Nx+1)] - L_b[N] * u[Nx-2+(Ny-1+J_b_y[N])*(Nx+1)] - L_b[S] * u[Nx-2+(Ny-1+J_b_y[S])*(Nx+1)]
+                    -L_b[SE] * u[Nx-2+(Ny-1+J_b_y[SE])*(Nx+1)] - L_b[NE] * u[Nx-2+J_b_x[NE]+(Ny-1)*(Nx+1)];
+
+            for(size_t sum=8; sum<L_b.size(); sum++)
+            {
+                rhs[Nx-2+(Ny-1)*(Nx+1)] -= L_b[sum] * u[Nx-2+J_b_x[sum]+(Ny-1+J_b_y[sum])*(Nx+1)];
+            }
+                
+            L_c = stencil.get_L_ne(Nx-1,Ny-1,Nx,Ny);
+            J_c_x = stencil.getJx(NE);
+            J_c_y = stencil.getJy(NE);
+
+            ndiagL2[Nx-4] = L_c[NW];
+            ndiagL1[Nx-3] = L_c[W];
+            diagR[Nx-2] = L_c[C];
+
+            rhs[(Nx-1)+(Ny-1)*(Nx+1)] = fv[Nx-1+(Ny-1)*(Nx+1)] - L_c[N] * u[Nx-1+(Ny-1+J_c_y[N])*(Nx+1)]
+                    - L_c[S] * u[Nx-1+(Ny-1+J_c_y[S])*(Nx+1)] - L_c[E] * u[Nx+(Ny-1)*(Nx+1)] - L_c[NE] * u[Nx-1+(Ny-1+J_c_y[NE])*(Nx+1)];
+
+            for(size_t sum=7; sum<L_c.size(); sum++)
+            {
+                rhs[Nx-1+(Ny-1)*(Nx+1)] -= L_c[sum] * u[Nx-1+J_c_x[sum]+(Ny-1+J_c_y[sum])*(Nx+1)];
+            }
+
+            // LR-decomposition + transformation of the rhs
+            for(size_t k=1; k<Nx-2; k++)  
+            {
+                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
+                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
+                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
+                rhs[(Ny-1)*(Nx+1) + 1 + k] = rhs[(Ny-1)*(Nx+1) + 1 + k] - ndiagL1[k-1] * rhs[(Ny-1)*(Nx+1)+k]; 
+
+                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
+                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
+                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
+                rhs[(Ny-1)*(Nx+1) + 1 + k+1] = rhs[(Ny-1)*(Nx+1) + 1 + k+1] - ndiagL2[k-1] * rhs[(Ny-1)*(Nx+1)+k];
+            }
+
+            ndiagL1[Nx-2-1] = ndiagL1[Nx-2-1]/diagR[Nx-2-1];
+            diagR[Nx-2] -= ndiagL1[Nx-2-1] * ndiagR1[Nx-2-1];
+            rhs[(Ny-1)*(Nx+1) + 1 + Nx-2] = rhs[(Ny-1)*(Nx+1) + 1 + Nx-2] - ndiagL1[Nx-2-1] * rhs[(Ny-1)*(Nx+1)+ Nx-2];
+
+            // solve the linear system of equations R u = rhs
+            u[(Ny-1)*(Nx+1)+(Nx-1)] = rhs[(Ny-1)*(Nx+1)+(Nx-1)] / diagR[Nx-2];
+            
+            for(size_t j=Nx-2; j>1; j--)
+            {
+               u[(Ny-1)*(Nx+1)+j] = 1/diagR[j-1] * ( rhs[(Ny-1)*(Nx+1)+j] - ndiagR1[j-1] * u[(Ny-1)*(Nx+1)+j+1] );
+
+               rhs[(Ny-1)*(Nx+1)+j-1] -= ndiagR2[j-2] * u[(Ny-1)*(Nx+1)+j+1];
+            }
+            u[(Ny-1)*(Nx+1)+1] = 1/diagR[0] * ( rhs[(Ny-1)*(Nx+1)+1] - ndiagR1[0] * u[(Ny-1)*(Nx+1)+1+1] );
+        }
+
+        else // not constant
+            {
+                std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+                std::valarray<int> J_x = stencil.getJx(C);
+                std::valarray<int> J_y = stencil.getJy(C);
+                
+                std::valarray<Precision> L_b = stencil.get_L_s(2,1,Nx,Ny);
+                std::valarray<int> J_b_x = stencil.getJx(S);
+                std::valarray<int> J_b_y = stencil.getJy(S);
+ 
+                std::valarray<Precision> L_c = stencil.get_L_sw(1,1,Nx,Ny);
+                std::valarray<int> J_c_x = stencil.getJx(SW);
+                std::valarray<int> J_c_y = stencil.getJy(SW);
+
+                
+                diagR[0] = L_c[C];
+                ndiagR1[0] = L_c[E];
+                ndiagR2[0] = L_c[NE];
+                                    
+                rhs[1+Nx+1] = fv[1+Nx+1] - L_c[N] * u[1+(1+J_c_y[N])*(Nx+1)] - L_c[S] * u[1+(1+J_c_y[S])*(Nx+1)]
+                    - L_c[W] * u[Nx+1] - L_c[NW] * u[1+(1+J_c_y[NW])*(Nx+1)];
+                    
+                for(size_t sum=7; sum<L_c.size(); sum++)
+                {
+                    rhs[1+Nx+1] -= L_c[sum] * u[1+J_c_x[sum]+(1+J_c_y[sum])*(Nx+1)];
+                }
+                
+                ndiagL1[0] = L_b[W];
+                diagR[1] = L_b[C];
+                ndiagR1[1] = L_b[E];                    
+                ndiagR2[1] = L_b[SE];
+
+                rhs[2+Nx+1] = fv[2+Nx+1] - L_b[N] * u[2+(1+J_b_y[N])*(Nx+1)] - L_b[S] * u[2+(1+J_b_y[S])*(Nx+1)]
+                                -L_b[NE] * u[2+(1+J_b_y[NE])*(Nx+1)] - L_b[NW] * u[2+J_b_x[NW]+Nx+1];
+
+                for(size_t sum=8; sum<L_b.size(); sum++)
+                {
+                    rhs[2+Nx+1] -= L_b[sum] * u[2+J_b_x[sum]+(1+J_b_y[sum])*(Nx+1)];
+                }
+
+                for(size_t j=3; j<Nx-2; j++)  
+                {
+                    
+                    L_b = stencil.get_L_s(j,1,Nx,Ny);
+                    
+                    ndiagL2[j-3] = L_b[NW];
+                    ndiagL1[j-2] = L_b[W];
+                    diagR[j-1] = L_b[C];
+                    ndiagR1[j-1] = L_b[E];                  
+                    ndiagR2[j-1] = L_b[SE];
+                        
+                    rhs[j+Nx+1] = fv[j+Nx+1] - L_b[N] * u[j+(1+J_b_y[N])*(Nx+1)] - L_b[S] * u[j+(1+J_b_y[S])*(Nx+1)]
+                            -L_b[NE] * u[j+(1+J_b_y[NE])*(Nx+1)];
+
+                    for(size_t sum=8; sum<L_b.size(); sum++)
+                    {
+                        rhs[j+Nx+1] -= L_b[sum] * u[j+J_b_x[sum]+(1+J_b_y[sum])*(Nx+1)];
+                    }
+                }
+                    
+                L_b = stencil.get_L_s(Nx-2,1,Nx,Ny);
+
+                ndiagL2[Nx-5] = L_b[NW];
+                ndiagL1[Nx-4] = L_b[W];
+                diagR[Nx-3] = L_b[C];
+                ndiagR1[Nx-3] = L_b[E];
+
+                rhs[Nx-2+Nx+1] = fv[Nx-2+Nx+1] - L_b[N] * u[Nx-2+(1+J_b_y[N])*(Nx+1)] - L_b[S] * u[Nx-2+(1+J_b_y[S])*(Nx+1)]
+                            -L_b[NE] * u[Nx-2+(1+J_b_y[NE])*(Nx+1)] - L_b[SE] * u[Nx-2+J_b_x[SE]+Nx+1];
+
+                for(size_t sum=8; sum<L_b.size(); sum++)
+                {
+                    rhs[Nx-2+Nx+1] -= L_b[sum] * u[Nx-2+J_b_x[sum]+(1+J_b_y[sum])*(Nx+1)];
+                }
+                    
+                L_c = stencil.get_L_se(Nx-1,1,Nx,Ny);
+                J_c_x = stencil.getJx(SE);
+                J_c_y = stencil.getJy(SE);
+
+                ndiagL2[Nx-4] = L_c[NW];
+                ndiagL1[Nx-3] = L_c[W];
+                diagR[Nx-2] = L_c[C];
+
+                rhs[(Nx-1)+(Nx+1)] = fv[Nx-1+Nx+1] - L_c[N] * u[Nx-1+(1+J_c_y[N])*(Nx+1)] 
+                        - L_c[S] * u[Nx-1+(1+J_c_y[S])*(Nx+1)] - L_c[E] * u[Nx+Nx+1] - L_c[NE] * u[Nx-1+(1+J_c_y[NE])*(Nx+1)];
+
+                for(size_t sum=7; sum<L_c.size(); sum++)
+                {
+                    rhs[Nx-1+(Nx+1)] -= L_c[sum] * u[Nx-1+J_c_x[sum]+(1+J_c_y[sum])*(Nx+1)];
+                }
+
+                // LR-decomposition + transformation of the rhs
+            for(size_t k=1; k<Nx-2; k++)  
+            {
+                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
+                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
+                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
+                rhs[(Nx+1) + 1 + k] = rhs[(Nx+1) + 1 + k] - ndiagL1[k-1] * rhs[(Nx+1)+k]; 
+
+                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
+                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
+                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
+                rhs[(Nx+1) + 1 + k+1] = rhs[(Nx+1) + 1 + k+1] - ndiagL2[k-1] * rhs[(Nx+1)+k];
+            }
+
+            ndiagL1[Nx-2-1] = ndiagL1[Nx-2-1]/diagR[Nx-2-1];
+            diagR[Nx-2] -= ndiagL1[Nx-2-1] * ndiagR1[Nx-2-1];
+            rhs[(Nx+1) + 1 + Nx-2] = rhs[(Nx+1) + 1 + Nx-2] - ndiagL1[Nx-2-1] * rhs[(Nx+1)+ Nx-2];
+
+            // solve the linear system of equations R u = rhs
+            u[(Nx+1)+(Nx-1)] = rhs[(Nx+1)+(Nx-1)] / diagR[Nx-2];
+        
+            for(size_t j=Nx-2; j>1; j--)
+            {
+               u[(Nx+1)+j] = 1/diagR[j-1] * ( rhs[(Nx+1)+j] - ndiagR1[j-1] * u[(Nx+1)+j+1] );
+
+               rhs[(Nx+1)+j-1] -= ndiagR2[j-2] * u[(Nx+1)+j+1];
+            }
+            u[(Nx+1)+1] = 1/diagR[0] * ( rhs[(Nx+1)+1] - ndiagR1[0] * u[(Nx+1)+1+1] );
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////           
+            // durchlaufe alle inneren Zeilen, Zeilenindex i                
+            for(size_t i=2; i < Ny-1; i++)
+            {
+                // setze rechte Seite                   
+                L_b = stencil.get_L_w(1,i,Nx,Ny);
+                J_b_x = stencil.getJx(W);
+                J_b_y = stencil.getJy(W);
+
+                diagR[0] = L_b[C];
+                ndiagR1[0] = L_b[E];
+                ndiagR2[0] = L_b[NE];
+                                
+                rhs[1+i*(Nx+1)] = fv[1+i*(Nx+1)] - L_b[N] * u[1+(i+J_b_y[N])*(Nx+1)] - L_b[S] * u[1+(i+J_b_y[S])*(Nx+1)]
+                - L_b[W] * u[i*(Nx+1)] - L_b[NW] * u[1+(i+J_b_y[NW])*(Nx+1)] - L_b[SE] * u[1+(i+J_b_y[SE])*(Nx+1)];
+                
+                for(size_t sum=8; sum<L_b.size(); sum++)
+                {
+                    rhs[1+i*(Nx+1)] -= L_b[sum] * u[1+J_b_x[sum]+(i+J_b_y[sum])*(Nx+1)];
+                }
+                                    
+                L = stencil.get_L_c(2,i,Nx,Ny);
+                
+                ndiagL1[0] = L[W];
+                diagR[1] = L[C];
+                ndiagR1[1] = L[E];                  
+                ndiagR2[1] = L[SE];
+
+                rhs[2+i*(Nx+1)] = fv[2+i*(Nx+1)] - L[N] * u[2+(i+J_y[N])*(Nx+1)] - L[S] * u[2+(i+J_y[S])*(Nx+1)]
+                            -L[NE] * u[2+(i+J_y[NE])*(Nx+1)] - L[SW] * u[2+(i+J_y[SW])*(Nx+1)] - L[NW] * u[2+J_x[NW]+i*(Nx+1)];
+
+                for(size_t sum=9; sum<L.size(); sum++)
+                {
+                    rhs[2+i*(Nx+1)] -= L[sum] * u[2+J_x[sum]+(i+J_y[sum])*(Nx+1)];
+                }
+
+                for(size_t j=3; j<Nx-2; j++)  
+                {
+                    L = stencil.get_L_c(j,i,Nx,Ny);
+                    
+                    ndiagL2[j-3] = L[NW];
+                    ndiagL1[j-2] = L[W];
+                    diagR[j-1] = L[C];
+                    ndiagR1[j-1] = L[E];                    
+                    ndiagR2[j-1] = L[SE];
+                    
+                    rhs[j+i*(Nx+1)] = fv[j+i*(Nx+1)] - L[N] * u[j+(i+J_y[N])*(Nx+1)] - L[S] * u[j+(i+J_y[S])*(Nx+1)]
+                        -L[NE] * u[j+(i+J_y[NE])*(Nx+1)] - L[SW] * u[j+(i+J_y[SW])*(Nx+1)];
+
+                    for(size_t sum=9; sum<L.size(); sum++)
+                    {
+                        rhs[j+i*(Nx+1)] -= L[sum] * u[j+J_x[sum]+(i+J_y[sum])*(Nx+1)];
+                    }
+                }
+                
+                L = stencil.get_L_c(Nx-2,i,Nx,Ny);
+
+                ndiagL2[Nx-5] = L[NW];
+                ndiagL1[Nx-4] = L[W];
+                diagR[Nx-3] = L[C];
+                ndiagR1[Nx-3] = L[E];
+
+                rhs[Nx-2+i*(Nx+1)] = fv[Nx-2+i*(Nx+1)] - L[N] * u[Nx-2+(i+J_y[N])*(Nx+1)] - L[S] * u[Nx-2+(i+J_y[S])*(Nx+1)]
+                        -L[NE] * u[Nx-2+(i+J_y[NE])*(Nx+1)] - L[SW] * u[Nx-2+(i+J_y[SW])*(Nx+1)] - L[SE] * u[Nx-2+J_x[SE]+i*(Nx+1)];
+
+                for(size_t sum=9; sum<L.size(); sum++)
+                {
+                    rhs[Nx-2+i*(Nx+1)] -= L[sum] * u[Nx-2+J_x[sum]+(i+J_y[sum])*(Nx+1)];
+                }
+                
+                L_b = stencil.get_L_e(Nx-1,i,Nx,Ny);
+                J_b_x = stencil.getJx(E);
+                J_b_y = stencil.getJy(E);
+
+                ndiagL2[Nx-4] = L_b[NW];
+                ndiagL1[Nx-3] = L_b[W];
+                diagR[Nx-2] = L_b[C];
+
+                rhs[(Nx-1)+i*(Nx+1)] = fv[Nx-1+i*(Nx+1)] - L_b[N] * u[Nx-1+(i+J_b_y[N])*(Nx+1)] 
+                    - L_b[S] * u[Nx-1+(i+J_b_y[S])*(Nx+1)] - L_b[E] * u[Nx+i*(Nx+1)] - L_b[NE] * u[Nx-1+(i+J_b_y[NE])*(Nx+1)]
+                    - L_b[SE] * u[Nx-1+(i+J_b_y[SE])*(Nx+1)];
+
+                for(size_t sum=9; sum<L_b.size(); sum++)
+                {
+                    rhs[Nx-1+i*(Nx+1)] -= L_b[sum] * u[Nx-1+J_b_x[sum]+(i+J_b_y[sum])*(Nx+1)];
+                }
+                
+                // LR-decomposition + transformation of the rhs
+                for(size_t k=1; k<Nx-2; k++)  
+                {
+                    ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
+                    diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
+                    ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
+                    rhs[i*(Nx+1) + 1 + k] = rhs[i*(Nx+1) + 1 + k] - ndiagL1[k-1] * rhs[i*(Nx+1)+k]; 
+
+                    ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
+                    ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
+                    diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
+                    rhs[i*(Nx+1) + 1 + k+1] = rhs[i*(Nx+1) + 1 + k+1] - ndiagL2[k-1] * rhs[i*(Nx+1)+k];
+                }
+
+                ndiagL1[Nx-2-1] = ndiagL1[Nx-2-1]/diagR[Nx-2-1];
+                diagR[Nx-2] -= ndiagL1[Nx-2-1] * ndiagR1[Nx-2-1];
+                rhs[i*(Nx+1) + 1 + Nx-2] = rhs[i*(Nx+1) + 1 + Nx-2] - ndiagL1[Nx-2-1] * rhs[i*(Nx+1)+ Nx-2];
+
+                // solve the linear system of equations R u = rhs
+                u[i*(Nx+1)+(Nx-1)] = rhs[i*(Nx+1)+(Nx-1)] / diagR[Nx-2];
+            
+                for(size_t j=Nx-2; j>1; j--)
+                {
+                   u[i*(Nx+1)+j] = 1/diagR[j-1] * ( rhs[i*(Nx+1)+j] - ndiagR1[j-1] * u[i*(Nx+1)+j+1] );
+
+                   rhs[i*(Nx+1)+j-1] -= ndiagR2[j-2] * u[i*(Nx+1)+j+1];
+                }
+                u[i*(Nx+1)+1] = 1/diagR[0] * ( rhs[i*(Nx+1)+1] - ndiagR1[0] * u[i*(Nx+1)+1+1] );
+            }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // setze rechte Seite in oberster Zeile                 
+            L_c = stencil.get_L_nw(1,Ny-1,Nx,Ny);
+            J_c_x = stencil.getJx(NW);
+            J_c_y = stencil.getJy(NW);
+
+            diagR[0] = L_c[C];
+            ndiagR1[0] = L_c[E];
+            ndiagR2[0] = L_c[NW];
+                                
+            rhs[1+(Ny-1)*(Nx+1)] = fv[1+(Ny-1)*(Nx+1)] - L_c[N] * u[1+(Ny-1+J_c_y[N])*(Nx+1)] - L_c[S] * u[1+(Ny-1+J_c_y[S])*(Nx+1)]
+                - L_c[W] * u[(Ny-1)*(Nx+1)]  - L_c[NE] * u[1+(Ny-1+J_c_y[NE])*(Nx+1)];
+                
+            for(size_t sum=7; sum<L_c.size(); sum++)
+            {
+                rhs[1+(Ny-1)*(Nx+1)] -= L_c[sum] * u[1+J_c_x[sum]+(Ny-1+J_c_y[sum])*(Nx+1)];
+            }
+            
+            L_b = stencil.get_L_n(2,Ny-1,Nx,Ny);
+            J_b_x = stencil.getJx(N);
+            J_b_y = stencil.getJy(N);
+            
+            ndiagL1[0] = L_b[W];
+            diagR[1] = L_b[C];
+            ndiagR1[1] = L_b[E];                    
+            ndiagR2[1] = L_b[NE];
+
+            rhs[2+(Ny-1)*(Nx+1)] = fv[2+(Ny-1)*(Nx+1)] - L_b[N] * u[2+(Ny-1+J_b_y[N])*(Nx+1)] - L_b[S] * u[2+(Ny-1+J_b_y[S])*(Nx+1)]
+                    - L_b[SE] * u[2+(Ny-1+J_b_y[SE])*(Nx+1)] - L_b[NW] * u[2+J_b_x[NW]+(Ny-1)*(Nx+1)];
+
+            for(size_t sum=8; sum<L_b.size(); sum++)
+            {
+                rhs[2+(Ny-1)*(Nx+1)] -= L_b[sum] * u[2+J_b_x[sum]+(Ny-1+J_b_y[sum])*(Nx+1)];
+            }
+
+            for(size_t j=3; j<Nx-2; j++)  
+            {
+                L_b = stencil.get_L_n(j,Ny-1,Nx,Ny);
+                
+                ndiagL2[j-3] = L_b[NW];
+                ndiagL1[j-2] = L_b[W];
+                diagR[j-1] = L_b[C];
+                ndiagR1[j-1] = L_b[E];                  
+                ndiagR2[j-1] = L_b[NE];
+                    
+                rhs[j+(Ny-1)*(Nx+1)] = fv[j+(Ny-1)*(Nx+1)] - L_b[N] * u[j+(Ny-1+J_b_y[N])*(Nx+1)] - L_b[S] * u[j+(Ny-1+J_b_y[S])*(Nx+1)]
+                        -L_b[SE] * u[j+(Ny-1+J_b_y[SE])*(Nx+1)];
+
+                for(size_t sum=8; sum<L_b.size(); sum++)
+                {
+                    rhs[j+(Ny-1)*(Nx+1)] -= L_b[sum] * u[j+J_b_x[sum]+(Ny-1+J_b_y[sum])*(Nx+1)];
+                }
+            }
+                
+            L_b = stencil.get_L_n(Nx-2,Ny-1,Nx,Ny);
+
+            ndiagL2[Nx-5] = L_b[NW];
+            ndiagL1[Nx-4] = L_b[W];
+            diagR[Nx-3] = L_b[C];
+            ndiagR1[Nx-3] = L_b[E];
+
+            rhs[Nx-2+(Ny-1)*(Nx+1)] = fv[Nx-2+(Ny-1)*(Nx+1)] - L_b[N] * u[Nx-2+(Ny-1+J_b_y[N])*(Nx+1)] - L_b[S] * u[Nx-2+(Ny-1+J_b_y[S])*(Nx+1)]
+                    -L_b[SE] * u[Nx-2+(Ny-1+J_b_y[SE])*(Nx+1)] - L_b[NE] * u[Nx-2+J_b_x[NE]+(Ny-1)*(Nx+1)];
+
+            for(size_t sum=8; sum<L_b.size(); sum++)
+            {
+                rhs[Nx-2+(Ny-1)*(Nx+1)] -= L_b[sum] * u[Nx-2+J_b_x[sum]+(Ny-1+J_b_y[sum])*(Nx+1)];
+            }
+                
+            L_c = stencil.get_L_ne(Nx-1,Ny-1,Nx,Ny);
+            J_c_x = stencil.getJx(NE);
+            J_c_y = stencil.getJy(NE);
+
+            ndiagL2[Nx-4] = L_c[NW];
+            ndiagL1[Nx-3] = L_c[W];
+            diagR[Nx-2] = L_c[C];
+
+            rhs[(Nx-1)+(Ny-1)*(Nx+1)] = fv[Nx-1+(Ny-1)*(Nx+1)] - L_c[N] * u[Nx-1+(Ny-1+J_c_y[N])*(Nx+1)]
+                    - L_c[S] * u[Nx-1+(Ny-1+J_c_y[S])*(Nx+1)] - L_c[E] * u[Nx+(Ny-1)*(Nx+1)] - L_c[NE] * u[Nx-1+(Ny-1+J_c_y[NE])*(Nx+1)];
+
+            for(size_t sum=7; sum<L_c.size(); sum++)
+            {
+                rhs[Nx-1+(Ny-1)*(Nx+1)] -= L_c[sum] * u[Nx-1+J_c_x[sum]+(Ny-1+J_c_y[sum])*(Nx+1)];
+            }
+
+            // LR-decomposition + transformation of the rhs
+            for(size_t k=1; k<Nx-2; k++)  
+            {
+                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
+                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
+                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
+                rhs[(Ny-1)*(Nx+1) + 1 + k] = rhs[(Ny-1)*(Nx+1) + 1 + k] - ndiagL1[k-1] * rhs[(Ny-1)*(Nx+1)+k]; 
+
+                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
+                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
+                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
+                rhs[(Ny-1)*(Nx+1) + 1 + k+1] = rhs[(Ny-1)*(Nx+1) + 1 + k+1] - ndiagL2[k-1] * rhs[(Ny-1)*(Nx+1)+k];
+            }
+
+            ndiagL1[Nx-2-1] = ndiagL1[Nx-2-1]/diagR[Nx-2-1];
+            diagR[Nx-2] -= ndiagL1[Nx-2-1] * ndiagR1[Nx-2-1];
+            rhs[(Ny-1)*(Nx+1) + 1 + Nx-2] = rhs[(Ny-1)*(Nx+1) + 1 + Nx-2] - ndiagL1[Nx-2-1] * rhs[(Ny-1)*(Nx+1)+ Nx-2];
+
+            // solve the linear system of equations R u = rhs
+            u[(Ny-1)*(Nx+1)+(Nx-1)] = rhs[(Ny-1)*(Nx+1)+(Nx-1)] / diagR[Nx-2];
+            
+            for(size_t j=Nx-2; j>1; j--)
+            {
+               u[(Ny-1)*(Nx+1)+j] = 1/diagR[j-1] * ( rhs[(Ny-1)*(Nx+1)+j] - ndiagR1[j-1] * u[(Ny-1)*(Nx+1)+j+1] );
+
+               rhs[(Ny-1)*(Nx+1)+j-1] -= ndiagR2[j-2] * u[(Ny-1)*(Nx+1)+j+1];
+            }
+            u[(Ny-1)*(Nx+1)+1] = 1/diagR[0] * ( rhs[(Ny-1)*(Nx+1)+1] - ndiagR1[0] * u[(Ny-1)*(Nx+1)+1+1] );
+            
+        }
+
+    }
+
+    else 
+    {
+        
+        for(int k=0; k<2; k++)
+        {
+            Precision factor = 1.0;
+
+            /**
+     * \todo in case of large stencils a four colour RB is needed
+     */
+    //first do the red points
+    //south west corner
+    factor = 1.0/stencil.get_center_sw(1,1,Nx,Ny);
+    u[1*(Nx+1)+1]+=factor*(fv[1*(Nx+1)+1]
+                -stencil.apply_sw(u,1,1,Nx,Ny));
+    //red points on south boarder
+    for (size_t i=3;i<(Nx-1);i+=2)
+    {
+        factor = 1.0/stencil.get_center_s(i,1,Nx,Ny);
+        u[1*(Nx+1)+i]+=factor*(fv[1*(Nx+1)+i]
+                -stencil.apply_s(u,i,1,Nx,Ny));
+    }
+    //south east corner
+    factor = 1.0/stencil.get_center_se((Nx-1),1,Nx,Ny);
+    u[1*(Nx+1)+(Nx-1)]+=factor*(fv[1*(Nx+1)+(Nx-1)]
+                -stencil.apply_se(u,(Nx-1),1,Nx,Ny));
+    for (size_t j=3;j<(Ny-1);j+=2)
+    {
+        //west boarder point in j. line
+        factor = 1.0/stencil.get_center_w(1,j,Nx,Ny);
+        u[j*(Nx+1)+1]+=factor*(fv[j*(Nx+1)+1]
+                -stencil.apply_w(u,1,j,Nx,Ny));
+        
+        for (size_t i=3;i<(Nx-1);i+=2)
+        {
+            factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
+            u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
+                    -stencil.apply_c(u,i,j,Nx,Ny));
+        }
+        
+        //east boarder point in j. line
+        factor = 1.0/stencil.get_center_e((Nx-1),j,Nx,Ny);
+        u[j*(Nx+1)+(Nx-1)]+=factor*(fv[j*(Nx+1)+(Nx-1)]
+                -stencil.apply_e(u,(Nx-1),j,Nx,Ny));
+        
+    }
+    
+    //the missing red points in the center
+    for (size_t j=2;j<(Ny-1);j+=2)
+    {
+        for (size_t i=2;i<(Nx-1);i+=2)
+        {
+            factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
+            u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
+                    -stencil.apply_c(u,i,j,Nx,Ny));
+        }
+    }
+    //north west corner
+    
+    factor = 1.0/stencil.get_center_nw(1,(Ny-1),Nx,Ny);
+    u[(Nx-1)*(Nx+1)+1]+=factor*(fv[(Nx-1)*(Nx+1)+1]
+                -stencil.apply_nw(u,1,(Ny-1),Nx,Ny));
+    //red points on north boarder
+    for (size_t i=3;i<(Nx-1);i+=2)
+    {
+        factor = 1.0/stencil.get_center_n(i,(Nx-1),Nx,Ny);
+        u[(Nx-1)*(Nx+1)+i]+=factor*(fv[(Nx-1)*(Nx+1)+i]
+                -stencil.apply_n(u,i,(Ny-1),Nx,Ny));
+    }
+    
+    //north east corner
+    factor = 1.0/stencil.get_center_ne((Nx-1),(Nx-1),Nx,Ny);
+    u[(Nx-1)*(Nx+1)+(Nx-1)]+=factor*(fv[(Nx-1)*(Nx+1)+(Nx-1)]
+            -stencil.apply_ne(u,(Nx-1),(Ny-1),Nx,Ny));
+    
+    //do black points
+    //black points on south boarder
+    
+    for (size_t i=2;i<(Nx-1);i+=2)
+    {
+         factor = 1.0/stencil.get_center_s(i,1,Nx,Ny);
+            u[1*(Nx+1)+i]+=factor*(fv[1*(Nx+1)+i]
+                -stencil.apply_s(u,i,1,Nx,Ny));
+    }
+    for (size_t j=2;j<(Ny-1);j+=2)
+    {
+        //west boarder points
+        factor = 1.0/stencil.get_center_w(1,j,Nx,Ny);
+        u[j*(Nx+1)+1]+=factor*(fv[j*(Nx+1)+1]
+                -stencil.apply_w(u,1,j,Nx,Ny));
+        
+        for (size_t i=3;i<(Nx-1);i+=2)
+        {
+            factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
+            u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
+                    -stencil.apply_c(u,i,j,Nx,Ny));
+        }
+        
+        //east boarder points
+        factor = 1.0/stencil.get_center_e((Nx-1),j,Nx,Ny);
+        u[j*(Nx+1)+(Nx-1)]+=factor*(fv[j*(Nx+1)+(Nx-1)]
+                -stencil.apply_e(u,(Nx-1),j,Nx,Ny));
+    }
+    for (size_t j=3;j<(Ny-1);j+=2)
+    {
+        for (size_t i=2;i<(Nx-1);i+=2)
+        {
+            factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
+            u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
+                    -stencil.apply_c(u,i,j,Nx,Ny));
+        }
+    }
+    //black points on north boarder
+    for (size_t i=2;i<(Nx-1);i+=2)
+    {
+        factor = 1.0/stencil.get_center_n(i,(Ny-1),Nx,Ny);
+        u[(Nx-1)*(Nx+1)+i]+=factor*(fv[(Nx-1)*(Nx+1)+i]
+                -stencil.apply_n(u,i,(Ny-1),Nx,Ny));
+    }
+        }
+    }
+}
+void ZebraLineGS::yline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+                        std::valarray<Precision> &rhs, const Stencil &stencil, const size_t Nx, 
+                        const size_t Ny) const
+
+{
+    if((Ny > 4) && (Nx > 4))
+    {
+        std::valarray<Precision> diagR(0.0,Ny-1);
+        std::valarray<Precision> ndiagR1(0.0,Ny-2);
+        std::valarray<Precision> ndiagL1(0.0,Ny-2);
+        std::valarray<Precision> ndiagR2(0.0,Ny-3);
+        std::valarray<Precision> ndiagL2(0.0,Ny-3);
+                
+        if(stencil.isConstant() == true)
+        {
+            // get const operator L
+                const std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+                const std::valarray<int> J_x = stencil.getJx(C);
+                const std::valarray<int> J_y = stencil.getJy(C);
+                
+                std::valarray<Precision> L_b = stencil.get_L_w(1,2,Nx,Ny);
+                std::valarray<int> J_b_x = stencil.getJx(W);
+                std::valarray<int> J_b_y = stencil.getJy(W);
+ 
+                std::valarray<Precision> L_c = stencil.get_L_sw(1,1,Nx,Ny);
+                std::valarray<int> J_c_x = stencil.getJx(SW);
+                std::valarray<int> J_c_y = stencil.getJy(SW);
+
+                diagR[0] = L_c[C];
+                ndiagR1[0] = L_c[N];
+                ndiagR2[0] = L_c[NW];
+                                
+                rhs[1+Nx+1] = fv[1+Nx+1] - L_c[S] * u[1+(1+J_c_y[S])*(Nx+1)]
+                    - L_c[W] * u[Nx+1] - L_c[E] * u[2+Nx+1] - L_c[NE] * u[1+J_c_x[NE]+Nx+1];
+                    
+                for(size_t sum=7; sum<L_c.size(); sum++)
+                {
+                    rhs[1+Nx+1] -= L_c[sum] * u[1+J_c_x[sum]+(1+J_c_y[sum])*(Nx+1)];
+                }
+
+                ndiagL1[0] = L_b[S];
+                diagR[1] = L_b[C];
+                ndiagR1[1] = L_b[N];                    
+                ndiagR2[1] = L_b[NW];
+
+                rhs[1+2*(Nx+1)] = fv[1+2*(Nx+1)] - L_b[W] * u[2*(Nx+1)] - L_b[E] * u[2+2*(Nx+1)]
+                  -L_b[NE] * u[1+J_b_x[NE]+2*(Nx+1)] - L_b[SE] * u[1+(2+J_b_y[SE])*(Nx+1)];
+
+                for(size_t sum=8; sum<L_b.size(); sum++)
+                {
+                    rhs[1+2*(Nx+1)] -= L_b[sum] * u[1+J_b_x[sum]+(2+J_b_y[sum])*(Nx+1)];
+                }
+
+                for(size_t j=3; j<Ny-2; j++)  
+                {
+                    ndiagL2[j-3] = L_b[SE];
+                    ndiagL1[j-2] = L_b[S];
+                    diagR[j-1] = L_b[C];
+                    ndiagR1[j-1] = L_b[N];                  
+                    ndiagR2[j-1] = L_b[NW];
+                        
+                    rhs[1+j*(Nx+1)] = fv[1+j*(Nx+1)] - L_b[W] * u[1+J_b_x[W]+j*(Nx+1)] - L_b[E] * u[1+J_b_x[E]+j*(Nx+1)]
+                            -L_b[NE] * u[1+J_b_x[NE]+j*(Nx+1)];
+
+                    for(size_t sum=8; sum<L_b.size(); sum++)
+                    {
+                      rhs[1+j*(Nx+1)] -= L_b[sum] * u[1+J_b_x[sum]+(j+J_b_y[sum])*(Nx+1)];
+                    }
+                }
+                    
+                ndiagL2[Ny-5] = L_b[SE];
+                ndiagL1[Ny-4] = L_b[S];
+                diagR[Ny-3] = L_b[C];
+                ndiagR1[Ny-3] = L_b[N];
+
+                rhs[1+(Ny-2)*(Nx+1)] = fv[1+(Ny-2)*(Nx+1)] - L_b[W] * u[(Ny-2)*(Nx+1)] - L_b[E] * u[2+(Ny-2)*(Nx+1)]
+                  -L_b[NE] * u[1+J_b_x[NE]+(Ny-2)*(Nx+1)] - L_b[NW] * u[1+(Ny-2+J_b_y[NW])*(Nx+1)];
+
+                for(size_t sum=8; sum<L_b.size(); sum++)
+                {
+                  rhs[1+(Ny-2)*(Nx+1)] -= L_b[sum] * u[1+J_b_x[sum]+(Ny-2+J_b_y[sum])*(Nx+1)];
+                }
+                    
+                L_c = stencil.get_L_nw(1,Ny-1,Nx,Ny);
+                J_c_x = stencil.getJx(NW);
+                J_c_y = stencil.getJy(NW);
+
+                ndiagL2[Ny-4] = L_c[NE];
+                ndiagL1[Ny-3] = L_c[S];
+                diagR[Ny-2] = L_c[C];
+
+                rhs[1+(Ny-1)*(Nx+1)] = fv[1+(Ny-1)*(Nx+1)] - L_c[W] * u[(Ny-1)*(Nx+1)] - L_c[E] * u[2+(Ny-1)*(Nx+1)]
+                        - L_c[NW] * u[1+J_c_x[NW]+(Ny-1)*(Nx+1)] - L_c[N] * u[1+(Ny-1+J_c_y[N])*(Nx+1)];
+
+                for(size_t sum=7; sum<L_c.size(); sum++)
+                {
+                  rhs[1+(Ny-1)*(Nx+1)] -= L_c[sum] * u[1+J_c_x[sum]+(Ny-1+J_c_y[sum])*(Nx+1)];
+                }
+
+                // LR-decomposition + transformation of the rhs
+            for(size_t k=1; k<Ny-2; k++)  
+            {
+                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
+                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
+                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
+                rhs[(k+1)*(Nx+1) + 1] = rhs[(k+1)*(Nx+1) + 1] - ndiagL1[k-1] * rhs[k*(Nx+1)+1]; 
+
+                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
+                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
+                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
+                rhs[(k+2)*(Nx+1) + 1] = rhs[(k+2)*(Nx+1) + 1] - ndiagL2[k-1] * rhs[k*(Nx+1)+1];
+            }
+            ndiagL1[Ny-2-1] = ndiagL1[Ny-2-1]/diagR[Ny-2-1];
+            diagR[Ny-2] -= ndiagL1[Ny-2-1] * ndiagR1[Ny-2-1];
+            rhs[(Ny-1)*(Nx+1) + 1] = rhs[(Ny-1)*(Nx+1) + 1] - ndiagL1[Ny-2-1] * rhs[(Ny-2)*(Nx+1)+ 1];
+
+            // solve the linear system of equations R u = rhs
+            u[1+(Nx+1)*(Ny-1)] = rhs[1+(Nx+1)*(Ny-1)] / diagR[Ny-2];
+            for(size_t k=Ny-2; k>1; k--)
+            {
+                u[1+k*(Nx+1)] = 1/diagR[k-1] * ( rhs[1+k*(Nx+1)] - ndiagR1[k-1] * u[1+(k+1)*(Nx+1)] );
+
+                rhs[(k-1)*(Nx+1)+1] -= ndiagR2[k-2] * u[(k+1)*(Nx+1)+1];
+            }
+            u[(Nx+1)+1] = 1/diagR[0] * ( rhs[(Nx+1)+1] - ndiagR1[0] * u[2*(Nx+1)+1] );
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+            // durchlaufe alle inneren Spalten, Spaltenindex i              
+            for(size_t i=2; i < Nx-1; i++)
+            {
+                // setze rechte Seite                   
+                    L_b = stencil.get_L_s(i,1,Nx,Ny);
+                    J_b_x = stencil.getJx(S);
+                    J_b_y = stencil.getJy(S);
+
+                    diagR[0] = L_b[C];
+                    ndiagR1[0] = L_b[N];
+                    ndiagR2[0] = L_b[NE];
+       
+                    rhs[i+Nx+1] = fv[i+Nx+1] - L_b[S] * u[i+(1+J_b_y[S])*(Nx+1)] - L_b[W] * u[i+J_b_x[W]+Nx+1] 
+                        - L_b[E] * u[i+J_b_x[E]+Nx+1] - L_b[NW] * u[i+J_b_x[NW]+Nx+1] - L_b[SE] * u[i+J_b_x[SE]+(Nx+1)];
+                    
+                    for(size_t sum=7; sum<L_b.size(); sum++)
+                    {
+                        rhs[i+Nx+1] -= L_b[sum] * u[i+J_b_x[sum]+(1+J_b_y[sum])*(Nx+1)];
+                    }
+
+                    ndiagL1[0] = L[S];
+                    diagR[1] = L[C];
+                    ndiagR1[1] = L[N];                  
+                    ndiagR2[1] = L[NE];
+
+                    rhs[i+2*(Nx+1)] = fv[i+2*(Nx+1)] - L[W] * u[i+J_x[W]+2*(Nx+1)] - L[E] * u[i+J_x[E]+2*(Nx+1)]
+                      -L[NW] * u[i+J_x[NW]+2*(Nx+1)] - L[SE] * u[i+J_x[SE]+2*(Nx+1)] - L[SW] * u[i+(2+J_y[SW])*(Nx+1)];
+
+                    for(size_t sum=9; sum<L.size(); sum++)
+                    {
+                        rhs[i+2*(Nx+1)] -= L[sum] * u[i+J_x[sum]+(2+J_y[sum])*(Nx+1)];
+                    }
+                        
+
+                    for(size_t j=3; j<Ny-2; j++)
+                    {
+                       ndiagL2[j-3] = L[SW];
+                       ndiagL1[j-2] = L[S];
+                       diagR[j-1] = L[C];
+                       ndiagR1[j-1] = L[N];
+                       ndiagR2[j-1] = L[NE];
+ 
+                       rhs[i+j*(Nx+1)] = fv[i+j*(Nx+1)] - L[W] * u[i+J_x[W]+j*(Nx+1)] - L[E] * u[i+J_x[E]+j*(Nx+1)]
+                             -L[NW] * u[i+J_x[NW]+j*(Nx+1)] - L[SE] * u[i+J_x[SE]+j*(Nx+1)];
+                       
+                       for(size_t sum=9; sum<L.size(); sum++)
+                       {
+                           rhs[i+j*(Nx+1)] -= L[sum] * u[i+J_x[sum]+(j+J_y[sum])*(Nx+1)];
+                       }
+                    }
+                                        
+                    ndiagL2[Nx-5] = L[SW];
+                    ndiagL1[Nx-4] = L[S];
+                    diagR[Nx-3] = L[C];
+                    ndiagR1[Nx-3] = L[N];
+
+                    rhs[i+(Ny-2)*(Nx+1)] = fv[i+(Ny-2)*(Nx+1)] - L[W] * u[i+J_x[W]+(Ny-2)*(Nx+1)] - L[E] * u[i+J_x[E]+(Ny-2)*(Nx+1)]
+                         -L[NW] * u[i+J_x[NW]+(Ny-2)*(Nx+1)] - L[SE] * u[i+J_x[SE]+(Ny-2)*(Nx+1)] - L[NE] * u[i+(Ny-2+J_y[NE])*(Nx+1)];
+                    
+                    for(size_t sum=9; sum<L.size(); sum++)
+                    {
+                        rhs[i+(Ny-2)*(Nx+1)] -= L[sum] * u[i+J_x[sum]+(Ny-2+J_y[sum])*(Nx+1)];
+                    }
+
+
+                    L_b = stencil.get_L_n(i,Ny-1,Nx,Ny);
+                    J_b_x = stencil.getJx(N);
+                    J_b_y = stencil.getJy(N);
+
+                    ndiagL2[Nx-4] = L_b[SW];
+                    ndiagL1[Nx-3] = L_b[S];
+                    diagR[Nx-2] = L_b[C];
+
+                    rhs[i+(Ny-1)*(Nx+1)] = fv[i+(Ny-1)*(Nx+1)] - L_b[N] * u[i+(Ny-1+J_b_y[N])*(Nx+1)] 
+                        - L_b[W] * u[i+J_b_x[W]+(Ny-1)*(Nx+1)] - L_b[E] * u[i+J_b_x[E]+(Ny-1)*(Nx+1)] - L_b[NW] * u[i+J_b_x[NW]+(Ny-1)*(Nx+1)]
+                        - L_b[SE] * u[i+J_b_x[SE]+(Ny-1)*(Nx+1)];
+
+                    for(size_t sum=9; sum<L_b.size(); sum++)
+                    {
+                        rhs[i+(Ny-1)*(Nx+1)] -= L_b[sum] * u[i+J_b_x[sum]+(Ny-1+J_b_y[sum])*(Nx+1)];
+                    }
+                    
+                    // LR-decomposition + transformation of the rhs
+                for(size_t k=1; k<Ny-2; k++)  
+                {
+                    ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
+                    diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
+                    ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
+                    rhs[(k+1)*(Nx+1) + i] = rhs[(k+1)*(Nx+1) + i] - ndiagL1[k-1] * rhs[k*(Nx+1)+i]; 
+
+                    ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
+                    ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
+                    diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
+                    rhs[(k+2)*(Nx+1) + i] = rhs[(k+2)*(Nx+1) + i] - ndiagL2[k-1] * rhs[k*(Nx+1)+i];
+                }
+                ndiagL1[Ny-2-1] = ndiagL1[Ny-2-1]/diagR[Ny-2-1];
+                diagR[Ny-2] -= ndiagL1[Ny-2-1] * ndiagR1[Ny-2-1];
+                rhs[(Ny-1)*(Nx+1) + i] = rhs[(Ny-1)*(Nx+1) + i] - ndiagL1[Ny-2-1] * rhs[(Ny-2)*(Nx+1)+ i];
+
+                // solve the linear system of equations R u = rhs
+                u[i+(Nx+1)*(Ny-1)] = rhs[i+(Nx+1)*(Ny-1)] / diagR[Ny-2];
+
+                for(size_t k=Ny-2; k>1; k--)
+                {
+                    u[i+k*(Nx+1)] = 1/diagR[k-1] * ( rhs[i+k*(Nx+1)] - ndiagR1[k-1] * u[i+(k+1)*(Nx+1)] );
+
+                    rhs[(k-1)*(Nx+1)+i] -= ndiagR2[k-2] * u[(k+1)*(Nx+1)+i];
+                }
+                u[(Nx+1)+i] = 1/diagR[0] * ( rhs[(Nx+1)+i] - ndiagR1[0] * u[2*(Nx+1)+i] );
+            }
+
+////////////////letzte Spalte//////////////////
+            
+            L_c = stencil.get_L_se(Nx-1,1,Nx,Ny);
+            J_c_x = stencil.getJx(SE);
+            J_c_y = stencil.getJy(SE);
+
+            
+            rhs[Nx-1+Nx+1] = fv[Nx-1+Nx+1] - L_c[S] * u[Nx-1+(1+J_c_y[S])*(Nx+1)]
+                - L_c[W] * u[Nx-2+Nx+1] - L_c[E] * u[Nx+Nx+1] - L_c[NW] * u[Nx-1+J_c_x[NW]+Nx+1];
+                
+            for(size_t sum=7; sum<L_c.size(); sum++)
+            {
+                rhs[Nx-1+Nx+1] -= L_c[sum] * u[Nx-1+J_c_x[sum]+(1+J_c_y[sum])*(Nx+1)];
+            }
+
+            L_b = stencil.get_L_e(Nx-1,2,Nx,Ny);
+            J_b_x = stencil.getJx(E);
+            J_b_y = stencil.getJy(E);
+
+            ndiagL1[0] = L_b[S];
+            diagR[1] = L_b[C];
+            ndiagR1[1] = L_b[N];                    
+            ndiagR2[1] = L_b[NE];
+
+            rhs[Nx-1+2*(Nx+1)] = fv[Nx-1+2*(Nx+1)] - L_b[W] * u[Nx-2+2*(Nx+1)] - L_b[E] * u[Nx+2*(Nx+1)]
+              -L_b[NW] * u[Nx-1+J_b_x[NW]+2*(Nx+1)] - L_b[SE] * u[Nx-1+(2+J_b_y[SE])*(Nx+1)];
+
+            for(size_t sum=8; sum<L_b.size(); sum++)
+            {
+                rhs[Nx-1+2*(Nx+1)] -= L_b[sum] * u[Nx-1+J_b_x[sum]+(2+J_b_y[sum])*(Nx+1)];
+            }
+
+            for(size_t j=3; j<Ny-2; j++)  
+            {
+                ndiagL2[j-3] = L_b[SE];
+                ndiagL1[j-2] = L_b[S];
+                diagR[j-1] = L_b[C];
+                ndiagR1[j-1] = L_b[N];                  
+                ndiagR2[j-1] = L_b[NE];
+                    
+                rhs[Nx-1+j*(Nx+1)] = fv[Nx-1+j*(Nx+1)] - L_b[W] * u[Nx-1+J_b_x[W]+j*(Nx+1)] - L_b[E] * u[Nx-1+J_b_x[E]+j*(Nx+1)]
+                        -L_b[NW] * u[Nx-1+J_b_x[NW]+j*(Nx+1)];
+
+                for(size_t sum=8; sum<L_b.size(); sum++)
+                {
+                    rhs[Nx-1+j*(Nx+1)] -= L_b[sum] * u[Nx-1+J_b_x[sum]+(j+J_b_y[sum])*(Nx+1)];
+                }
+            }
+                
+            ndiagL2[Ny-5] = L_b[SE];
+            ndiagL1[Ny-4] = L_b[S];
+            diagR[Ny-3] = L_b[C];
+            ndiagR1[Ny-3] = L_b[N];
+
+            rhs[Nx-1+(Ny-2)*(Nx+1)] = fv[Nx-1+(Ny-2)*(Nx+1)] - L_b[W] * u[Nx-2+(Ny-2)*(Nx+1)] - L_b[E] * u[Nx+(Ny-2)*(Nx+1)]
+              - L_b[NW] * u[Nx-1+J_b_x[NW]+(Ny-2)*(Nx+1)] - L_b[NE] * u[Nx-1+(Ny-2+J_b_y[NE])*(Nx+1)];
+
+            for(size_t sum=8; sum<L_b.size(); sum++)
+            {
+              rhs[Nx-1+(Ny-2)*(Nx+1)] -= L_b[sum] * u[Nx-1+J_b_x[sum]+(Ny-2+J_b_y[sum])*(Nx+1)];
+            }
+                
+            L_c = stencil.get_L_ne(Nx-1,Ny-1,Nx,Ny);
+            J_c_x = stencil.getJx(NE);
+            J_c_y = stencil.getJy(NE);
+
+            ndiagL2[Ny-4] = L_c[NE];
+            ndiagL1[Ny-3] = L_c[S];
+            diagR[Ny-2] = L_c[C];
+
+            rhs[Nx-1+(Ny-1)*(Nx+1)] = fv[Nx-1+(Ny-1)*(Nx+1)] - L_c[W] * u[Nx-2+(Ny-1)*(Nx+1)] 
+              - L_c[E] * u[Nx+(Ny-1)*(Nx+1)] - L_c[NW] * u[Nx-1+J_c_x[NW]+(Ny-1)*(Nx+1)] - L_c[N] * u[Nx-1+(Ny-1+J_c_y[N])*(Nx+1)];
+
+            for(size_t sum=7; sum<L_c.size(); sum++)
+            {
+                rhs[Nx-1+(Ny-1)*(Nx+1)] -= L_c[sum] * u[Nx-1+J_c_x[sum]+(Ny-1+J_c_y[sum])*(Nx+1)];
+            }
+
+            // LR-decomposition + transformation of the rhs
+            for(size_t k=1; k<Ny-2; k++)  
+            {
+                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
+                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
+                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
+                rhs[(k+1)*(Nx+1) + Nx-1] = rhs[(k+1)*(Nx+1) + Nx-1] - ndiagL1[k-1] * rhs[k*(Nx+1)+Nx-1]; 
+
+                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
+                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
+                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
+                rhs[(k+2)*(Nx+1) + Nx-1] = rhs[(k+2)*(Nx+1) + Nx-1] - ndiagL2[k-1] * rhs[k*(Nx+1)+Nx-1];
+            }
+            ndiagL1[Ny-2-1] = ndiagL1[Ny-2-1]/diagR[Ny-2-1];
+            diagR[Ny-2] -= ndiagL1[Ny-2-1] * ndiagR1[Ny-2-1];
+            rhs[(Ny-1)*(Nx+1) + Nx-1] = rhs[(Ny-1)*(Nx+1) + Nx-1] - ndiagL1[Ny-2-1] * rhs[(Ny-2)*(Nx+1)+ Nx-1];
+
+            // solve the linear system of equations R u = rhs
+            u[Nx-1+(Nx+1)*(Ny-1)] = rhs[Nx-1+(Nx+1)*(Ny-1)] / diagR[Ny-2];
+
+            for(size_t k=Ny-2; k>1; k--)
+            {
+                u[Nx-1+k*(Nx+1)] = 1/diagR[k-1] * ( rhs[Nx-1+k*(Nx+1)] - ndiagR1[k-1] * u[Nx-1+(k+1)*(Nx+1)] );
+
+                rhs[(k-1)*(Nx+1)+Nx-1] -= ndiagR2[k-2] * u[(k+1)*(Nx+1)+Nx-1];
+            }
+            u[(Nx+1)+Nx-1] = 1/diagR[0] * ( rhs[(Nx+1)+Nx-1] - ndiagR1[0] * u[2*(Nx+1)+Nx-1] );
+
+        }
+        else // stencil not constant
+            {
+                std::valarray<Precision> L = stencil.get_L_c(2,2,Nx,Ny);
+                std::valarray<int> J_x = stencil.getJx(C);
+                std::valarray<int> J_y = stencil.getJy(C);
+                
+                std::valarray<Precision> L_b = stencil.get_L_w(1,2,Nx,Ny);
+                std::valarray<int> J_b_x = stencil.getJx(W);
+                std::valarray<int> J_b_y = stencil.getJy(W);
+ 
+                std::valarray<Precision> L_c = stencil.get_L_sw(1,1,Nx,Ny);
+                std::valarray<int> J_c_x = stencil.getJx(SW);
+                std::valarray<int> J_c_y = stencil.getJy(SW);
+
+                diagR[0] = L_c[C];
+                ndiagR1[0] = L_c[N];
+                ndiagR2[0] = L_c[NW];
+                                
+                rhs[1+Nx+1] = fv[1+Nx+1] - L_c[S] * u[1+(1+J_c_y[S])*(Nx+1)]
+                    - L_c[W] * u[Nx+1] - L_c[E] * u[2+Nx+1] - L_c[NE] * u[1+J_c_x[NE]+Nx+1];
+                    
+                for(size_t sum=7; sum<L_c.size(); sum++)
+                {
+                    rhs[1+Nx+1] -= L_c[sum] * u[1+J_c_x[sum]+(1+J_c_y[sum])*(Nx+1)];
+                }
+
+                
+                ndiagL1[0] = L_b[S];
+                diagR[1] = L_b[C];
+                ndiagR1[1] = L_b[N];                    
+                ndiagR2[1] = L_b[NW];
+
+                rhs[1+2*(Nx+1)] = fv[1+2*(Nx+1)] - L_b[W] * u[2*(Nx+1)] - L_b[E] * u[2+2*(Nx+1)]
+                  -L_b[NE] * u[1+J_b_x[NE]+2*(Nx+1)] - L_b[SE] * u[1+(2+J_b_y[SE])*(Nx+1)];
+
+                for(size_t sum=8; sum<L_b.size(); sum++)
+                {
+                    rhs[1+2*(Nx+1)] -= L_b[sum] * u[1+J_b_x[sum]+(2+J_b_y[sum])*(Nx+1)];
+                }
+
+                for(size_t j=3; j<Ny-2; j++)  
+                {
+                    L_b = stencil.get_L_w(1,j,Nx,Ny);
+
+                    ndiagL2[j-3] = L_b[SE];
+                    ndiagL1[j-2] = L_b[S];
+                    diagR[j-1] = L_b[C];
+                    ndiagR1[j-1] = L_b[N];                  
+                    ndiagR2[j-1] = L_b[NW];
+                        
+                    rhs[1+j*(Nx+1)] = fv[1+j*(Nx+1)] - L_b[W] * u[1+J_b_x[W]+j*(Nx+1)] - L_b[E] * u[1+J_b_x[E]+j*(Nx+1)]
+                            -L_b[NE] * u[1+J_b_x[NE]+j*(Nx+1)];
+
+                    for(size_t sum=8; sum<L_b.size(); sum++)
+                    {
+                      rhs[1+j*(Nx+1)] -= L_b[sum] * u[1+J_b_x[sum]+(j+J_b_y[sum])*(Nx+1)];
+                    }
+                }
+
+                L_b = stencil.get_L_w(1,Ny-2,Nx,Ny);
+                
+                ndiagL2[Ny-5] = L_b[SE];
+                ndiagL1[Ny-4] = L_b[S];
+                diagR[Ny-3] = L_b[C];
+                ndiagR1[Ny-3] = L_b[N];
+
+                rhs[1+(Ny-2)*(Nx+1)] = fv[1+(Ny-2)*(Nx+1)] - L_b[W] * u[(Ny-2)*(Nx+1)] - L_b[E] * u[2+(Ny-2)*(Nx+1)]
+                  -L_b[NE] * u[1+J_b_x[NE]+(Ny-2)*(Nx+1)] - L_b[NW] * u[1+(Ny-2+J_b_y[NW])*(Nx+1)];
+
+                for(size_t sum=8; sum<L_b.size(); sum++)
+                {
+                  rhs[1+(Ny-2)*(Nx+1)] -= L_b[sum] * u[1+J_b_x[sum]+(Ny-2+J_b_y[sum])*(Nx+1)];
+                }
+                    
+                L_c = stencil.get_L_nw(1,Ny-1,Nx,Ny);
+                J_c_x = stencil.getJx(NW);
+                J_c_y = stencil.getJy(NW);
+
+                ndiagL2[Ny-4] = L_c[NE];
+                ndiagL1[Ny-3] = L_c[S];
+                diagR[Ny-2] = L_c[C];
+
+                rhs[1+(Ny-1)*(Nx+1)] = fv[1+(Ny-1)*(Nx+1)] - L_c[W] * u[(Ny-1)*(Nx+1)] - L_c[E] * u[2+(Ny-1)*(Nx+1)]
+                        - L_c[NW] * u[1+J_c_x[NW]+(Ny-1)*(Nx+1)] - L_c[N] * u[1+(Ny-1+J_c_y[N])*(Nx+1)];
+
+                for(size_t sum=7; sum<L_c.size(); sum++)
+                {
+                  rhs[1+(Ny-1)*(Nx+1)] -= L_c[sum] * u[1+J_c_x[sum]+(Ny-1+J_c_y[sum])*(Nx+1)];
+                }
+
+                // LR-decomposition + transformation of the rhs
+            for(size_t k=1; k<Ny-2; k++)  
+            {
+                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
+                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
+                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
+                rhs[(k+1)*(Nx+1) + 1] = rhs[(k+1)*(Nx+1) + 1] - ndiagL1[k-1] * rhs[k*(Nx+1)+1]; 
+
+                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
+                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
+                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
+                rhs[(k+2)*(Nx+1) + 1] = rhs[(k+2)*(Nx+1) + 1] - ndiagL2[k-1] * rhs[k*(Nx+1)+1];
+            }
+            ndiagL1[Ny-2-1] = ndiagL1[Ny-2-1]/diagR[Ny-2-1];
+            diagR[Ny-2] -= ndiagL1[Ny-2-1] * ndiagR1[Ny-2-1];
+            rhs[(Ny-1)*(Nx+1) + 1] = rhs[(Ny-1)*(Nx+1) + 1] - ndiagL1[Ny-2-1] * rhs[(Ny-2)*(Nx+1)+ 1];
+
+            // solve the linear system of equations R u = rhs
+            u[1+(Nx+1)*(Ny-1)] = rhs[1+(Nx+1)*(Ny-1)] / diagR[Ny-2];
+            for(size_t k=Ny-2; k>1; k--)
+            {
+                u[1+k*(Nx+1)] = 1/diagR[k-1] * ( rhs[1+k*(Nx+1)] - ndiagR1[k-1] * u[1+(k+1)*(Nx+1)] );
+
+                rhs[(k-1)*(Nx+1)+1] -= ndiagR2[k-2] * u[(k+1)*(Nx+1)+1];
+            }
+            u[(Nx+1)+1] = 1/diagR[0] * ( rhs[(Nx+1)+1] - ndiagR1[0] * u[2*(Nx+1)+1] );
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+            // durchlaufe alle inneren Spalten, Spaltenindex i              
+            for(size_t i=2; i < Nx-1; i++)
+            {
+                // setze rechte Seite                   
+                    L_b = stencil.get_L_s(i,1,Nx,Ny);
+                    J_b_x = stencil.getJx(S);
+                    J_b_y = stencil.getJy(S);
+
+                    diagR[0] = L_b[C];
+                    ndiagR1[0] = L_b[N];
+                    ndiagR2[0] = L_b[NE];
+       
+                    rhs[i+Nx+1] = fv[i+Nx+1] - L_b[S] * u[i+(1+J_b_y[S])*(Nx+1)] - L_b[W] * u[i+J_b_x[W]+Nx+1] 
+                        - L_b[E] * u[i+J_b_x[E]+Nx+1] - L_b[NW] * u[i+J_b_x[NW]+Nx+1] - L_b[SE] * u[i+J_b_x[SE]+(Nx+1)];
+                    
+                    for(size_t sum=7; sum<L_b.size(); sum++)
+                    {
+                        rhs[i+Nx+1] -= L_b[sum] * u[i+J_b_x[sum]+(1+J_b_y[sum])*(Nx+1)];
+                    }
+
+                    L = stencil.get_L_c(i,2,Nx,Ny);
+
+                    ndiagL1[0] = L[S];
+                    diagR[1] = L[C];
+                    ndiagR1[1] = L[N];                  
+                    ndiagR2[1] = L[NE];
+
+                    rhs[i+2*(Nx+1)] = fv[i+2*(Nx+1)] - L[W] * u[i+J_x[W]+2*(Nx+1)] - L[E] * u[i+J_x[E]+2*(Nx+1)]
+                      -L[NW] * u[i+J_x[NW]+2*(Nx+1)] - L[SE] * u[i+J_x[SE]+2*(Nx+1)] - L[SW] * u[i+(2+J_y[SW])*(Nx+1)];
+
+                    for(size_t sum=9; sum<L.size(); sum++)
+                    {
+                        rhs[i+2*(Nx+1)] -= L[sum] * u[i+J_x[sum]+(2+J_y[sum])*(Nx+1)];
+                    }
+                        
+
+                    for(size_t j=3; j<Ny-2; j++)
+                    {
+                       L = stencil.get_L_c(i,j,Nx,Ny);
+                       ndiagL2[j-3] = L[SW];
+                       ndiagL1[j-2] = L[S];
+                       diagR[j-1] = L[C];
+                       ndiagR1[j-1] = L[N];
+                       ndiagR2[j-1] = L[NE];
+ 
+                       rhs[i+j*(Nx+1)] = fv[i+j*(Nx+1)] - L[W] * u[i+J_x[W]+j*(Nx+1)] - L[E] * u[i+J_x[E]+j*(Nx+1)]
+                             -L[NW] * u[i+J_x[NW]+j*(Nx+1)] - L[SE] * u[i+J_x[SE]+j*(Nx+1)];
+                       
+                       for(size_t sum=9; sum<L.size(); sum++)
+                       {
+                           rhs[i+j*(Nx+1)] -= L[sum] * u[i+J_x[sum]+(j+J_y[sum])*(Nx+1)];
+                       }
+                    }
+                                        
+                    L = stencil.get_L_c(i,Ny-2,Nx,Ny);
+                    ndiagL2[Nx-5] = L[SW];
+                    ndiagL1[Nx-4] = L[S];
+                    diagR[Nx-3] = L[C];
+                    ndiagR1[Nx-3] = L[N];
+
+                    rhs[i+(Ny-2)*(Nx+1)] = fv[i+(Ny-2)*(Nx+1)] - L[W] * u[i+J_x[W]+(Ny-2)*(Nx+1)] - L[E] * u[i+J_x[E]+(Ny-2)*(Nx+1)]
+                         -L[NW] * u[i+J_x[NW]+(Ny-2)*(Nx+1)] - L[SE] * u[i+J_x[SE]+(Ny-2)*(Nx+1)] - L[NE] * u[i+(Ny-2+J_y[NE])*(Nx+1)];
+                    
+                    for(size_t sum=9; sum<L.size(); sum++)
+                    {
+                        rhs[i+(Ny-2)*(Nx+1)] -= L[sum] * u[i+J_x[sum]+(Ny-2+J_y[sum])*(Nx+1)];
+                    }
+
+
+                    L_b = stencil.get_L_n(i,Ny-1,Nx,Ny);
+                    J_b_x = stencil.getJx(N);
+                    J_b_y = stencil.getJy(N);
+
+                    ndiagL2[Nx-4] = L_b[SW];
+                    ndiagL1[Nx-3] = L_b[S];
+                    diagR[Nx-2] = L_b[C];
+
+                    rhs[i+(Ny-1)*(Nx+1)] = fv[i+(Ny-1)*(Nx+1)] - L_b[N] * u[i+(Ny-1+J_b_y[N])*(Nx+1)] 
+                        - L_b[W] * u[i+J_b_x[W]+(Ny-1)*(Nx+1)] - L_b[E] * u[i+J_b_x[E]+(Ny-1)*(Nx+1)] - L_b[NW] * u[i+J_b_x[NW]+(Ny-1)*(Nx+1)]
+                        - L_b[SE] * u[i+J_b_x[SE]+(Ny-1)*(Nx+1)];
+
+                    for(size_t sum=9; sum<L_b.size(); sum++)
+                    {
+                        rhs[i+(Ny-1)*(Nx+1)] -= L_b[sum] * u[i+J_b_x[sum]+(Ny-1+J_b_y[sum])*(Nx+1)];
+                    }
+                    
+                    // LR-decomposition + transformation of the rhs
+                for(size_t k=1; k<Ny-2; k++)  
+                {
+                    ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
+                    diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
+                    ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
+                    rhs[(k+1)*(Nx+1) + i] = rhs[(k+1)*(Nx+1) + i] - ndiagL1[k-1] * rhs[k*(Nx+1)+i]; 
+
+                    ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
+                    ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
+                    diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
+                    rhs[(k+2)*(Nx+1) + i] = rhs[(k+2)*(Nx+1) + i] - ndiagL2[k-1] * rhs[k*(Nx+1)+i];
+                }
+                ndiagL1[Ny-2-1] = ndiagL1[Ny-2-1]/diagR[Ny-2-1];
+                diagR[Ny-2] -= ndiagL1[Ny-2-1] * ndiagR1[Ny-2-1];
+                rhs[(Ny-1)*(Nx+1) + i] = rhs[(Ny-1)*(Nx+1) + i] - ndiagL1[Ny-2-1] * rhs[(Ny-2)*(Nx+1)+ i];
+
+                // solve the linear system of equations R u = rhs
+                u[i+(Nx+1)*(Ny-1)] = rhs[i+(Nx+1)*(Ny-1)] / diagR[Ny-2];
+
+                for(size_t k=Ny-2; k>1; k--)
+                {
+                    u[i+k*(Nx+1)] = 1/diagR[k-1] * ( rhs[i+k*(Nx+1)] - ndiagR1[k-1] * u[i+(k+1)*(Nx+1)] );
+
+                    rhs[(k-1)*(Nx+1)+i] -= ndiagR2[k-2] * u[(k+1)*(Nx+1)+i];
+                }
+                u[(Nx+1)+i] = 1/diagR[0] * ( rhs[(Nx+1)+i] - ndiagR1[0] * u[2*(Nx+1)+i] );
+            }
+
+////////////////letzte Spalte//////////////////
+            
+            L_c = stencil.get_L_se(Nx-1,1,Nx,Ny);
+            J_c_x = stencil.getJx(SE);
+            J_c_y = stencil.getJy(SE);
+
+            
+            rhs[Nx-1+Nx+1] = fv[Nx-1+Nx+1] - L_c[S] * u[Nx-1+(1+J_c_y[S])*(Nx+1)]
+                - L_c[W] * u[Nx-2+Nx+1] - L_c[E] * u[Nx+Nx+1] - L_c[NW] * u[Nx-1+J_c_x[NW]+Nx+1];
+                
+            for(size_t sum=7; sum<L_c.size(); sum++)
+            {
+                rhs[Nx-1+Nx+1] -= L_c[sum] * u[Nx-1+J_c_x[sum]+(1+J_c_y[sum])*(Nx+1)];
+            }
+
+            L_b = stencil.get_L_e(Nx-1,2,Nx,Ny);
+            J_b_x = stencil.getJx(E);
+            J_b_y = stencil.getJy(E);
+
+            ndiagL1[0] = L_b[S];
+            diagR[1] = L_b[C];
+            ndiagR1[1] = L_b[N];                    
+            ndiagR2[1] = L_b[NE];
+
+            rhs[Nx-1+2*(Nx+1)] = fv[Nx-1+2*(Nx+1)] - L_b[W] * u[Nx-2+2*(Nx+1)] - L_b[E] * u[Nx+2*(Nx+1)]
+              -L_b[NW] * u[Nx-1+J_b_x[NW]+2*(Nx+1)] - L_b[SE] * u[Nx-1+(2+J_b_y[SE])*(Nx+1)];
+
+            for(size_t sum=8; sum<L_b.size(); sum++)
+            {
+                rhs[Nx-1+2*(Nx+1)] -= L_b[sum] * u[Nx-1+J_b_x[sum]+(2+J_b_y[sum])*(Nx+1)];
+            }
+
+            for(size_t j=3; j<Ny-2; j++)  
+            {
+                L_b = stencil.get_L_e(Nx-1,j,Nx,Ny);
+                
+                ndiagL2[j-3] = L_b[SE];
+                ndiagL1[j-2] = L_b[S];
+                diagR[j-1] = L_b[C];
+                ndiagR1[j-1] = L_b[N];                  
+                ndiagR2[j-1] = L_b[NE];
+                    
+                rhs[Nx-1+j*(Nx+1)] = fv[Nx-1+j*(Nx+1)] - L_b[W] * u[Nx-1+J_b_x[W]+j*(Nx+1)] - L_b[E] * u[Nx-1+J_b_x[E]+j*(Nx+1)]
+                        -L_b[NW] * u[Nx-1+J_b_x[NW]+j*(Nx+1)];
+
+                for(size_t sum=8; sum<L_b.size(); sum++)
+                {
+                    rhs[Nx-1+j*(Nx+1)] -= L_b[sum] * u[Nx-1+J_b_x[sum]+(j+J_b_y[sum])*(Nx+1)];
+                }
+            }
+                
+            L_b = stencil.get_L_e(Nx-1,Ny-2,Nx,Ny);
+
+            ndiagL2[Ny-5] = L_b[SE];
+            ndiagL1[Ny-4] = L_b[S];
+            diagR[Ny-3] = L_b[C];
+            ndiagR1[Ny-3] = L_b[N];
+
+            rhs[Nx-1+(Ny-2)*(Nx+1)] = fv[Nx-1+(Ny-2)*(Nx+1)] - L_b[W] * u[Nx-2+(Ny-2)*(Nx+1)] - L_b[E] * u[Nx+(Ny-2)*(Nx+1)]
+              - L_b[NW] * u[Nx-1+J_b_x[NW]+(Ny-2)*(Nx+1)] - L_b[NE] * u[Nx-1+(Ny-2+J_b_y[NE])*(Nx+1)];
+
+            for(size_t sum=8; sum<L_b.size(); sum++)
+            {
+              rhs[Nx-1+(Ny-2)*(Nx+1)] -= L_b[sum] * u[Nx-1+J_b_x[sum]+(Ny-2+J_b_y[sum])*(Nx+1)];
+            }
+                
+            L_c = stencil.get_L_ne(Nx-1,Ny-1,Nx,Ny);
+            J_c_x = stencil.getJx(NE);
+            J_c_y = stencil.getJy(NE);
+
+            ndiagL2[Ny-4] = L_c[NE];
+            ndiagL1[Ny-3] = L_c[S];
+            diagR[Ny-2] = L_c[C];
+
+            rhs[Nx-1+(Ny-1)*(Nx+1)] = fv[Nx-1+(Ny-1)*(Nx+1)] - L_c[W] * u[Nx-2+(Ny-1)*(Nx+1)] 
+              - L_c[E] * u[Nx+(Ny-1)*(Nx+1)] - L_c[NW] * u[Nx-1+J_c_x[NW]+(Ny-1)*(Nx+1)] - L_c[N] * u[Nx-1+(Ny-1+J_c_y[N])*(Nx+1)];
+
+            for(size_t sum=7; sum<L_c.size(); sum++)
+            {
+                rhs[Nx-1+(Ny-1)*(Nx+1)] -= L_c[sum] * u[Nx-1+J_c_x[sum]+(Ny-1+J_c_y[sum])*(Nx+1)];
+            }
+
+            // LR-decomposition + transformation of the rhs
+            for(size_t k=1; k<Ny-2; k++)  
+            {
+                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
+                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
+                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
+                rhs[(k+1)*(Nx+1) + Nx-1] = rhs[(k+1)*(Nx+1) + Nx-1] - ndiagL1[k-1] * rhs[k*(Nx+1)+Nx-1]; 
+
+                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
+                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
+                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
+                rhs[(k+2)*(Nx+1) + Nx-1] = rhs[(k+2)*(Nx+1) + Nx-1] - ndiagL2[k-1] * rhs[k*(Nx+1)+Nx-1];
+            }
+            ndiagL1[Ny-2-1] = ndiagL1[Ny-2-1]/diagR[Ny-2-1];
+            diagR[Ny-2] -= ndiagL1[Ny-2-1] * ndiagR1[Ny-2-1];
+            rhs[(Ny-1)*(Nx+1) + Nx-1] = rhs[(Ny-1)*(Nx+1) + Nx-1] - ndiagL1[Ny-2-1] * rhs[(Ny-2)*(Nx+1)+ Nx-1];
+
+            // solve the linear system of equations R u = rhs
+            u[Nx-1+(Nx+1)*(Ny-1)] = rhs[Nx-1+(Nx+1)*(Ny-1)] / diagR[Ny-2];
+
+            for(size_t k=Ny-2; k>1; k--)
+            {
+                u[Nx-1+k*(Nx+1)] = 1/diagR[k-1] * ( rhs[Nx-1+k*(Nx+1)] - ndiagR1[k-1] * u[Nx-1+(k+1)*(Nx+1)] );
+
+                rhs[(k-1)*(Nx+1)+Nx-1] -= ndiagR2[k-2] * u[(k+1)*(Nx+1)+Nx-1];
+            }
+            u[(Nx+1)+Nx-1] = 1/diagR[0] * ( rhs[(Nx+1)+Nx-1] - ndiagR1[0] * u[2*(Nx+1)+Nx-1] );
+
+        }
+    }
+    else //parameter zu klein
+    {
+          
+        for(int k=0; k<2; k++)
+        {
+            Precision factor = 1.0;
+            factor = 1.0/stencil.get_center_sw(1,1,Nx,Ny);
+            u[1*(Nx+1)+1]+=factor*(fv[1*(Nx+1)+1]
+                -stencil.apply_sw(u,1,1,Nx,Ny));
+            //red points on south boarder
+            for (size_t i=3;i<(Nx-1);i+=2)
+            {
+                factor = 1.0/stencil.get_center_s(i,1,Nx,Ny);
+                u[1*(Nx+1)+i]+=factor*(fv[1*(Nx+1)+i]
+                    -stencil.apply_s(u,i,1,Nx,Ny));
+            }
+            //south east corner
+            factor = 1.0/stencil.get_center_se((Nx-1),1,Nx,Ny);
+            u[1*(Nx+1)+(Nx-1)]+=factor*(fv[1*(Nx+1)+(Nx-1)]
+                -stencil.apply_se(u,(Nx-1),1,Nx,Ny));
+            for (size_t j=3;j<(Ny-1);j+=2)
+            {
+                //west boarder point in j. line
+                factor = 1.0/stencil.get_center_w(1,j,Nx,Ny);
+                u[j*(Nx+1)+1]+=factor*(fv[j*(Nx+1)+1]
+                    -stencil.apply_w(u,1,j,Nx,Ny));
+                
+                for (size_t i=3;i<(Nx-1);i+=2)
+                {
+                    factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
+                    u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
+                        -stencil.apply_c(u,i,j,Nx,Ny));
+                }
+                
+                //east boarder point in j. line
+                factor = 1.0/stencil.get_center_e((Nx-1),j,Nx,Ny);
+                u[j*(Nx+1)+(Nx-1)]+=factor*(fv[j*(Nx+1)+(Nx-1)]
+                    -stencil.apply_e(u,(Nx-1),j,Nx,Ny));
+                
+            }
+            
+            //the missing red points in the center
+            for (size_t j=2;j<(Ny-1);j+=2)
+            {
+                for (size_t i=2;i<(Nx-1);i+=2)
+                {
+                    factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
+                    u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
+                        -stencil.apply_c(u,i,j,Nx,Ny));
+                }       
+            }
+            //north west corner
+            
+            factor = 1.0/stencil.get_center_nw(1,(Ny-1),Nx,Ny);
+            u[(Nx-1)*(Nx+1)+1]+=factor*(fv[(Nx-1)*(Nx+1)+1]
+                -stencil.apply_nw(u,1,(Ny-1),Nx,Ny));
+            //red points on north boarder
+            for (size_t i=3;i<(Nx-1);i+=2)
+            {
+                factor = 1.0/stencil.get_center_n(i,(Nx-1),Nx,Ny);
+                u[(Nx-1)*(Nx+1)+i]+=factor*(fv[(Nx-1)*(Nx+1)+i]
+                    -stencil.apply_n(u,i,(Ny-1),Nx,Ny));
+            }
+            
+            //north east corner
+            factor = 1.0/stencil.get_center_ne((Nx-1),(Nx-1),Nx,Ny);
+            u[(Nx-1)*(Nx+1)+(Nx-1)]+=factor*(fv[(Nx-1)*(Nx+1)+(Nx-1)]
+                -stencil.apply_ne(u,(Nx-1),(Ny-1),Nx,Ny));
+            
+            //do black points
+            //black points on south boarder
+            
+            for (size_t i=2;i<(Nx-1);i+=2)
+            {
+                factor = 1.0/stencil.get_center_s(i,1,Nx,Ny);
+                u[1*(Nx+1)+i]+=factor*(fv[1*(Nx+1)+i]
+                    -stencil.apply_s(u,i,1,Nx,Ny));
+            }
+            for (size_t j=2;j<(Ny-1);j+=2)
+            {
+                //west boarder points
+                factor = 1.0/stencil.get_center_w(1,j,Nx,Ny);
+                u[j*(Nx+1)+1]+=factor*(fv[j*(Nx+1)+1]
+                    -stencil.apply_w(u,1,j,Nx,Ny));
+                
+                for (size_t i=3;i<(Nx-1);i+=2)
+                {
+                    factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
+                    u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
+                        -stencil.apply_c(u,i,j,Nx,Ny));
+                }
+                
+                //east boarder points
+                factor = 1.0/stencil.get_center_e((Nx-1),j,Nx,Ny);
+                u[j*(Nx+1)+(Nx-1)]+=factor*(fv[j*(Nx+1)+(Nx-1)]
+                    -stencil.apply_e(u,(Nx-1),j,Nx,Ny));
+            }
+            for (size_t j=3;j<(Ny-1);j+=2)
+            {
+                for (size_t i=2;i<(Nx-1);i+=2)
+                {
+                    factor = 1.0/stencil.get_center_c(i,j,Nx,Ny);
+                    u[j*(Nx+1)+i]+=factor*(fv[j*(Nx+1)+i]
+                        -stencil.apply_c(u,i,j,Nx,Ny));
+                }
+            }
+            //black points on north boarder
+            for (size_t i=2;i<(Nx-1);i+=2)
+            {
+                factor = 1.0/stencil.get_center_n(i,(Ny-1),Nx,Ny);
+                u[(Nx-1)*(Nx+1)+i]+=factor*(fv[(Nx-1)*(Nx+1)+i]
+                    -stencil.apply_n(u,i,(Ny-1),Nx,Ny));
+            }
         }
     }
 }
