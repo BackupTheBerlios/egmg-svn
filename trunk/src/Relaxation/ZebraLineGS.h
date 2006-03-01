@@ -6,8 +6,9 @@
 #ifndef ZEBRALINEGS_H_
 #define ZEBRALINEGS_H_
 
+#include<valarray>
 #include "Relaxation.h"
-#include "../Stencil/Stencil.h"
+#include "GSRedBlack.h"
 
 
 namespace mg
@@ -19,6 +20,7 @@ class ZebraLineGS : public mg::Relaxation
 {
 private:
     const Direction direction_;
+    const GSRedBlack gsRedBlack_;
     void ninepointxzebra(
         std::valarray<Precision> &u,
         const std::valarray<Precision> &f, 
@@ -50,6 +52,7 @@ private:
     void xLRSolver(
         std::valarray<Precision>& u,
         const size_t sy,
+        const size_t nx,
         std::valarray<Precision>& rhs,
         std::valarray<Precision>& ndiagL,
         std::valarray<Precision>& diagR,
@@ -57,19 +60,33 @@ private:
     void yLRSolver(
         std::valarray<Precision>& u,
         const size_t sx,
+        const size_t nx,
+        const size_t ny,
         std::valarray<Precision>& rhs,
         std::valarray<Precision>& ndiagL,
         std::valarray<Precision>& diagR,
         const std::valarray<Precision>& ndiagR) const;
     void xLRSolver(
-    std::valarray<Precision>& u,
-    const size_t sy,
-    std::valarray<Precision>& rhs,
-    std::valarray<Precision>& ndiagL1,
-    std::valarray<Precision>& ndiagL2,
-    std::valarray<Precision>& diagR,
-    std::valarray<Precision>& ndiagR1,
-    const std::valarray<Precision>& ndiagR2) const;
+        std::valarray<Precision>& u,
+        const size_t sy,
+        const size_t nx,
+        std::valarray<Precision>& rhs,
+        std::valarray<Precision>& ndiagL1,
+        std::valarray<Precision>& ndiagL2,
+        std::valarray<Precision>& diagR,
+        std::valarray<Precision>& ndiagR1,
+        const std::valarray<Precision>& ndiagR2) const;
+    void yLRSolver(
+        std::valarray<Precision>& u,
+        const size_t sx,
+        const size_t nx,
+        const size_t ny,
+        std::valarray<Precision>& rhs,
+        std::valarray<Precision>& ndiagL1,
+        std::valarray<Precision>& ndiagL2,
+        std::valarray<Precision>& diagR,
+        std::valarray<Precision>& ndiagR1,
+        const std::valarray<Precision>& ndiagR2) const;
 public:
     /**
      * \brief The constructor of a ZebraLineGS object
@@ -85,7 +102,7 @@ public:
         const int postSmoothingSteps =1,
         const Direction direction =ALTDIR)
         : Relaxation(preSmoothingSteps,postSmoothingSteps),
-          direction_(direction) {}
+          direction_(direction), gsRedBlack_() {}
     virtual ~ZebraLineGS() {}
 
     /**

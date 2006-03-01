@@ -1,9 +1,10 @@
-Objects = GSLexicographic.o GSRedBlack.o
+Objects = GSLexicographic.o GSRedBlack.o ZebraLineGS.o
 
 %.o: %.h %.cpp
 	$(CXX) $(CXXFLAGS) -c $*.cpp
 	
-GSLexicographic.h GSRedBlack.h lineGS.h lineJAC.h: Relaxation.h
+GSLexicographic.h GSRedBlack.h ZebraLineGS.h: Relaxation.h
+ZebraLineGS.h: GSRedBlack.h
 
 Relaxation.h: ../general/parameters.h ../Stencil/Stencil.h
 
