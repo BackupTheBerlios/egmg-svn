@@ -7,7 +7,7 @@
 #define LINEGS_H_
 
 #include<valarray>
-#include "Relaxation.h"
+#include "LineRelaxation.h"
 #include "GSLexicographic.h"
 
 namespace mg
@@ -15,10 +15,9 @@ namespace mg
 /**
  * \brief LineGS is a class for a Gauss Seidel line relaxation
  */
-class LineGS : public mg::Relaxation
+class LineGS : public mg::LineRelaxation
 {
 private:
-    const Direction direction_;
     const GSLexicographic gsLexicographic_;
     void ninepointxline(
         std::valarray<Precision> &u,
@@ -56,15 +55,16 @@ public:
      * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
      * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      * \param[in] direction             direction of the line relaxation
+     *                                  (def. alternating directions)
      * \see Direction
      */ 
-    ZebraLineGS(
+    LineGS(
         const int preSmoothingSteps =1,
         const int postSmoothingSteps =1,
         const Direction direction =ALTDIR)
-        : Relaxation(preSmoothingSteps,postSmoothingSteps),
-          direction_(direction), gsLexicographic_() {}
-    virtual ~ZebraLineGS() {}
+        : LineRelaxation(preSmoothingSteps,postSmoothingSteps,direction),
+          gsLexicographic_() {}
+    virtual ~LineGS() {}
 
     /**
      * \brief relax() executes one relaxation step on the input vector

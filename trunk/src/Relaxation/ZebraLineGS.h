@@ -7,7 +7,7 @@
 #define ZEBRALINEGS_H_
 
 #include<valarray>
-#include "Relaxation.h"
+#include "LineRelaxation.h"
 #include "GSRedBlack.h"
 
 
@@ -16,10 +16,9 @@ namespace mg
 /**
  * \brief ZebraLineGS is a class for a Gauss Seidel zebra line relaxation
  */
-class ZebraLineGS : public mg::Relaxation
+class ZebraLineGS : public mg::LineRelaxation
 {
 private:
-    const Direction direction_;
     const GSRedBlack gsRedBlack_;
     void ninepointxzebra(
         std::valarray<Precision> &u,
@@ -49,44 +48,6 @@ private:
         const Stencil &stencil,
         const size_t nx, 
         const size_t ny) const;
-    void xLRSolver(
-        std::valarray<Precision>& u,
-        const size_t sy,
-        const size_t nx,
-        std::valarray<Precision>& rhs,
-        std::valarray<Precision>& ndiagL,
-        std::valarray<Precision>& diagR,
-        const std::valarray<Precision>& ndiagR) const;
-    void yLRSolver(
-        std::valarray<Precision>& u,
-        const size_t sx,
-        const size_t nx,
-        const size_t ny,
-        std::valarray<Precision>& rhs,
-        std::valarray<Precision>& ndiagL,
-        std::valarray<Precision>& diagR,
-        const std::valarray<Precision>& ndiagR) const;
-    void xLRSolver(
-        std::valarray<Precision>& u,
-        const size_t sy,
-        const size_t nx,
-        std::valarray<Precision>& rhs,
-        std::valarray<Precision>& ndiagL1,
-        std::valarray<Precision>& ndiagL2,
-        std::valarray<Precision>& diagR,
-        std::valarray<Precision>& ndiagR1,
-        const std::valarray<Precision>& ndiagR2) const;
-    void yLRSolver(
-        std::valarray<Precision>& u,
-        const size_t sx,
-        const size_t nx,
-        const size_t ny,
-        std::valarray<Precision>& rhs,
-        std::valarray<Precision>& ndiagL1,
-        std::valarray<Precision>& ndiagL2,
-        std::valarray<Precision>& diagR,
-        std::valarray<Precision>& ndiagR1,
-        const std::valarray<Precision>& ndiagR2) const;
 public:
     /**
      * \brief The constructor of a ZebraLineGS object
@@ -95,14 +56,15 @@ public:
      * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
      * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      * \param[in] direction             direction of the line relaxation
+     *                                  (def. alternating directions)
      * \see Direction
      */ 
     ZebraLineGS(
         const int preSmoothingSteps =1,
         const int postSmoothingSteps =1,
         const Direction direction =ALTDIR)
-        : Relaxation(preSmoothingSteps,postSmoothingSteps),
-          direction_(direction), gsRedBlack_() {}
+        : LineRelaxation(preSmoothingSteps,postSmoothingSteps,direction),
+          gsRedBlack_() {}
     virtual ~ZebraLineGS() {}
 
     /**
