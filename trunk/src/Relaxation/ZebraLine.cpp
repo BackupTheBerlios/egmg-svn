@@ -9,7 +9,7 @@
 
 namespace mg
 {			
-void ZebraLineJAC::relax(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+void ZebraLine::relax(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
 	               const Stencil &stencil, const size_t Nx, const size_t Ny) const
 {
 	// valarray needed for LR-decomposition of a tridiagonal matrix
@@ -136,7 +136,7 @@ void ZebraLineJAC::relax(std::valarray<Precision> &u, const std::valarray<Precis
 	}
 
 }
-void ZebraLineJAC::ninepointxzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+void ZebraLine::ninepointxzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
                         std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
                         const size_t Ny) const
                    
@@ -436,7 +436,7 @@ void ZebraLineJAC::ninepointxzebra(std::valarray<Precision> &u, const std::valar
         }
     }                       
 }
-void ZebraLineJAC::ninepointyzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+void ZebraLine::ninepointyzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
                         std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
                         const size_t Ny) const
                    
@@ -731,7 +731,7 @@ void ZebraLineJAC::ninepointyzebra(std::valarray<Precision> &u, const std::valar
         }
     }                       
 }
-void ZebraLineJAC::xzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+void ZebraLine::xzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
                         std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
                         const size_t Ny) const
 
@@ -1554,7 +1554,7 @@ void ZebraLineJAC::xzebra(std::valarray<Precision> &u, const std::valarray<Preci
         }
     }
 }
-void ZebraLineJAC::yzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
+void ZebraLine::yzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
                         std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
                         const size_t Ny) const
 

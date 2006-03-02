@@ -14,7 +14,7 @@ namespace mg
 /**
  * \brief lineJAC is a class template for a Jacobi line relaxation
  */
-class ZebraLineJAC : public mg::LineRelaxation
+class ZebraLine : public mg::LineRelaxation
 {
     private:
     Precision omega_;
@@ -44,14 +44,14 @@ public:
      * \param[in] omega                 relaxation parameter (def. 1.0)
      * \see Direction
      */ 
-    ZebraLineJAC(
+    ZebraLine(
         const int preSmoothingSteps =1,
         const int postSmoothingSteps =1,
         const Direction direction =ALTDIR,
         const Precision omega =1.0)
         : LineRelaxation(preSmoothingSteps,postSmoothingSteps,direction),
           omega_(omega) {}
-    virtual ~ZebraLineJAC() {}
+    virtual ~ZebraLine() {}
     
 	/**
       * \brief relax() executes one relaxation step on the input vector
