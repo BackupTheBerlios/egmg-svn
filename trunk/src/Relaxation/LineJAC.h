@@ -19,32 +19,13 @@ private:
 void ninepointxline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
                             std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
                             const size_t Ny) const;
-
             void ninepointyline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
                             std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
                             const size_t Ny) const;
-
-            void ninepointxzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
-                            std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
-                            const size_t Ny) const;
-
-            void ninepointyzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
-                            std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
-                            const size_t Ny) const;
-
             void xline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
                             std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
                             const size_t Ny) const;
-
             void yline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
-                            std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
-                            const size_t Ny) const;
-
-            void xzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
-                            std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
-                            const size_t Ny) const;
-
-            void yzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
                             std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
                             const size_t Ny) const;
 public:
