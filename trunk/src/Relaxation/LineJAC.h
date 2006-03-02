@@ -1,5 +1,6 @@
 /** \file LineJAC.h
  * \author Andre Oeckerath
+ * \brief LineJAC.h contains the interface of the class LineJAC.
  * \see LineRelaxation.h
  */
 #ifndef LINEJAC_H_
@@ -16,18 +17,34 @@ class LineJAC : public mg::LineRelaxation
 {
 private:
     const Precision omega_;
-void ninepointxline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
-                            std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
-                            const size_t Ny) const;
-            void ninepointyline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
-                            std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
-                            const size_t Ny) const;
-            void xline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
-                            std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
-                            const size_t Ny) const;
-            void yline(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
-                            std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
-                            const size_t Ny) const;
+    void ninepointxline(
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray resid,
+        const Stencil &stencil,
+        const size_t nx, 
+        const size_t ny) const;
+    void ninepointyline(
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray resid,
+        const Stencil &stencil,
+        const size_t nx, 
+        const size_t ny) const;
+    void xline(
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray resid,
+        const Stencil &stencil,
+        const size_t nx, 
+        const size_t ny) const;
+    void yline(
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray resid,
+        const Stencil &stencil,
+        const size_t nx, 
+        const size_t Ny) const;
 public:
     /**
      * \brief The constructor of a LineJAC object
@@ -63,8 +80,8 @@ public:
      * \param ny    number of steps in y direction
      */
     void relax(
-        std::valarray<Precision> &u,
-        const std::valarray<Precision> &f, 
+        NumericArray &u,
+        const NumericArray &f, 
         const Stencil &stencil,
         const size_t nx,
         const size_t ny) const; 

@@ -2,24 +2,24 @@
 
 namespace mg
 {
-std::vector<std::valarray<int> > Galerkin::initJx_(const Stencil& sten)
+std::vector<PositionArray > Galerkin::initJx_(const Stencil& sten)
 {
-	std::vector<std::valarray<int> > jx(9);
+	std::vector<PositionArray > jx(9);
 	for (size_t i=0; i<9; ++i)
 	{
-		std::valarray<int> temp = sten.getJx(static_cast<Position>(i));
+		PositionArray temp = sten.getJx(static_cast<Position>(i));
 		jx[i].resize(temp.size());
 		jx[i] = temp;
 	}
 	return jx;
 }
 
-std::vector<std::valarray<int> > Galerkin::initJy_(const Stencil& sten)
+std::vector<PositionArray > Galerkin::initJy_(const Stencil& sten)
 {
-	std::vector<std::valarray<int> > jy(9);
+	std::vector<PositionArray > jy(9);
 	for (size_t i=0; i<9; ++i)
 	{
-		std::valarray<int> temp = sten.getJy(static_cast<Position>(i));
+		PositionArray temp = sten.getJy(static_cast<Position>(i));
 		jy[i].resize(temp.size());
 		jy[i] = temp;
 	}
@@ -35,7 +35,7 @@ void Galerkin::updateJxJy_()
 	
 }
 
-virtual const std::valarray<Precision>& Galerkin::getL(
+virtual const NumericArray& Galerkin::getL(
     const Position,
     const size_t,
     const size_t,

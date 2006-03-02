@@ -6,7 +6,7 @@
 #ifndef GSLEXICOGRAPHIC_H_
 #define GSLEXICOGRAPHIC_H_
 
-#include<valarray>
+
 #include "Relaxation.h"
 
 namespace mg
@@ -49,8 +49,8 @@ public:
      * \param[in] ny        number of steps in y direction
      */
     void relax(
-        std::valarray<Precision>& u,
-        const std::valarray<Precision>& f,
+        NumericArray& u,
+        const NumericArray& f,
         const Stencil& stencil,
         const size_t nx,
         const size_t ny) const;

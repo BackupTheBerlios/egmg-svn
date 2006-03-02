@@ -5,7 +5,7 @@
 #ifndef STENCIL_H_
 #define STENCIL_H_
 
-#include <valarray>
+
 #include "../general/parameters.h"
 
 namespace mg
@@ -43,7 +43,7 @@ public:
      * \return              the value of \f$ L_h u_h \f$
      */
     virtual Precision apply(
-        const std::valarray<Precision>& u,
+        const NumericArray& u,
         const Position pos,
         const size_t sx,
         const size_t sy,
@@ -137,7 +137,7 @@ public:
      * \param[in] ny        number of points in y direction
      * \return              the coefficients of Laplacian2D2
      */
-    virtual const std::valarray<Precision>& getL(
+    virtual const NumericArray& getL(
         const Position pos,
         const size_t sx,
         const size_t sy,
@@ -151,7 +151,7 @@ public:
      * \param[in] pos  the relative position to get the coordinates vector at
      * \return         the coordinates vector in x direction
      */
-    virtual const std::valarray<int>& getJx(const Position pos) const =0;
+    virtual const PositionArray& getJx(const Position pos) const =0;
     
     /**
      * \brief returns the coordinate vector in y dir. for the coefficient vector
@@ -160,7 +160,7 @@ public:
      * \param[in] pos   the relative position the get the coordinates vector at
      * \return          the coordinates vector in y direction
      */
-    virtual const std::valarray<int>& getJy(const Position pos) const =0;
+    virtual const PositionArray& getJy(const Position pos) const =0;
     
     /**
      * \brief pushs a new Prolongation on the stack of prolongations

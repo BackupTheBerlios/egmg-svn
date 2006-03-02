@@ -5,7 +5,7 @@
 #ifndef RESIDUUM_H_
 #define RESIDUUM_H_
 
-#include <valarray>
+
 #include "../general/parameters.h"
 #include "../Stencil/Stencil.h"
 
@@ -25,9 +25,9 @@ namespace mg
      * \param[in] ny        number of steps in y direction
      * \return              a vector with the resduum
      */
-    std::valarray<Precision> residuum(
-        const std::valarray<Precision>& u,
-        const std::valarray<Precision>& fv,
+    NumericArray residuum(
+        const NumericArray& u,
+        const NumericArray& fv,
         const Stencil& stencil,
         const size_t nx,
         const size_t ny);

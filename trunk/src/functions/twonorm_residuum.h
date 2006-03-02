@@ -5,7 +5,7 @@
 #ifndef TWONORM_RESIDUUM_H_
 #define TWONORM_RESIDUUM_H_
 
-#include <valarray>
+
 #include "../general/parameters.h"
 #include "../Stencil/Stencil.h"
 
@@ -25,8 +25,8 @@ namespace mg
  * \return      the two norm of the resduum
  */
     Precision twonorm_residuum(
-        const std::valarray<Precision>& u,
-        const std::valarray<Precision>& fv,
+        const NumericArray& u,
+        const NumericArray& fv,
         const Stencil& stencil,
         const size_t nx,
         const size_t ny);

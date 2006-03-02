@@ -6,7 +6,7 @@
 #ifndef ZEBRALINEGS_H_
 #define ZEBRALINEGS_H_
 
-#include<valarray>
+
 #include "LineRelaxation.h"
 #include "GSRedBlack.h"
 
@@ -21,30 +21,30 @@ class ZebraLineGS : public mg::LineRelaxation
 private:
     const GSRedBlack gsRedBlack_;
     void ninepointxzebra(
-        std::valarray<Precision> &u,
-        const std::valarray<Precision> &f, 
-        std::valarray<Precision> &rhs,
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray &rhs,
         const Stencil &stencil,
         const size_t nx, 
         const size_t ny) const;
     void ninepointyzebra(
-        std::valarray<Precision> &u,
-        const std::valarray<Precision> &f, 
-        std::valarray<Precision> &rhs,
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray &rhs,
         const Stencil &stencil,
         const size_t nx, 
         const size_t ny) const;
     void xzebra(
-        std::valarray<Precision> &u,
-        const std::valarray<Precision> &f, 
-        std::valarray<Precision> &rhs,
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray &rhs,
         const Stencil &stencil,
         const size_t nx, 
         const size_t ny) const;
     void yzebra(
-        std::valarray<Precision> &u,
-        const std::valarray<Precision> &f, 
-        std::valarray<Precision> &rhs,
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray &rhs,
         const Stencil &stencil,
         const size_t nx, 
         const size_t ny) const;
@@ -81,8 +81,8 @@ public:
      * \param ny	number of steps in y direction
      */
     void relax(
-        std::valarray<Precision> &u,
-        const std::valarray<Precision> &f, 
+        NumericArray &u,
+        const NumericArray &f, 
 		const Stencil &stencil,
         const size_t nx,
         const size_t ny) const;	

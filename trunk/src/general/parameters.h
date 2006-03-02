@@ -5,6 +5,8 @@
 #ifndef PARAMETERS_H_
 #define PARAMETERS_H_
 
+#include <valarray>
+
 /**
  * \brief the namespace mg is for everything in this library
  * 
@@ -16,6 +18,10 @@ namespace mg
 	 * \brief the Precision to do the calculations with
 	 */
 	typedef double Precision;
+    
+    typedef std::valarray<Precision> NumericArray;
+    
+    typedef std::valarray<int> PositionArray;
 		
 	/**
 	 * \enum mg::Postion

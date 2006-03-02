@@ -24,9 +24,9 @@ int output(std::vector<Precision>& vec, size_t flag){
   }
 
   // create three arrays to store the calculated convergence rates
-  std::valarray<Precision> F1(0.0,max);
-  std::valarray<Precision> F2(0.0,max);
-  std::valarray<Precision> F3(0.0,max);
+  NumericArray F1(0.0,max);
+  NumericArray F2(0.0,max);
+  NumericArray F3(0.0,max);
 
   // initializing temp0, tempfive
   temp0 = vec.at(0);
@@ -61,7 +61,7 @@ int output(std::vector<Precision>& vec, size_t flag){
 
 
 
-int outputvalue(std::valarray<Precision> u, size_t Nx, size_t Ny){
+int outputvalue(NumericArray u, size_t Nx, size_t Ny){
   size_t x,y;
 
    //error check

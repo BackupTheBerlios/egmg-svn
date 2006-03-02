@@ -10,8 +10,8 @@
 namespace mg
 {
     Precision max_residuum(
-        const std::valarray<Precision>& u,
-        const std::valarray<Precision>& fv,
+        const NumericArray& u,
+        const NumericArray& fv,
         const Stencil& stencil,
         const size_t nx,
         const size_t ny)

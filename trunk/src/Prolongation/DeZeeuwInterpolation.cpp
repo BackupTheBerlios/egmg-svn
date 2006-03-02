@@ -13,21 +13,21 @@
 namespace mg
 {
 // This function only works for max. compact 9-point stencils
-std::valarray<Precision> DeZeeuwInterpolation::prolongate(
-    const std::valarray<Precision>& u,
+NumericArray DeZeeuwInterpolation::prolongate(
+    const NumericArray& u,
     const Stencil& stencil,
     const size_t nx,
     const size_t ny) const
 {
     register const size_t nxNew=2*nx;
     register const size_t nyNew=2*ny;
-    std::valarray<Precision> result((nxNew+1)*(nyNew+1));
-    std::valarray<int> jx=stencil.getJx(C);
-    std::valarray<int> jy=stencil.getJy(C);
-    std::valarray<Precision> stencilL=stencil.getL(C,0,0,nx,ny);
+    NumericArray result((nxNew+1)*(nyNew+1));
+    PositionArray jx=stencil.getJx(C);
+    PositionArray jy=stencil.getJy(C);
+    NumericArray stencilL=stencil.getL(C,0,0,nx,ny);
     std::valarray<size_t> position(9);
-    std::valarray<Precision> ms(9);
-    std::valarray<Precision> mt(9);
+    NumericArray ms(9);
+    NumericArray mt(9);
     // position[0]=No. of the sw-element of the stencil
     // position[1]=No. of the s-element of the stencil
     // position[2]=No. of the se-element of the stencil

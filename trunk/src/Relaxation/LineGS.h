@@ -6,7 +6,7 @@
 #ifndef LINEGS_H_
 #define LINEGS_H_
 
-#include<valarray>
+
 #include "LineRelaxation.h"
 #include "GSLexicographic.h"
 
@@ -20,30 +20,30 @@ class LineGS : public mg::LineRelaxation
 private:
     const GSLexicographic gsLexicographic_;
     void ninepointxline(
-        std::valarray<Precision> &u,
-        const std::valarray<Precision> &f, 
-        std::valarray<Precision> &rhs,
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray &rhs,
         const Stencil &stencil,
         const size_t nx, 
         const size_t ny) const;
     void ninepointyline(
-        std::valarray<Precision> &u,
-        const std::valarray<Precision> &f, 
-        std::valarray<Precision> &rhs,
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray &rhs,
         const Stencil &stencil,
         const size_t nx, 
         const size_t ny) const;
     void xline(
-        std::valarray<Precision> &u,
-        const std::valarray<Precision> &f, 
-        std::valarray<Precision> &rhs,
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray &rhs,
         const Stencil &stencil,
         const size_t nx, 
         const size_t ny) const;
     void yline(
-        std::valarray<Precision> &u,
-        const std::valarray<Precision> &f, 
-        std::valarray<Precision> &rhs,
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray &rhs,
         const Stencil &stencil,
         const size_t nx, 
         const size_t ny) const;
@@ -80,8 +80,8 @@ public:
      * \param ny    number of steps in y direction
      */
     void relax(
-        std::valarray<Precision> &u,
-        const std::valarray<Precision> &f, 
+        NumericArray &u,
+        const NumericArray &f, 
         const Stencil &stencil,
         const size_t nx,
         const size_t ny) const;

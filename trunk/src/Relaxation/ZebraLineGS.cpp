@@ -9,14 +9,14 @@
 namespace mg
 {		
 void ZebraLineGS::relax(
-    std::valarray<Precision> &u,
-    const std::valarray<Precision> &f, 
+    NumericArray &u,
+    const NumericArray &f, 
     const Stencil &stencil,
     const size_t nx,
     const size_t ny) const
 {
     // valarrays needed for LR-decomposition of a tridiagonal matrix
-    std::valarray<Precision> rhs(0.0,u.size());
+    NumericArray rhs(0.0,u.size());
     switch (stencil.size())
     {
         case 1:  // stencil of size 1
@@ -87,24 +87,24 @@ void ZebraLineGS::relax(
  *       doing redudant things in seperate functions
  */
 void ZebraLineGS::ninepointxzebra(
-    std::valarray<Precision> &u,
-    const std::valarray<Precision> &f, 
-    std::valarray<Precision> &rhs,
+    NumericArray &u,
+    const NumericArray &f, 
+    NumericArray &rhs,
     const Stencil &stencil,
     const size_t nx, 
     const size_t ny) const                      
 { 
     //valarrays needed for saving the tridiagonal matrix A of linear system
     //A u = rhs
-    std::valarray<Precision> diagR(nx-1);
-    std::valarray<Precision> ndiagR(nx-2);
-    std::valarray<Precision> ndiagL(nx-2);
+    NumericArray diagR(nx-1);
+    NumericArray ndiagR(nx-2);
+    NumericArray ndiagL(nx-2);
     if(stencil.isConstant())
     {
         // get const operator L
-        const std::valarray<Precision> operatorL = stencil.getL(C,2,2,nx,ny);
-        const std::valarray<int> jX = stencil.getJx(C);
-        const std::valarray<int> jY = stencil.getJy(C);
+        const NumericArray operatorL = stencil.getL(C,2,2,nx,ny);
+        const PositionArray jX = stencil.getJx(C);
+        const PositionArray jY = stencil.getJy(C);
             
         // for each line: correction of the rhs given by 
         // rhs = fv - [L[n]  0  L[s]]^t * u and elimination of the 
@@ -190,9 +190,9 @@ void ZebraLineGS::ninepointxzebra(
     {
         //Stencil ist not constant, so L needs to be evaluated in each grid
         //point no other change in the algorithm  
-        std::valarray<Precision> operatorL = stencil.getL(C,2,2,nx,ny);
-        std::valarray<int> jX = stencil.getJx(C);
-        std::valarray<int> jY = stencil.getJy(C);
+        NumericArray operatorL = stencil.getL(C,2,2,nx,ny);
+        PositionArray jX = stencil.getJx(C);
+        PositionArray jY = stencil.getJy(C);
         if(nx > 2)
         {
             operatorL=stencil.getL(SW,1,1,nx,ny);
@@ -366,24 +366,24 @@ void ZebraLineGS::ninepointxzebra(
     }                       
 }
 void ZebraLineGS::ninepointyzebra(
-    std::valarray<Precision> &u,
-    const std::valarray<Precision> &f, 
-    std::valarray<Precision> &rhs,
+    NumericArray &u,
+    const NumericArray &f, 
+    NumericArray &rhs,
     const Stencil &stencil,
     const size_t nx, 
     const size_t ny) const
 { 
     //valarrays needed for saving the tridiagonal matrix A of linear system
     //A u = rhs
-    std::valarray<Precision> diagR(ny-1);
-    std::valarray<Precision> ndiagR(ny-2);
-    std::valarray<Precision> ndiagL(ny-2);
+    NumericArray diagR(ny-1);
+    NumericArray ndiagR(ny-2);
+    NumericArray ndiagL(ny-2);
     if(stencil.isConstant())
     {
         // get const operator L
-        const std::valarray<Precision> operatorL=stencil.getL(C,2,2,nx,ny);
-        const std::valarray<int> jX = stencil.getJx(C);
-        const std::valarray<int> jY = stencil.getJy(C);
+        const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
+        const PositionArray jX = stencil.getJx(C);
+        const PositionArray jY = stencil.getJy(C);
         // for each odd line correction of the rhs given by
         // rhs = fv + [1  0  1] * u and elimination of the 
         // boundary condition in first and last inner point  
@@ -465,9 +465,9 @@ void ZebraLineGS::ninepointyzebra(
     {
         //Stencil ist not constant, so L needs to be evaluated in each grid
         //point no other change in the algorithm  
-        std::valarray<Precision> operatorL = stencil.getL(C,2,2,nx,ny);
-        std::valarray<int> jX = stencil.getJx(C);
-        std::valarray<int> jY = stencil.getJy(C);
+        NumericArray operatorL = stencil.getL(C,2,2,nx,ny);
+        PositionArray jX = stencil.getJx(C);
+        PositionArray jY = stencil.getJy(C);
         if(ny > 2)
         {
             operatorL=stencil.getL(SW,1,1,nx,ny);
@@ -639,32 +639,32 @@ void ZebraLineGS::ninepointyzebra(
     }                       
 }
 void ZebraLineGS::xzebra(
-    std::valarray<Precision> &u,
-    const std::valarray<Precision> &f, 
-    std::valarray<Precision> &rhs,
+    NumericArray &u,
+    const NumericArray &f, 
+    NumericArray &rhs,
     const Stencil &stencil,
     const size_t nx, 
     const size_t ny) const
 {
     if((ny > 4) && (nx > 4))
     {   
-        std::valarray<Precision> diagR(0.0,nx-1);
-        std::valarray<Precision> ndiagR1(0.0,nx-2);
-        std::valarray<Precision> ndiagL1(0.0,nx-2);
-        std::valarray<Precision> ndiagR2(0.0,nx-3);
-        std::valarray<Precision> ndiagL2(0.0,nx-3);
+        NumericArray diagR(0.0,nx-1);
+        NumericArray ndiagR1(0.0,nx-2);
+        NumericArray ndiagL1(0.0,nx-2);
+        NumericArray ndiagR2(0.0,nx-3);
+        NumericArray ndiagL2(0.0,nx-3);
         if(stencil.isConstant())
         {
             // get const operator L
-            const std::valarray<Precision> operatorL=stencil.getL(C,2,2,nx,ny);
-            const std::valarray<int> jX=stencil.getJx(C);
-            const std::valarray<int> jY=stencil.getJy(C);
-            std::valarray<Precision> operatorLB=stencil.getL(S,2,1,nx,ny);
-            std::valarray<int> jXB=stencil.getJx(S);
-            std::valarray<int> jYB=stencil.getJy(S);        
-            std::valarray<Precision> operatorLC=stencil.getL(SW,1,1,nx,ny);
-            std::valarray<int> jXC=stencil.getJx(SW);
-            std::valarray<int> jYC=stencil.getJy(SW);
+            const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
+            const PositionArray jX=stencil.getJx(C);
+            const PositionArray jY=stencil.getJy(C);
+            NumericArray operatorLB=stencil.getL(S,2,1,nx,ny);
+            PositionArray jXB=stencil.getJx(S);
+            PositionArray jYB=stencil.getJy(S);        
+            NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
+            PositionArray jXC=stencil.getJx(SW);
+            PositionArray jYC=stencil.getJy(SW);
             // set right hand side for line 1                   
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[E];
@@ -995,15 +995,15 @@ void ZebraLineGS::xzebra(
         }
         else // stencil not constant
         {
-            std::valarray<Precision> operatorL=stencil.getL(C,2,2,nx,ny);
-            std::valarray<int> jX=stencil.getJx(C);
-            std::valarray<int> jY=stencil.getJy(C);
-            std::valarray<Precision> operatorLB=stencil.getL(S,2,1,nx,ny);
-            std::valarray<int> jXB=stencil.getJx(S);
-            std::valarray<int> jYB=stencil.getJy(S);
-            std::valarray<Precision> operatorLC=stencil.getL(SW,1,1,nx,ny);
-            std::valarray<int> jXC=stencil.getJx(SW);
-            std::valarray<int> jYC=stencil.getJy(SW);
+            NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
+            PositionArray jX=stencil.getJx(C);
+            PositionArray jY=stencil.getJy(C);
+            NumericArray operatorLB=stencil.getL(S,2,1,nx,ny);
+            PositionArray jXB=stencil.getJx(S);
+            PositionArray jYB=stencil.getJy(S);
+            NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
+            PositionArray jXC=stencil.getJx(SW);
+            PositionArray jYC=stencil.getJy(SW);
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[E];
             ndiagR2[0]=operatorLC[NE];
@@ -1356,32 +1356,32 @@ void ZebraLineGS::xzebra(
     }
 }
 void ZebraLineGS::yzebra(
-    std::valarray<Precision> &u,
-    const std::valarray<Precision> &f, 
-    std::valarray<Precision> &rhs,
+    NumericArray &u,
+    const NumericArray &f, 
+    NumericArray &rhs,
     const Stencil &stencil,
     const size_t nx, 
     const size_t ny) const
 {
     if((ny > 4) && (nx > 4))
     {
-        std::valarray<Precision> diagR(0.0,ny-1);
-        std::valarray<Precision> ndiagR1(0.0,ny-2);
-        std::valarray<Precision> ndiagL1(0.0,ny-2);
-        std::valarray<Precision> ndiagR2(0.0,ny-3);
-        std::valarray<Precision> ndiagL2(0.0,ny-3);
+        NumericArray diagR(0.0,ny-1);
+        NumericArray ndiagR1(0.0,ny-2);
+        NumericArray ndiagL1(0.0,ny-2);
+        NumericArray ndiagR2(0.0,ny-3);
+        NumericArray ndiagL2(0.0,ny-3);
         if(stencil.isConstant())
         {
             // get const operator L
-            const std::valarray<Precision> operatorL=stencil.getL(C,2,2,nx,ny);
-            const std::valarray<int> jX=stencil.getJx(C);
-            const std::valarray<int> jY=stencil.getJy(C);
-            std::valarray<Precision> operatorLB=stencil.getL(W,1,2,nx,ny);
-            std::valarray<int> jXB=stencil.getJx(W);
-            std::valarray<int> jYB=stencil.getJy(W);
-            std::valarray<Precision> operatorLC=stencil.getL(SW,1,1,nx,ny);
-            std::valarray<int> jXC=stencil.getJx(SW);
-            std::valarray<int> jYC=stencil.getJy(SW);
+            const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
+            const PositionArray jX=stencil.getJx(C);
+            const PositionArray jY=stencil.getJy(C);
+            NumericArray operatorLB=stencil.getL(W,1,2,nx,ny);
+            PositionArray jXB=stencil.getJx(W);
+            PositionArray jYB=stencil.getJy(W);
+            NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
+            PositionArray jXC=stencil.getJx(SW);
+            PositionArray jYC=stencil.getJy(SW);
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[N];
             ndiagR2[0]=operatorLC[NW];
@@ -1715,15 +1715,15 @@ void ZebraLineGS::yzebra(
         }
         else // stencil not constant
         {
-            std::valarray<Precision> operatorL=stencil.getL(C,2,2,nx,ny);
-            std::valarray<int> jX=stencil.getJx(C);
-            std::valarray<int> jY=stencil.getJy(C);
-            std::valarray<Precision> operatorLB=stencil.getL(W,1,2,nx,ny);
-            std::valarray<int> jXB=stencil.getJx(W);
-            std::valarray<int> jYB=stencil.getJy(W);
-            std::valarray<Precision> operatorLC=stencil.getL(SW,1,1,nx,ny);
-            std::valarray<int> jXC=stencil.getJx(SW);
-            std::valarray<int> jYC=stencil.getJy(SW);
+            NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
+            PositionArray jX=stencil.getJx(C);
+            PositionArray jY=stencil.getJy(C);
+            NumericArray operatorLB=stencil.getL(W,1,2,nx,ny);
+            PositionArray jXB=stencil.getJx(W);
+            PositionArray jYB=stencil.getJy(W);
+            NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
+            PositionArray jXC=stencil.getJx(SW);
+            PositionArray jYC=stencil.getJy(SW);
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[N];
             ndiagR2[0]=operatorLC[NW];

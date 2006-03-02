@@ -5,7 +5,7 @@
 #ifndef RELAXATION_H_
 #define RELAXATION_H_
 
-#include <valarray>
+
 #include "../general/parameters.h"
 #include "../Stencil/Stencil.h"
 
@@ -78,8 +78,8 @@ public:
      * \param[in] ny            number of steps in y direction
      */
     virtual void relax(
-        std::valarray<Precision>& u,
-        const std::valarray<Precision>& f,
+        NumericArray& u,
+        const NumericArray& f,
         const Stencil& stencil,
         const size_t nx,
         const size_t ny) const=0;
@@ -95,8 +95,8 @@ public:
      * \param[in] ny            number of steps in y direction
      */    
     virtual void preSmooth(
-        std::valarray<Precision>& u,
-        const std::valarray<Precision>& f,
+        NumericArray& u,
+        const NumericArray& f,
         const Stencil& stencil,
         const size_t nx,
         const size_t ny) const
@@ -116,8 +116,8 @@ public:
      * \param[in] ny            number of steps in y direction
      */   
     virtual void postSmooth(
-        std::valarray<Precision>& u,
-        const std::valarray<Precision>& f,
+        NumericArray& u,
+        const NumericArray& f,
         const Stencil& stencil,
         const size_t nx,
         const size_t ny) const

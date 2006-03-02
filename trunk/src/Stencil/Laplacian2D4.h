@@ -6,7 +6,7 @@
 #define LAPLACIAN2D4_H_
 
 #include <vector>
-#include <valarray>
+
 #include "Stencil.h"
 #include "../Prolongation/Prolongation.h"
 #include "../Restriction/Restriction.h"
@@ -26,119 +26,119 @@ namespace mg
 class Laplacian2D4 : public Stencil
 {
 private:
-    mutable std::valarray<Precision> lCenter_;
-    mutable std::valarray<Precision> lBorder_;
-    mutable std::valarray<Precision> lCorner_;
-    const std::vector<std::valarray<int> > jx_;
-    const std::vector<std::valarray<int> > jy_;
+    mutable NumericArray lCenter_;
+    mutable NumericArray lBorder_;
+    mutable NumericArray lCorner_;
+    const std::vector<PositionArray > jx_;
+    const std::vector<PositionArray > jy_;
     const Precision ax_;
     const Precision ay_;
 
-    std::vector<std::valarray<int> > initJx_()
+    std::vector<PositionArray > initJx_()
     {
-        std::vector<std::valarray<int> > jx(9);
+        std::vector<PositionArray > jx(9);
 
         const int jxCenter[]={0,-1,0,1,0,-2,0,2,0};
 
         jx[C].resize(9);
-        jx[C]=std::valarray<int>(jxCenter,9);
+        jx[C]=PositionArray(jxCenter,9);
 
         int jxBorder[]={0,-1,0,1,0,0,2,0};
 
         jx[W].resize(8);
-        jx[W]=std::valarray<int>(jxBorder,8);
+        jx[W]=PositionArray(jxBorder,8);
 
         jxBorder[5]=-2;
         jxBorder[6]=2;
         jxBorder[7]=0;
         jx[N].resize(8);
-        jx[N]=std::valarray<int>(jxBorder,8);
+        jx[N]=PositionArray(jxBorder,8);
 
         jxBorder[5]=-2;
         jxBorder[6]=0;
         jxBorder[7]=0;
         jx[E].resize(8);
-        jx[E]=std::valarray<int>(jxBorder,8);
+        jx[E]=PositionArray(jxBorder,8);
 
         jxBorder[5]=-2;
         jxBorder[6]=0;
         jxBorder[7]=2;
         jx[S].resize(8);
-        jx[S]=std::valarray<int>(jxBorder,8);
+        jx[S]=PositionArray(jxBorder,8);
 
         int jxCorner[]={0,-1,0,1,0,2,0};
 
         jx[NW].resize(7);
-        jx[NW]=std::valarray<int>(jxCorner,7);
+        jx[NW]=PositionArray(jxCorner,7);
 
         jxCorner[5]=-2;
         jxCorner[6]=0;
         jx[NE].resize(7);
-        jx[NE]=std::valarray<int>(jxCorner,7);
+        jx[NE]=PositionArray(jxCorner,7);
 
         jxCorner[5]=-2;
         jxCorner[6]=0;
         jx[SE].resize(7);
-        jx[SE]=std::valarray<int>(jxCorner,7);
+        jx[SE]=PositionArray(jxCorner,7);
 
         jxCorner[5]=0;
         jxCorner[6]=2;
         jx[SW].resize(7);
-        jx[SW]=std::valarray<int>(jxCorner,7);
+        jx[SW]=PositionArray(jxCorner,7);
 
         return jx;
     }
 
-    std::vector<std::valarray<int> > initJy_()
+    std::vector<PositionArray > initJy_()
     {
-        std::vector<std::valarray<int> > jy(9);
+        std::vector<PositionArray > jy(9);
 
         const int jyCenter[]={0,0,1,0,-1,0,2,0,-2};
 
         jy[C].resize(9);
-        jy[C]=std::valarray<int>(jyCenter,9);
+        jy[C]=PositionArray(jyCenter,9);
 
         int jyBorder[]={0,0,1,0,-1,2,0,-2};
 
         jy[W].resize(8);
-        jy[W]=std::valarray<int>(jyBorder,8);
+        jy[W]=PositionArray(jyBorder,8);
 
         jyBorder[5]=jyBorder[6]=0;
         jyBorder[7]=-2;
         jy[N].resize(8);
-        jy[N]=std::valarray<int>(jyBorder,8);
+        jy[N]=PositionArray(jyBorder,8);
 
         jyBorder[5]=0;
         jyBorder[6]=2;
         jyBorder[7]=-2;
         jy[E].resize(8);
-        jy[E]=std::valarray<int>(jyBorder,8);
+        jy[E]=PositionArray(jyBorder,8);
 
         jyBorder[5]=0;
         jyBorder[6]=2;
         jyBorder[7]=0;
         jy[S].resize(8);
-        jy[S]=std::valarray<int>(jyBorder,8);
+        jy[S]=PositionArray(jyBorder,8);
 
         int jyCorner[]={0,0,1,0,-1,0,-2};
 
         jy[NW].resize(7);
-        jy[NW]=std::valarray<int>(jyCorner,7);
+        jy[NW]=PositionArray(jyCorner,7);
 
         jyCorner[5]=0;
         jyCorner[6]=-2;
         jy[NE].resize(7);
-        jy[NE]=std::valarray<int>(jyCorner,7);
+        jy[NE]=PositionArray(jyCorner,7);
 
         jyCorner[5]=0;
         jyCorner[6]=2;
         jy[SE].resize(7);
-        jy[SE]=std::valarray<int>(jyCorner,7);
+        jy[SE]=PositionArray(jyCorner,7);
 
         jyCorner[5]=2;
         jyCorner[6]=0;
         jy[SW].resize(7);
-        jy[SW]=std::valarray<int>(jyCorner,7);
+        jy[SW]=PositionArray(jyCorner,7);
 
         return jy;
     }
@@ -164,7 +164,7 @@ public:
     virtual ~Laplacian2D4() {}
 
     inline Precision apply(
-        const std::valarray<Precision>& u,
+        const NumericArray& u,
         const Position position,
         const size_t sx,
         const size_t sy,
@@ -240,7 +240,7 @@ public:
      * \param[in] ny    the step size in y direction
      * \return          the coefficients of Laplacian2D4
      */
-    inline const std::valarray<Precision>& getL(
+    inline const NumericArray& getL(
         const Position position,
         const size_t,
         const size_t,
@@ -278,13 +278,13 @@ public:
         return lCenter_; //never reached
     }
 
-    inline const std::valarray<int>& getJx(const Position position) const
+    inline const PositionArray& getJx(const Position position) const
     {
         return jx_[position];
 
     }
 
-    inline const std::valarray<int>& getJy(const Position position) const
+    inline const PositionArray& getJy(const Position position) const
     {
         return jy_[position];
     }

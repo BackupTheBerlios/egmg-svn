@@ -5,7 +5,7 @@
 #ifndef OUTPUT_H_
 #define OUTPUT_H_
 
-#include<valarray>
+
 #include<vector>
 #include "../general/parameters.h"
 
@@ -34,7 +34,7 @@ int output(std::vector<Precision>& vec, size_t flag);
  * \param Nx	 Number of steps in x direction
  * \param Ny	 Number of steps in y direction
  */
-int outputvalue(std::valarray<Precision> u, size_t Nx, size_t Ny);
+int outputvalue(NumericArray u, size_t Nx, size_t Ny);
 }
 
 #endif /*OUTPUT_H_*/

@@ -1,9 +1,11 @@
-/** \file lineGS.h
+/** \file ZebraLine.h
  * \author Andre Oeckerath
- * \see Relaxation.h
+ * \brief ZebraLine.h contains the interface of the class ZebraLine.
+ * \see LineRelaxation.h
  */
-#ifndef lineJAC_H_
-#define lineJAC_H_
+#ifndef ZEBRALINE_H_
+#define ZEBRALINE_H_
+
 
 #include "LineRelaxation.h"
 #include "../Stencil/Stencil.h"
@@ -12,31 +14,45 @@
 namespace mg
 {
 /**
- * \brief lineJAC is a class template for a Jacobi line relaxation
+ * \brief ZebraLine is a class for a zebra line relaxation
  */
 class ZebraLine : public mg::LineRelaxation
 {
-    private:
-    Precision omega_;
-			void ninepointxzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
-		                    std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
-					        const size_t Ny) const;
-
-			void ninepointyzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
-		                    std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
-					        const size_t Ny) const;
-			void xzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
-		                    std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
-					        const size_t Ny) const;
-
-			void yzebra(std::valarray<Precision> &u, const std::valarray<Precision> &fv, 
-		                    std::valarray<Precision> resid, const Stencil &stencil, const size_t Nx, 
-					        const size_t Ny) const;
+private:
+    const Precision omega_;
+    void ninepointxzebra(
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray resid,
+        const Stencil &stencil,
+        const size_t nx, 
+        const size_t ny) const;
+    void ninepointyzebra(
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray resid,
+        const Stencil &stencil,
+        const size_t nx, 
+        const size_t ny) const;
+    void xzebra(
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray resid,
+        const Stencil &stencil,
+        const size_t nx, 
+        const size_t ny) const;
+    void yzebra(
+        NumericArray &u,
+        const NumericArray &f, 
+        NumericArray resid,
+        const Stencil &stencil,
+        const size_t nx, 
+        const size_t ny) const;
 public:
     /**
-     * \brief The constructor of a ZebraLineJAC object
+     * \brief The constructor of a ZebraLine object
      * 
-     * ZebraLineJAC constructs a ZebraLineJAC object with:
+     * ZebraLine constructs a ZebraLine object with:
      * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
      * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      * \param[in] direction             direction of the line relaxation
@@ -56,9 +72,9 @@ public:
 	/**
       * \brief relax() executes one relaxation step on the input vector
       * 
-      * relax() exectues one Jacobi line relaxation step on the 
-	  * input vector on a rectangular 2D gird with lexicographic ordering and the
-      * discretazation Stencil with const coefficient for a pde
+      * relax() exectues one zebra line relaxation step on the input
+	  * vector on a rectangular 2D gird with lexicographic ordering and the
+      * discretazation Stencil for a pde
       * 
      * \param u     the vector representation of the 2D grid to perform the
      *              relaxation on this vector will be changed
@@ -67,11 +83,11 @@ public:
      * \param ny    number of steps in y direction
      */
     void relax(
-        std::valarray<Precision> &u,
-        const std::valarray<Precision> &f, 
+        NumericArray &u,
+        const NumericArray &f, 
         const Stencil &stencil,
         const size_t nx,
         const size_t ny) const;
 };
 }
-#endif
+#endif /* ZEBRALINE_H_ */

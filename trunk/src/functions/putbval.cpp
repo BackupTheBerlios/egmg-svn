@@ -8,7 +8,7 @@
 namespace mg
 {
     void putbval(
-        std::valarray<Precision>& u,
+        NumericArray& u,
         const size_t nx,
         const size_t ny,
         const function2D g)

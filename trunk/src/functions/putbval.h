@@ -5,7 +5,7 @@
 #ifndef PUTBVAL_H_
 #define PUTBVAL_H_
 
-#include <valarray>
+
 #include "../general/parameters.h"
 
 namespace mg
@@ -20,7 +20,7 @@ namespace mg
      * \param[in] g         the diriclet boundry condition
      */
     void putbval(
-        std::valarray<Precision>& u,
+        NumericArray& u,
         const size_t nx,
         const size_t ny,
         const function2D g);

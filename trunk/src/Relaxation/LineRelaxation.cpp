@@ -9,13 +9,13 @@
 namespace mg
 {
 void LineRelaxation::xLRSolver(
-    std::valarray<Precision>& u,
+    NumericArray& u,
     const size_t sy,
     const size_t nx,
-    std::valarray<Precision>& rhs,
-    std::valarray<Precision>& ndiagL,
-    std::valarray<Precision>& diagR,
-    const std::valarray<Precision>& ndiagR) const
+    NumericArray& rhs,
+    NumericArray& ndiagL,
+    NumericArray& diagR,
+    const NumericArray& ndiagR) const
 {
     for(size_t sx=1; sx<nx-1; sx++) 
     {
@@ -32,14 +32,14 @@ void LineRelaxation::xLRSolver(
     }
 }
 void LineRelaxation::yLRSolver(
-    std::valarray<Precision>& u,
+    NumericArray& u,
     const size_t sx,
     const size_t nx,
     const size_t ny,
-    std::valarray<Precision>& rhs,
-    std::valarray<Precision>& ndiagL,
-    std::valarray<Precision>& diagR,
-    const std::valarray<Precision>& ndiagR) const
+    NumericArray& rhs,
+    NumericArray& ndiagL,
+    NumericArray& diagR,
+    const NumericArray& ndiagR) const
 {
     // LR-decomposition + transformation of the rhs vector
     for(size_t sy=1; sy<ny-1; sy++) 
@@ -58,15 +58,15 @@ void LineRelaxation::yLRSolver(
     }
 }
 void LineRelaxation::xLRSolver(
-    std::valarray<Precision>& u,
+    NumericArray& u,
     const size_t sy,
     const size_t nx,
-    std::valarray<Precision>& rhs,
-    std::valarray<Precision>& ndiagL1,
-    std::valarray<Precision>& ndiagL2,
-    std::valarray<Precision>& diagR,
-    std::valarray<Precision>& ndiagR1,
-    const std::valarray<Precision>& ndiagR2) const
+    NumericArray& rhs,
+    NumericArray& ndiagL1,
+    NumericArray& ndiagL2,
+    NumericArray& diagR,
+    NumericArray& ndiagR1,
+    const NumericArray& ndiagR2) const
 {
     // LR-decomposition + transformation of the rhs
     for(size_t sx=1; sx<nx-2; sx++)  
@@ -96,16 +96,16 @@ void LineRelaxation::xLRSolver(
     u[sy*(nx+1)+1]=1/diagR[0]*(rhs[sy*(nx+1)+1]-ndiagR1[0]*u[sy*(nx+1)+1+1]);
 }
 void LineRelaxation::yLRSolver(
-    std::valarray<Precision>& u,
+    NumericArray& u,
     const size_t sx,
     const size_t nx,
     const size_t ny,
-    std::valarray<Precision>& rhs,
-    std::valarray<Precision>& ndiagL1,
-    std::valarray<Precision>& ndiagL2,
-    std::valarray<Precision>& diagR,
-    std::valarray<Precision>& ndiagR1,
-    const std::valarray<Precision>& ndiagR2) const
+    NumericArray& rhs,
+    NumericArray& ndiagL1,
+    NumericArray& ndiagL2,
+    NumericArray& diagR,
+    NumericArray& ndiagR1,
+    const NumericArray& ndiagR2) const
 {
     // LR-decomposition + transformation of the rhs
     for(size_t sy=1; sy<ny-2; sy++)  

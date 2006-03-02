@@ -8,18 +8,18 @@
 namespace mg
 {
 // This function only works for max. compact 9-point stencils
-std::valarray<Precision> DendyInterpolation::prolongate(
-    const std::valarray<Precision>& u,
+NumericArray DendyInterpolation::prolongate(
+    const NumericArray& u,
     const Stencil& stencil,
     const size_t nx,
     const size_t ny) const
 {
     const size_t nxNew=2*nx;
     const size_t nyNew=2*ny;
-    std::valarray<Precision> result((nxNew+1)*(nyNew+1));
-    std::valarray<int> jx=stencil.getJx(C);
-    std::valarray<int> jy=stencil.getJy(C);
-    std::valarray<Precision> stencilL=std::valarray<Precision>();
+    NumericArray result((nxNew+1)*(nyNew+1));
+    PositionArray jx=stencil.getJx(C);
+    PositionArray jy=stencil.getJy(C);
+    NumericArray stencilL=NumericArray();
     std::valarray<size_t> position(9);
     // position[0]=No. of the sw-element of the stencil
     // position[1]=No. of the s-element of the stencil

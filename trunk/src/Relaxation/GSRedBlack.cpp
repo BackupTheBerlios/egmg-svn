@@ -9,8 +9,8 @@ namespace mg
 {
 
 void GSRedBlack::relax(
-    std::valarray<Precision>& u,
-    const std::valarray<Precision>& f,
+    NumericArray& u,
+    const NumericArray& f,
     const Stencil& stencil,
     const size_t nx,
     const size_t ny) const

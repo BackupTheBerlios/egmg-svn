@@ -5,7 +5,7 @@
 #ifndef PUTRHS_H_
 #define PUTRHS_H_
 
-#include <valarray>
+
 #include "../general/parameters.h"
 
 namespace mg
@@ -19,7 +19,7 @@ namespace mg
      * \param[in] f         the right hand side function of the pde 
      */
     void putrhs(
-        std::valarray<Precision>& fv,
+        NumericArray& fv,
         const size_t nx,
         const size_t ny,
         const function2D f);

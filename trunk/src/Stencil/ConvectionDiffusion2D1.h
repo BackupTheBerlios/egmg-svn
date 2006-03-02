@@ -6,7 +6,7 @@
 #define CONVECTIONDIFFUSION2D1_H_
 
 #include <cmath>
-#include <valarray>
+
 #include <stdexcept>
 #include "Stencil.h"
 #include "../Prolongation/Prolongation.h"
@@ -27,23 +27,23 @@ namespace mg
 class ConvectionDiffusion2D1 : public Stencil
 {
 private:
-    mutable std::valarray<Precision> l_;
-    const std::valarray<int> jx_;
-    const std::valarray<int> jy_;
+    mutable NumericArray l_;
+    const PositionArray jx_;
+    const PositionArray jy_;
     const Precision epsilon_;
     int mode_;
     
     //initilize jx_, makes it possible to make jx_ const
-    std::valarray<int> initJx_() const
+    PositionArray initJx_() const
     {
         const int t[]={0,-1,0,1,0};
-        return std::valarray<int>(t,5);
+        return PositionArray(t,5);
     }
     //initilize jy_, makes it possible to make jy_ const
-    std::valarray<int> initJy_() const
+    PositionArray initJy_() const
     {
         const int t[]={0,0,1,0,-1};
-        return std::valarray<int>(t,5);
+        return PositionArray(t,5);
     }
     
     Precision a_(
@@ -96,7 +96,7 @@ public:
     virtual ~ConvectionDiffusion2D1() {}
 
     inline Precision apply(
-        const std::valarray<Precision>& u,
+        const NumericArray& u,
         const Position,
         const size_t sx,
         const size_t sy,
@@ -133,7 +133,7 @@ public:
             +fabs( a_(sx,sy,nx,ny) )*nx+fabs( b_(sx,sy,nx,ny) )*ny;
     }
 
-    inline const std::valarray<Precision>& getL(
+    inline const NumericArray& getL(
         const Position,
         const size_t sx,
         const size_t sy,
@@ -158,12 +158,12 @@ public:
         return l_; 
     }
 
-    inline const std::valarray<int>& getJx(const Position) const
+    inline const PositionArray& getJx(const Position) const
     {
         return jx_;
     }
 
-    inline const std::valarray<int>& getJy(const Position) const
+    inline const PositionArray& getJy(const Position) const
     {
         return jy_;
     }

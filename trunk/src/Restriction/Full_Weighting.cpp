@@ -7,8 +7,8 @@
 
 namespace mg
 {
-std::valarray<Precision> Full_Weighting::restriction(
-		const std::valarray<Precision>& u, const Stencil&,const Prolongation&,
+NumericArray Full_Weighting::restriction(
+		const NumericArray& u, const Stencil&,const Prolongation&,
 		const size_t Nx, const size_t Ny) const
 {
 	//if it is not possible to do standart coarsening throw an exeption
@@ -16,7 +16,7 @@ std::valarray<Precision> Full_Weighting::restriction(
 		throw std::domain_error("u");
 	const size_t Nx_new = Nx/2;
 	const size_t Ny_new = Ny/2;
-	std::valarray<Precision> result(0.0,(Nx_new+1)*(Ny_new+1));
+	NumericArray result(0.0,(Nx_new+1)*(Ny_new+1));
 	//do injection on the boarders
 	for (size_t j=0;j<=Ny_new;j++)
 	{

@@ -8,15 +8,15 @@
 namespace mg
 {
     
-std::valarray<Precision> SevenPointInterpolation::prolongate(
-    const std::valarray<Precision>& u,
+NumericArray SevenPointInterpolation::prolongate(
+    const NumericArray& u,
     const Stencil&,
     const size_t nx,
     const size_t ny) const
 {
     const size_t nxNew = 2*nx;
     const size_t nyNew = 2*ny;
-    std::valarray<Precision> result((nxNew+1)*(nyNew+1));
+    NumericArray result((nxNew+1)*(nyNew+1));
 
     //"interpolation" of coarse grid points
     for (size_t j=0; j<=ny; ++j)

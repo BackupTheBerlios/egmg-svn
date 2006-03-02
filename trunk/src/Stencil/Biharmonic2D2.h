@@ -6,7 +6,7 @@
 #define BIHARMONIC2D2_H_
 
 #include <vector>
-#include <valarray>
+
 #include "Stencil.h"
 #include "../Prolongation/Prolongation.h"
 #include "../Restriction/Restriction.h"
@@ -26,23 +26,23 @@ namespace mg
 class Biharmonic2D2 : public Stencil
 {
 private:
-    mutable std::valarray<Precision> lCenter_;
-    mutable std::valarray<Precision> lBorder_;
-    mutable std::valarray<Precision> lCorner_;
-    const std::vector<std::valarray<int> > jx_;
-    const std::vector<std::valarray<int> > jy_;
+    mutable NumericArray lCenter_;
+    mutable NumericArray lBorder_;
+    mutable NumericArray lCorner_;
+    const std::vector<PositionArray > jx_;
+    const std::vector<PositionArray > jy_;
 
-    std::vector<std::valarray<int> > initJx_()
+    std::vector<PositionArray > initJx_()
     {
-        std::vector<std::valarray<int> > jx(13);
+        std::vector<PositionArray > jx(13);
 
         const int jxCenter[]={0,-1,0,1,0,-2,0,2,0,-1,1,1,-1};
         jx[C].resize(13);
-        jx[C]=std::valarray<int>(jxCenter,13);
+        jx[C]=PositionArray(jxCenter,13);
 
         int jxBorder[]={0,-1,0,1,0,0,2,0,-1,1,1,-1};
         jx[W].resize(12);
-        jx[W]=std::valarray<int>(jxBorder,12);
+        jx[W]=PositionArray(jxBorder,12);
 
         jxBorder[5]=-2;
         jxBorder[6]=2;
@@ -52,7 +52,7 @@ private:
         jxBorder[10]=1;
         jxBorder[11]=-1;
         jx[N].resize(12);
-        jx[N]=std::valarray<int>(jxBorder,12);
+        jx[N]=PositionArray(jxBorder,12);
 
         jxBorder[5]=-2;
         jxBorder[6]=0;
@@ -62,7 +62,7 @@ private:
         jxBorder[10]=1;
         jxBorder[11]=-1;
         jx[E].resize(12);
-        jx[E]=std::valarray<int>(jxBorder,12);
+        jx[E]=PositionArray(jxBorder,12);
 
         jxBorder[5]=-2;
         jxBorder[6]=0;
@@ -72,11 +72,11 @@ private:
         jxBorder[10]=1;
         jxBorder[11]=-1;
         jx[S].resize(12);
-        jx[S]=std::valarray<int>(jxBorder,12);
+        jx[S]=PositionArray(jxBorder,12);
 
         int jxCorner[]={0,-1,0,1,0,2,0,-1,1,1,-1};
         jx[NW].resize(11);
-        jx[NW]=std::valarray<int>(jxCorner,11);
+        jx[NW]=PositionArray(jxCorner,11);
 
         jxCorner[5]=-2;
         jxCorner[6]=0;
@@ -85,7 +85,7 @@ private:
         jxBorder[9]=1;
         jxBorder[10]=-1;
         jx[NE].resize(11);
-        jx[NE]=std::valarray<int>(jxCorner,11);
+        jx[NE]=PositionArray(jxCorner,11);
 
         jxCorner[5]=-2;
         jxCorner[6]=0;
@@ -94,7 +94,7 @@ private:
         jxBorder[9]=1;
         jxBorder[10]=-1;
         jx[SE].resize(11);
-        jx[SE]=std::valarray<int>(jxCorner,11);
+        jx[SE]=PositionArray(jxCorner,11);
 
         jxCorner[5]=0;
         jxCorner[6]=2;
@@ -103,24 +103,24 @@ private:
         jxBorder[9]=1;
         jxBorder[10]=-1;
         jx[SW].resize(11);
-        jx[SW]=std::valarray<int>(jxCorner,11);
+        jx[SW]=PositionArray(jxCorner,11);
 
         return jx;
     }
 
-    std::vector<std::valarray<int> > initJy_()
+    std::vector<PositionArray > initJy_()
     {
-        std::vector<std::valarray<int> > jy(13);
+        std::vector<PositionArray > jy(13);
 
         const int jyCenter[]={0,0,1,0,-1,0,2,0,-2,1,1,-1,-1};
 
         jy[C].resize(13);
-        jy[C]=std::valarray<int>(jyCenter,13);
+        jy[C]=PositionArray(jyCenter,13);
 
         int jyBorder[]={0,0,1,0,-1,2,0,-2,1,1,-1,-1};
 
         jy[W].resize(12);
-        jy[W]=std::valarray<int>(jyBorder,12);
+        jy[W]=PositionArray(jyBorder,12);
 
         jyBorder[5]=jyBorder[6]=0;
         jyBorder[7]=-2;
@@ -129,7 +129,7 @@ private:
         jyBorder[10]=-1;
         jyBorder[11]=-1;
         jy[N].resize(12);
-        jy[N]=std::valarray<int>(jyBorder,12);
+        jy[N]=PositionArray(jyBorder,12);
 
         jyBorder[5]=0;
         jyBorder[6]=2;
@@ -139,7 +139,7 @@ private:
         jyBorder[10]=-1;
         jyBorder[11]=-1;
         jy[E].resize(12);
-        jy[E]=std::valarray<int>(jyBorder,12);
+        jy[E]=PositionArray(jyBorder,12);
 
         jyBorder[5]=0;
         jyBorder[6]=2;
@@ -149,12 +149,12 @@ private:
         jyBorder[10]=-1;
         jyBorder[11]=-1;
         jy[S].resize(12);
-        jy[S]=std::valarray<int>(jyBorder,12);
+        jy[S]=PositionArray(jyBorder,12);
 
         int jyCorner[]={0,0,1,0,-1,0,-2,1,1,-1,-1};
 
         jy[NW].resize(11);
-        jy[NW]=std::valarray<int>(jyCorner,11);
+        jy[NW]=PositionArray(jyCorner,11);
 
         jyCorner[5]=0;
         jyCorner[6]=-2;
@@ -163,7 +163,7 @@ private:
         jyBorder[9]=-1;
         jyBorder[10]=-1;
         jy[NE].resize(11);
-        jy[NE]=std::valarray<int>(jyCorner,11);
+        jy[NE]=PositionArray(jyCorner,11);
 
         jyCorner[5]=0;
         jyCorner[6]=2;
@@ -172,7 +172,7 @@ private:
         jyBorder[9]=-1;
         jyBorder[10]=-1;
         jy[SE].resize(11);
-        jy[SE]=std::valarray<int>(jyCorner,11);
+        jy[SE]=PositionArray(jyCorner,11);
 
         jyCorner[5]=2;
         jyCorner[6]=0;
@@ -181,7 +181,7 @@ private:
         jyBorder[9]=-1;
         jyBorder[10]=-1;
         jy[SW].resize(11);
-        jy[SW]=std::valarray<int>(jyCorner,11);
+        jy[SW]=PositionArray(jyCorner,11);
 
         return jy;
     }
@@ -203,7 +203,7 @@ public:
     virtual ~Biharmonic2D2() {}
 
     inline Precision apply(
-        const std::valarray<Precision>& u,
+        const NumericArray& u,
         const Position pos,
         const size_t sx,
         const size_t sy,
@@ -383,7 +383,7 @@ public:
      * \param[in] ny    the step size in y direction
      * \return          the coefficients of Biharmonic2D4
      */
-    inline const std::valarray<Precision>& getL(
+    inline const NumericArray& getL(
         const Position pos,
         const size_t,
         const size_t,
@@ -475,12 +475,12 @@ public:
         }
     }
 
-    inline const std::valarray<int>& getJx(const Position pos) const
+    inline const PositionArray& getJx(const Position pos) const
     {
         return jx_[pos];
     }
 
-    inline const std::valarray<int>& getJy(const Position pos) const
+    inline const PositionArray& getJy(const Position pos) const
     {
         return jy_[pos];
     }

@@ -7,14 +7,14 @@
 
 namespace mg
 {
-    std::valarray<Precision> residuum(
-        const std::valarray<Precision>& u,
-        const std::valarray<Precision>& fv,
+    NumericArray residuum(
+        const NumericArray& u,
+        const NumericArray& fv,
         const Stencil& stencil,
         const size_t nx,
         const size_t ny)
     {
-        std::valarray<Precision> result(0.0,u.size());
+        NumericArray result(0.0,u.size());
         if (stencil.size()<2)
             for (size_t j=1; j<ny; j++)
                 for(size_t i=1; i<nx; i++)

@@ -5,7 +5,7 @@
 #ifndef PROLONGATION_H_
 #define PROLONGATION_H_
 
-#include <valarray>
+
 #include "../general/parameters.h"
 #include "../general/TransferOperator.h"
 #include "../Stencil/Stencil.h"
@@ -31,8 +31,8 @@ public:
      * \param[in] ny        Number of steps in y direction
      * \return              a vector representing the prolongated rectangel
      */
-    virtual std::valarray<Precision> prolongate(
-        const std::valarray<Precision>& u,
+    virtual NumericArray prolongate(
+        const NumericArray& u,
         const Stencil& stencil,
         const size_t nx,
         const size_t ny) const =0;

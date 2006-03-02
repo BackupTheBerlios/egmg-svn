@@ -5,7 +5,7 @@
 #ifndef TRANSFEROPERATOR_H_
 #define TRANSFEROPERATOR_H_
 
-#include<valarray>
+
 #include "parameters.h"
 #include "../Stencil/Stencil.h"
 
@@ -56,7 +56,7 @@ class TransferOperator
 	 * 						dependend TransferOperators
 	 * \return				the coefficients of the TransferOperator
 	 */
-	virtual const std::valarray<Precision>& get_I(
+	virtual const NumericArray& get_I(
 		const size_t sx,
 		const size_t sy,
 		const size_t nx,
@@ -69,7 +69,7 @@ class TransferOperator
 	 * 
 	 * \return			the coordinates vector in y direction
 	 */
-	virtual const std::valarray<int>& getJx() const =0;
+	virtual const PositionArray& getJx() const =0;
 	
 	/**
 	 * \brief returns the coordinate vector in y dir. for the coefficient vec. I
@@ -77,7 +77,7 @@ class TransferOperator
 	 * 
 	 * \return			the coordinates vector in y direction
 	 */
-	virtual const std::valarray<int>& getJy() const =0;
+	virtual const PositionArray& getJy() const =0;
 };
 
 }

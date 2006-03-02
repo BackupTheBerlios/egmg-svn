@@ -3,7 +3,7 @@
 
 #include <map>
 #include <vector>
-#include <valarray>
+
 #include "Stencil.h"
 #include "../general/parameters.h"
 #include "../Prolongation/Prolongation.h"
@@ -53,15 +53,15 @@ private:
 
     };
 
-    std::vector<std::map<Quadruple,std::valarray<Precision> > > data_;
-    std::vector<std::valarray<int> > jx_;
-    std::vector<std::valarray<int> > jy_;
+    std::vector<std::map<Quadruple,NumericArray > > data_;
+    std::vector<PositionArray > jx_;
+    std::vector<PositionArray > jy_;
     const Stencil& stencil_;
     size_t size_;
     std::vector<const Prolongation*> prolongations_;
     std::vector<const Restriction*> restrictions_;
-    std::vector<std::valarray<int> > initJx_(const Stencil&);
-    std::vector<std::valarray<int> > initJy_(const Stencil&);
+    std::vector<PositionArray > initJx_(const Stencil&);
+    std::vector<PositionArray > initJy_(const Stencil&);
     void updateSize_();
     void updateJxJy_();
 public:
@@ -71,7 +71,7 @@ public:
     virtual ~Galerkin() {}
 
     virtual Precision apply(
-        const std::valarray<Precision>&,
+        const NumericArray&,
         const Position,
         const size_t,
         const size_t,
@@ -85,19 +85,19 @@ public:
         const size_t,
         const size_t) const;
 
-    virtual const std::valarray<Precision>& getL(
+    virtual const NumericArray& getL(
         const Position,
         const size_t,
         const size_t,
         const size_t,
         const size_t) const;
 
-    inline const std::valarray<int>& getJx(const Position p) const
+    inline const PositionArray& getJx(const Position p) const
     {
         return jx_[p];
     }
 
-    inline const std::valarray<int>& getJy(const Position p) const
+    inline const PositionArray& getJy(const Position p) const
     {
         return jy_[p];
     }

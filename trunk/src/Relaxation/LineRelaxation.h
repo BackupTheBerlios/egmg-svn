@@ -6,7 +6,7 @@
 #ifndef LINERELAXATION_H_
 #define LINERELAXATION_H_
 
-#include<valarray>
+
 #include "Relaxation.h"
 
 namespace mg
@@ -19,43 +19,43 @@ class LineRelaxation : public mg::Relaxation
 protected:
     const Direction direction_;
     void xLRSolver(
-        std::valarray<Precision>& u,
+        NumericArray& u,
         const size_t sy,
         const size_t nx,
-        std::valarray<Precision>& rhs,
-        std::valarray<Precision>& ndiagL,
-        std::valarray<Precision>& diagR,
-        const std::valarray<Precision>& ndiagR) const;
+        NumericArray& rhs,
+        NumericArray& ndiagL,
+        NumericArray& diagR,
+        const NumericArray& ndiagR) const;
     void yLRSolver(
-        std::valarray<Precision>& u,
+        NumericArray& u,
         const size_t sx,
         const size_t nx,
         const size_t ny,
-        std::valarray<Precision>& rhs,
-        std::valarray<Precision>& ndiagL,
-        std::valarray<Precision>& diagR,
-        const std::valarray<Precision>& ndiagR) const;
+        NumericArray& rhs,
+        NumericArray& ndiagL,
+        NumericArray& diagR,
+        const NumericArray& ndiagR) const;
     void xLRSolver(
-        std::valarray<Precision>& u,
+        NumericArray& u,
         const size_t sy,
         const size_t nx,
-        std::valarray<Precision>& rhs,
-        std::valarray<Precision>& ndiagL1,
-        std::valarray<Precision>& ndiagL2,
-        std::valarray<Precision>& diagR,
-        std::valarray<Precision>& ndiagR1,
-        const std::valarray<Precision>& ndiagR2) const;
+        NumericArray& rhs,
+        NumericArray& ndiagL1,
+        NumericArray& ndiagL2,
+        NumericArray& diagR,
+        NumericArray& ndiagR1,
+        const NumericArray& ndiagR2) const;
     void yLRSolver(
-        std::valarray<Precision>& u,
+        NumericArray& u,
         const size_t sx,
         const size_t nx,
         const size_t ny,
-        std::valarray<Precision>& rhs,
-        std::valarray<Precision>& ndiagL1,
-        std::valarray<Precision>& ndiagL2,
-        std::valarray<Precision>& diagR,
-        std::valarray<Precision>& ndiagR1,
-        const std::valarray<Precision>& ndiagR2) const;
+        NumericArray& rhs,
+        NumericArray& ndiagL1,
+        NumericArray& ndiagL2,
+        NumericArray& diagR,
+        NumericArray& ndiagR1,
+        const NumericArray& ndiagR2) const;
 public:
     /**
      * \brief The constructor of a LineRelaxation object
@@ -68,9 +68,9 @@ public:
      * \see Direction
      */ 
     LineRelaxation(
-        const int preSmoothingSteps =1,
-        const int postSmoothingSteps =1,
-        const Direction direction =ALTDIR)
+        const int preSmoothingSteps=1,
+        const int postSmoothingSteps=1,
+        const Direction direction=ALTDIR)
         : Relaxation(preSmoothingSteps,postSmoothingSteps),
           direction_(direction) {}
 };

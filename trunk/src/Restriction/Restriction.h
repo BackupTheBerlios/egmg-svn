@@ -5,7 +5,7 @@
 #ifndef RESTRICTION_H_
 #define RESTRICTION_H_
 
-#include <valarray>
+
 #include "../general/parameters.h"
 #include "../Prolongation/Prolongation.h"
 #include "../Stencil/Stencil.h"
@@ -37,8 +37,8 @@ public:
      * \return                      a vector with the values on the restricted
      *                              grid
      */
-    virtual std::valarray<Precision> restriction(
-        const std::valarray<Precision>& u,
+    virtual NumericArray restriction(
+        const NumericArray& u,
         const Stencil& stencil,
         const Prolongation& prolongation, 
         const size_t nx,

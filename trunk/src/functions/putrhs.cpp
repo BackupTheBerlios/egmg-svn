@@ -7,7 +7,7 @@
 namespace mg
 {
     void putrhs(
-        std::valarray<Precision>& fv,
+        NumericArray& fv,
         const size_t nx,
         const size_t ny,
         const function2D f)

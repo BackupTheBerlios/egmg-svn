@@ -5,7 +5,7 @@
 #ifndef ERROR_H_
 #define ERROR_H_
 
-#include <valarray>
+
 #include "../general/parameters.h"
 
 namespace mg
@@ -24,7 +24,7 @@ namespace mg
      * \return              the maximum norm of the error
      */
     Precision error(
-        const std::valarray<Precision>& u,
+        const NumericArray& u,
         const size_t nx,
         const size_t ny,
         const function2D solution);
