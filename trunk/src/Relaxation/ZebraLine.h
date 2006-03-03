@@ -7,7 +7,6 @@
 #define ZEBRALINE_H_
 
 #include "LineRelaxation.h"
-#include "../Stencil/Stencil.h"
 #include "GSRedBlack.h"
 
 namespace mg

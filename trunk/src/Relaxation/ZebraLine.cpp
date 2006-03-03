@@ -99,281 +99,140 @@ void ZebraLine::ninepointxzebra(
 { 
     NumericArray rhs(0.0,nx+1);
     NumericArray temp(0.0,(nx+1)*(ny+1));
-    
     //valarrays needed for saving the tridiagonal matrix A of linear system A u = rhs
     NumericArray diagR(nx-1);
     NumericArray ndiagR(nx-2);
     NumericArray ndiagL(nx-2);
-    
-    if(stencil.isConstant() == true)
+    if(stencil.isConstant())
     {
         // get const operator L
-        const NumericArray L = stencil.get_L_c(2,2,nx,ny);
-        const PositionArray J_x = stencil.getJx(C);
-        const PositionArray J_y = stencil.getJy(C);
-        
-        // for each line: correction of the rhs given by rhs = fv - [L[n]  0  L[s]]^t * u and elimination of the 
+        const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
+        const PositionArray jX=stencil.getJx(C);
+        const PositionArray jY=stencil.getJy(C);
+        // for each line: correction of the rhs given by 
+        // rhs = fv - [L[n]  0  L[s]]^t * u and elimination of the 
         // boundary condition in first and last inner point
-        for(size_t i=1; i<ny ; i+=2) 
+        for(size_t sy=1; sy<ny ; sy+=2) 
         {
-            for(size_t j=0; j<nx-1; j++)  
+            for(size_t sx=0; sx<nx-1; sx++)  
             {
-                rhs[j] = resid[i*(nx+1)+j+1];
-            }   
-                                            
+                rhs[sx]=resid[sy*(nx+1)+sx+1];
+            }                       
             // set tridiagonalmatrix for solving A u = rhs
             // A[i][i] = L[c]; A[i-1][i] = L[w]; A[i+1][i] = L[e]
-            diagR = L[C];
-            ndiagR = L[E];
-            ndiagL = L[W];
-
-            // LR-decomposition + transformation of the rhs vector
-            for(size_t k=1; k<nx-1; k++)  
-            {
-                ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
-                diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
-                rhs[k] = rhs[k] - ndiagL[k-1] * rhs[k-1];  
-            }
-
-            // solve the linear system of equations R u = rhs
-            temp[i*(nx+1)+(nx-1)] = rhs[nx-2] / diagR[nx-2];
-            
-            for(size_t j=nx-2; j>0; j--)
-            {
-                temp[i*(nx+1)+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR[j-1] * temp[i*(nx+1)+j+1] );
-            }
+            diagR=operatorL[C];
+            ndiagR=operatorL[E];
+            ndiagL=operatorL[W];
+            xLRSolver(temp,sy,nx,rhs,ndiagL,diagR,ndiagR);
         }
-
-        u += omega_ * temp;
-
-        resid = residuum(u,f,stencil,nx,ny);
-
-        temp = 0.0;
-
+        u+=omega_*temp;
+        resid=residuum(u,f,stencil,nx,ny);
+        temp=0.0;
         // same for even lines 
-        for(size_t i=2; i<ny ; i+=2)
+        for(size_t sy=2; sy<ny ; sy+=2)
         {
-            for(size_t j=0; j<nx-1; j++)  
+            for(size_t sx=0; sx<nx-1; sx++)  
             {
-                rhs[j] = resid[i*(nx+1)+j+1];
+                rhs[sx] = resid[sy*(nx+1)+sx+1];
             }   
-
-            diagR = L[C];
-            ndiagR = L[E];
-            ndiagL = L[W];
-
-            // LR-decomposition + transformation of the rhs vector
-            for(size_t k=1; k<nx-1; k++)  
-            {
-                ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
-                diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
-                rhs[k] = rhs[k] - ndiagL[k-1] * rhs[k-1];  
-            }
-
-            // solve the linear system of equations R u = rhs
-            temp[i*(nx+1)+(nx-1)] = rhs[nx-2] / diagR[nx-2];
-            
-            for(size_t j=nx-2; j>0; j--)
-            {
-                temp[i*(nx+1)+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR[j-1] * temp[i*(nx+1)+j+1] );
-            }
+            diagR=operatorL[C];
+            ndiagR=operatorL[E];
+            ndiagL=operatorL[W];
+            xLRSolver(temp,sy,nx,rhs,ndiagL,diagR,ndiagR);
         }
-
-        u += omega_ * temp;
-
-
+        u+=omega_*temp;
     }
-
-    else
+    else // Stencil is not constant
     {
-        //Stencil ist not constant, so L needs to be evaluated in each grid point
-        //no other change in the algorithm  
-        NumericArray L = stencil.get_L_c(2,2,nx,ny);
-        PositionArray J_x = stencil.getJx(C);
-        PositionArray J_y = stencil.getJy(C);
-
+        //Stencil ist not constant, so L needs to be evaluated in each grid
+        //point no other change in the algorithm  
+        NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
+        PositionArray jX=stencil.getJx(C);
+        PositionArray jY=stencil.getJy(C);
         if(nx > 2)
         {
-            L = stencil.get_L_sw(1,1,nx,ny);
-                
-            diagR[0] = L[C];
-            ndiagR[0] = L[E];
-
-            rhs[0] = resid[nx+1+1];
-
-            for(size_t j=2; j<nx-1; j++)
+            operatorL=stencil.getL(SW,1,1,nx,ny);
+            diagR[0]=operatorL[C];
+            ndiagR[0]=operatorL[E];
+            rhs[0]=resid[nx+1+1];
+            for(size_t sx=2; sx<nx-1; sx++)
             {
-                L = stencil.get_L_s(j,1,nx,ny);
-                diagR[j-1] = L[C];
-                ndiagR[j-1] = L[E];
-                ndiagL[j-2] = L[W];
-                 
-                rhs[j-1] = resid[nx+1+j];
+                operatorL=stencil.getL(S,sx,1,nx,ny);
+                diagR[sx-1]=operatorL[C];
+                ndiagR[sx-1]=operatorL[E];
+                ndiagL[sx-2]=operatorL[W];
+                rhs[sx-1]=resid[nx+1+sx];
             }
-
-            L = stencil.get_L_se(nx-1,1,nx,ny);
-            
-            diagR[nx-2] = L[C];
-            ndiagL[nx-3] = L[W];
-                
-            rhs[nx-2] = resid[nx+1+nx-1];
-
-            // LR-decomposition + transformation of the rhs vector
-            for(size_t k=1; k<nx-1; k++)  
+            operatorL=stencil.getL(SE,nx-1,1,nx,ny);
+            diagR[nx-2]=operatorL[C];
+            ndiagL[nx-3]=operatorL[W];
+            rhs[nx-2]=resid[nx+1+nx-1];
+            xLRSolver(temp,1,nx,rhs,ndiagL,diagR,ndiagR);
+            for(size_t sy=3; sy<ny-1 ; sy+=2)
             {
-                ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
-                diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
-                rhs[k] = rhs[k] - ndiagL[k-1] * rhs[k-1];  
-            }
-
-            // solve the linear system of equations R u = rhs
-            temp[nx+1+nx-1] = rhs[nx-2] / diagR[nx-2];
-            
-            for(size_t j=nx-2; j>0; j--)
-            {
-                temp[nx+1+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR[j-1] * temp[nx+1+j+1] );
-            }               
-            
-
-            for(size_t i=3; i<ny-1 ; i+=2)
-            {
-                L = stencil.get_L_w(1,i,nx,ny);
-                
-                diagR[0] = L[C];
-                ndiagR[0] = L[E];
-
-                rhs[0] = resid[i*(nx+1)+1];
-
-                for(size_t j=2; j<nx-1; j++)
+                operatorL=stencil.getL(W,1,sy,nx,ny);
+                diagR[0]=operatorL[C];
+                ndiagR[0]=operatorL[E];
+                rhs[0]=resid[sy*(nx+1)+1];
+                for(size_t sx=2; sx<nx-1; sx++)
                 {
-                    L = stencil.get_L_c(j,i,nx,ny);
-                    diagR[j-1] = L[C];
-                    ndiagR[j-1] = L[E];
-                    ndiagL[j-2] = L[W];
-                    
-                    rhs[j-1] = resid[i*(nx+1)+j];
+                    operatorL=stencil.getL(C,sx,sy,nx,ny);
+                    diagR[sx-1]=operatorL[C];
+                    ndiagR[sx-1]=operatorL[E];
+                    ndiagL[sx-2]=operatorL[W];
+                    rhs[sx-1]=resid[sy*(nx+1)+sx];
                 }
-
-                L = stencil.get_L_e(nx-1,i,nx,ny);
-                
-                diagR[nx-2] = L[C];
-                ndiagL[nx-3] = L[W];
-                
-                rhs[nx-2] = resid[i*(nx+1)+nx-1];
-
-
-                // LR-decomposition + transformation of the rhs vector
-                for(size_t k=1; k<nx-1; k++)  
-                {
-                    ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
-                    diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
-                    rhs[k] = rhs[k] - ndiagL[k-1] * rhs[k-1];  
-                }
-
-                // solve the linear system of equations R u = rhs
-                temp[i*(nx+1)+nx-1] = rhs[nx-2] / diagR[nx-2];
-                
-                for(size_t j=nx-2; j>0; j--)
-                {
-                    temp[i*(nx+1)+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR[j-1] * temp[i*(nx+1)+j+1] );
-                }
+                operatorL=stencil.getL(E,nx-1,sy,nx,ny);
+                diagR[nx-2]=operatorL[C];
+                ndiagL[nx-3]=operatorL[W];
+                rhs[nx-2]=resid[sy*(nx+1)+nx-1];
+                xLRSolver(temp,sy,nx,rhs,ndiagL,diagR,ndiagR);
             }
-
-            L = stencil.get_L_nw(1,ny-1,nx,ny);
-                
-            diagR[0] = L[C];
-            ndiagR[0] = L[E];
-
-            rhs[0] = resid[(ny-1)*(nx+1)+1];
-
-            for(size_t j=2; j<nx-1; j++)
+            operatorL=stencil.getL(NW,1,ny-1,nx,ny);
+            diagR[0]=operatorL[C];
+            ndiagR[0]=operatorL[E];
+            rhs[0]=resid[(ny-1)*(nx+1)+1];
+            for(size_t sx=2; sx<nx-1; sx++)
             {
-                L = stencil.get_L_n(j,ny-1,nx,ny);
-                diagR[j-1] = L[C];
-                ndiagR[j-1] = L[E];
-                ndiagL[j-2] = L[W];
-                
-                rhs[j-1] = resid[(ny-1)*(nx+1)+j];
+                operatorL=stencil.getL(N,sx,ny-1,nx,ny);
+                diagR[sx-1]=operatorL[C];
+                ndiagR[sx-1]=operatorL[E];
+                ndiagL[sx-2]=operatorL[W];
+                rhs[sx-1]=resid[(ny-1)*(nx+1)+sx];
             }
-
-            L = stencil.get_L_ne(nx-1,ny-1,nx,ny);
-                
-            diagR[nx-2] = L[C];
-            ndiagL[nx-3] = L[W];
-            
-            rhs[nx-2] = resid[(ny-1)*(nx+1)+nx-1];
-
-
-            // LR-decomposition + transformation of the rhs vector
-            for(size_t k=1; k<nx-1; k++)  
-            {
-                ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
-                diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
-                rhs[k] = rhs[k] - ndiagL[k-1] * rhs[k-1];  
-            }
-
-            // solve the linear system of equations R u = rhs
-            temp[(ny-1)*(nx+1)+(nx-1)] = rhs[nx-2] / diagR[nx-2];
-            
-            for(size_t j=nx-2; j>0; j--)
-            {
-                temp[(ny-1)*(nx+1)+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR[j-1] * temp[(ny-1)*(nx+1)+j+1] );
-            }
-
+            operatorL=stencil.getL(NE,nx-1,ny-1,nx,ny);
+            diagR[nx-2]=operatorL[C];
+            ndiagL[nx-3]=operatorL[W];
+            rhs[nx-2]=resid[(ny-1)*(nx+1)+nx-1];
+            xLRSolver(temp,ny-1,nx,rhs,ndiagL,diagR,ndiagR);
             u += omega_ * temp;
-
             resid = residuum(u,f,stencil,nx,ny);
-
             temp = 0.0;
-
             //even lines
-            for(size_t i=2; i<ny ; i+=2) 
+            for(size_t sy=2; sy<ny ; sy+=2) 
             {                   
-                L = stencil.get_L_w(1,i,nx,ny);
-                
-                diagR[0] = L[C];
-                ndiagR[0] = L[E];
-
-                rhs[0] = resid[i*(nx+1)+1];
-                
-                // L im Zentrum im Punkt (j/i)
-                for(size_t j=2; j<nx-1; j++)  
+                operatorL=stencil.getL(W,1,sy,nx,ny);
+                diagR[0]=operatorL[C];
+                ndiagR[0]=operatorL[E];
+                rhs[0]=resid[sy*(nx+1)+1];
+                // operatorL in the center Point (sx,sy)
+                for(size_t sx=2; sx<nx-1; sx++)  
                 {
-                    L = stencil.get_L_c(j,i,nx,ny);
-                    diagR[j-1] = L[C];
-                    ndiagR[j-1] = L[E];
-                    ndiagL[j-2] = L[W];
-
-                    rhs[j-1] = resid[i*(nx+1)+j];
+                    operatorL=stencil.getL(C,sx,sy,nx,ny);
+                    diagR[sx-1]=operatorL[C];
+                    ndiagR[sx-1]=operatorL[E];
+                    ndiagL[sx-2]=operatorL[W];
+                    rhs[sx-1]=resid[sy*(nx+1)+sx];
                 }
-                
-                L = stencil.get_L_e(nx-1,i,nx,ny);
-                
-                diagR[nx-2] = L[C];
-                ndiagL[nx-3] = L[W];
-
-                rhs[nx-2] = resid[i*(nx+1)+nx-1];
-
-                // LR-decomposition + transformation of the rhs vector
-                for(size_t k=1; k<nx-1; k++)  
-                {
-                    ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
-                    diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
-                    rhs[k] = rhs[k] - ndiagL[k-1] * rhs[k-1];  
-                }
-
-                // solve the linear system of equations R u = rhs
-                temp[i*(nx+1)+nx-1] = rhs[nx-2] / diagR[nx-2];
-                
-                for(size_t j=nx-2; j>0; j--)
-                {
-                    temp[i*(nx+1)+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR[j-1] * temp[i*(nx+1)+j+1] );
-                }
+                operatorL=stencil.getL(E,nx-1,sy,nx,ny);
+                diagR[nx-2]=operatorL[C];
+                ndiagL[nx-3]=operatorL[W];
+                rhs[nx-2]=resid[sy*(nx+1)+nx-1];
+                xLRSolver(temp,sy,nx,rhs,ndiagL,diagR,ndiagR);
             }
-
             u += omega_ * temp;
         }       
-        else // if Nx and Ny are too small do one GS_lex step
+        else // nx,ny too small
         {
             gsRedBlack_.relax(u,f,stencil,nx,ny);
         }
@@ -389,276 +248,139 @@ void ZebraLine::ninepointyzebra(
 { 
     NumericArray rhs(0.0,ny+1);
     NumericArray temp(0.0,(nx+1)*(ny+1));
-
     //valarrays needed for saving the tridiagonal matrix A of linear system A u = rhs
     NumericArray diagR(ny-1);
     NumericArray ndiagR(ny-2);
     NumericArray ndiagL(ny-2);
-    
-    if(stencil.isConstant() == true)
+    if(stencil.isConstant())
     {
         // get const operator L
-        const NumericArray L = stencil.get_L_c(2,2,nx,ny);
-        const PositionArray J_x = stencil.getJx(C);
-        const PositionArray J_y = stencil.getJy(C);
-
-        // for each line: correction of the rhs given by rhs = fv - [L[w]  0  L[e]] * u and elimination of the 
+        const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
+        const PositionArray jX=stencil.getJx(C);
+        const PositionArray jY=stencil.getJy(C);
+        // for each line: correction of the rhs given by
+        // rhs = fv - [L[w]  0  L[e]] * u and elimination of the 
         // boundary condition in first and last inner point
-        for(size_t i=1; i<nx ; i+=2) 
+        for(size_t sx=1; sx<nx ; sx+=2) 
         {
-            for(size_t j=0; j<ny-1; j++)  
+            for(size_t sy=0; sy<ny-1; sy++)  
             {
-                rhs[j] = resid[(j+1)*(nx+1)+i];
+                rhs[sy] = resid[(sy+1)*(nx+1)+sx];
             }
-
             // set tridiagonalmatrix for solving A u = rhs
             // A[i][i] = L[c]; A[i-1][i] = L[s]; A[i+1][i] = L[n]
-            diagR = L[C];
-            ndiagR = L[N];
-            ndiagL = L[S];
-
-            // LR-decomposition + transformation of the rhs vector
-            for(size_t k=1; k<ny-1; k++)  
-            {
-                ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
-                diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
-                rhs[k] = rhs[k] - ndiagL[k-1] * rhs[k-1];  
-            }
-            
-            // solve the linear system of equations R u = rhs
-            temp[i+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];                
-
-            for(size_t k=ny-2; k>0; k--)
-            {
-                temp[i+(nx+1)*k] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR[k-1] * temp[i+(nx+1)*(k+1)] );
-            }
+            diagR=operatorL[C];
+            ndiagR=operatorL[N];
+            ndiagL=operatorL[S];
+            yLRSolver(temp,sx,nx,ny,rhs,ndiagL,diagR,ndiagR);
         }
-
-        u += omega_ * temp;
-
-        resid = residuum(u,f,stencil,nx,ny);
-
-        temp = 0.0;
-
-
+        u+=omega_*temp;
+        resid=residuum(u,f,stencil,nx,ny);
+        temp=0.0;
         // same for each even line
-        for(size_t i=2; i<nx ; i+=2) 
+        for(size_t sx=2; sx<nx ; sx+=2) 
         {
-            for(size_t j=0; j<ny-1; j++)  
+            for(size_t sy=0; sy<ny-1; sy++)  
             {
-                rhs[j] = resid[(j+1)*(nx+1)+i];
+                rhs[sy]=resid[(sy+1)*(nx+1)+sx];
             }
-
             // set tridiagonalmatrix for solving A u = rhs
             // A[i][i] = L[c]; A[i-1][i] = L[s]; A[i+1][i] = L[n]
-            diagR = L[C];
-            ndiagR = L[N];
-            ndiagL = L[S];
-
-            // LR-decomposition + transformation of the rhs vector
-            for(size_t k=1; k<ny-1; k++)  
-            {
-                ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
-                diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
-                rhs[k] = rhs[k] - ndiagL[k-1] * rhs[k-1];  
-            }
-            
-            // solve the linear system of equations R u = rhs
-            temp[i+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];                
-
-            for(size_t k=ny-2; k>0; k--)
-            {
-                temp[i+(nx+1)*k] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR[k-1] * temp[i+(nx+1)*(k+1)] );
-            }
+            diagR=operatorL[C];
+            ndiagR=operatorL[N];
+            ndiagL=operatorL[S];
+            yLRSolver(temp,sx,nx,ny,rhs,ndiagL,diagR,ndiagR);
         }
-
-        u += omega_ * temp;
+        u+=omega_*temp;
     }
-
-    else
+    else // Stencil is not constant
     {
-        //Stencil ist not constant, so L needs to be evaluated in each grid point
-        //no other change in the algorithm  
-        NumericArray L = stencil.get_L_c(2,2,nx,ny);
-        PositionArray J_x = stencil.getJx(C);
-        PositionArray J_y = stencil.getJy(C);
-
+        //Stencil ist not constant, so L needs to be evaluated in each grid
+        //point no other change in the algorithm  
+        NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
+        PositionArray jX=stencil.getJx(C);
+        PositionArray jY=stencil.getJy(C);
         if(ny > 2)
         {
-            L = stencil.get_L_sw(1,1,nx,ny);
-                
-            diagR[0] = L[C];
-            ndiagR[0] = L[N];   
-                              
-            rhs[0] = resid[nx+1+1];
-            
-            for(size_t j=2; j<ny-1; j++) 
+            operatorL=stencil.getL(SW,1,1,nx,ny);
+            diagR[0]=operatorL[C];
+            ndiagR[0]=operatorL[N];           
+            rhs[0]=resid[nx+1+1];
+            for(size_t sy=2; sy<ny-1; sy++) 
             {
-                L = stencil.get_L_w(1,j,nx,ny);
-                diagR[j-1] = L[C];
-                ndiagR[j-1] = L[N];
-                ndiagL[j-2] = L[S];
-
-                rhs[j-1] = resid[j*(nx+1)+1];                   
+                operatorL=stencil.getL(W,1,sy,nx,ny);
+                diagR[sy-1]=operatorL[C];
+                ndiagR[sy-1]=operatorL[N];
+                ndiagL[sy-2]=operatorL[S];
+                rhs[sy-1]=resid[sy*(nx+1)+1];                   
             }
-                
-            L = stencil.get_L_nw(1,ny-1,nx,ny);
-                
-            diagR[ny-2] = L[C];
-            ndiagL[ny-3] = L[S];
-            
-            rhs[ny-2] = resid[(ny-1)*(nx+1)+1];
-            
-            // LR-decomposition + transformation of the rhs vector
-            for(size_t k=1; k<ny-1; k++)  
+            operatorL=stencil.getL(NW,1,ny-1,nx,ny);
+            diagR[ny-2]=operatorL[C];
+            ndiagL[ny-3]=operatorL[S];
+            rhs[ny-2]=resid[(ny-1)*(nx+1)+1];
+            yLRSolver(temp,1,nx,ny,rhs,ndiagL,diagR,ndiagR);
+            for(size_t sx=3; sx<nx-1 ; sx+=2)
             {
-                ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
-                diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
-                rhs[k] = rhs[k] - ndiagL[k-1] * rhs[k-1];  
-            }
-
-            // solve the linear system of equations R u = rhs
-            temp[1+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];
-            for(size_t k=ny-2; k>0; k--)
-            {
-                temp[1+(nx+1)*k] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR[k-1] * temp[1+(nx+1)*(k+1)] );
-            }
-            
-            for(size_t i=3; i<nx-1 ; i+=2)
-            {
-                L = stencil.get_L_s(i,1,nx,ny);
-                
-                diagR[0] = L[C];
-                ndiagR[0] = L[N];   
-                
-                rhs[0] = resid[nx+1+i];
-                
-                for(size_t j=2; j<ny-1; j++) 
+                operatorL=stencil.getL(S,sx,1,nx,ny);
+                diagR[0]=operatorL[C];
+                ndiagR[0]=operatorL[N];   
+                rhs[0]=resid[nx+1+sx];
+                for(size_t sy=2; sy<ny-1; sy++) 
                 {
-                    L = stencil.get_L_c(i,j,nx,ny);
-                    diagR[j-1] = L[C];
-                    ndiagR[j-1] = L[N];
-                    ndiagL[j-2] = L[S];
-
-                    rhs[j-1] = resid[j*(nx+1)+i];
+                    operatorL=stencil.getL(C,sx,sy,nx,ny);
+                    diagR[sy-1]=operatorL[C];
+                    ndiagR[sy-1]=operatorL[N];
+                    ndiagL[sy-2]=operatorL[S];
+                    rhs[sy-1]=resid[sy*(nx+1)+sx];
                 }
-                
-                L = stencil.get_L_n(i,ny-1,nx,ny);
-                
-                diagR[ny-2] = L[C];
-                ndiagL[ny-3] = L[S];
-
-                rhs[ny-2] = resid[(ny-1)*(nx+1)+i];
-                
-                // LR-decomposition + transformation of the rhs vector
-                for(size_t k=1; k<ny-1; k++)  
-                {
-                    ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
-                    diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
-                    rhs[k] = rhs[k] - ndiagL[k-1] * rhs[k-1];  
-                }
-                
-                // solve the linear system of equations R u = rhs
-                temp[i+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];
-                
-                for(size_t k=ny-2; k>0; k--)
-                {
-                    temp[i+(nx+1)*k] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR[k-1] * temp[i+(nx+1)*(k+1)] );
-                }
+                operatorL=stencil.getL(N,sx,ny-1,nx,ny);
+                diagR[ny-2]=operatorL[C];
+                ndiagL[ny-3]=operatorL[S];
+                rhs[ny-2]=resid[(ny-1)*(nx+1)+sx];
+                yLRSolver(temp,sx,nx,ny,rhs,ndiagL,diagR,ndiagR);
             }
-
-            L = stencil.get_L_se(nx-1,1,nx,ny);
-                
-            diagR[0] = L[C];
-            ndiagR[0] = L[N];   
-                
-            rhs[0] = resid[nx+1+nx-1];
-                
-            for(size_t j=2; j<ny-1; j++) 
+            operatorL=stencil.getL(SE,nx-1,1,nx,ny);
+            diagR[0]=operatorL[C];
+            ndiagR[0]=operatorL[N];   
+            rhs[0]=resid[nx+1+nx-1];
+            for(size_t sy=2; sy<ny-1; sy++) 
             {
-                L = stencil.get_L_e(nx-1,j,nx,ny);
-                diagR[j-1] = L[C];
-                ndiagR[j-1] = L[N];
-                ndiagL[j-2] = L[S];
-
-                rhs[j-1] = resid[j*(nx+1)+nx-1];                    
+                operatorL=stencil.getL(E,nx-1,sy,nx,ny);
+                diagR[sy-1]=operatorL[C];
+                ndiagR[sy-1]=operatorL[N];
+                ndiagL[sy-2]=operatorL[S];
+                rhs[sy-1]=resid[sy*(nx+1)+nx-1];                    
             }                   
-
-            L = stencil.get_L_ne(nx-1,ny-1,nx,ny);
-                
-            diagR[ny-2] = L[C];
-            ndiagL[ny-3] = L[S];
-
-            rhs[ny-2] = resid[(ny-1)*(nx+1)+nx-1];
-
-            // LR-decomposition + transformation of the rhs vector
-            for(size_t k=1; k<ny-1; k++)  
+            operatorL=stencil.getL(NE,nx-1,ny-1,nx,ny);
+            diagR[ny-2]=operatorL[C];
+            ndiagL[ny-3]=operatorL[S];
+            rhs[ny-2]=resid[(ny-1)*(nx+1)+nx-1];
+            yLRSolver(temp,nx-1,nx,ny,rhs,ndiagL,diagR,ndiagR);
+            u+=omega_*temp;
+            resid=residuum(u,f,stencil,nx,ny);
+            temp=0.0;
+            for(size_t sx=2; sx<nx-1 ; sx+=2)
             {
-                ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
-                diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
-                rhs[k] = rhs[k] - ndiagL[k-1] * rhs[k-1];  
-            }
-                
-            // solve the linear system of equations R u = rhs
-            temp[nx-1+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];
-                
-            for(size_t k=ny-2; k>0; k--)
-            {
-                temp[nx-1+(nx+1)*k] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR[k-1] * temp[nx-1+(nx+1)*(k+1)] );
-            }
-            
-            u += omega_ * temp;
-
-            resid = residuum(u,f,stencil,nx,ny);
-
-            temp = 0.0;
-
-            for(size_t i=2; i<nx-1 ; i+=2)
-            {
-                L = stencil.get_L_s(i,1,nx,ny);
-                
-                diagR[0] = L[C];
-                ndiagR[0] = L[N];   
-                
-                rhs[0] = resid[nx+1+i];
-                
-                for(size_t j=2; j<ny-1; j++) 
+                operatorL=stencil.getL(S,sx,1,nx,ny);
+                diagR[0]=operatorL[C];
+                ndiagR[0]=operatorL[N];   
+                rhs[0]=resid[nx+1+sx];
+                for(size_t sy=2; sy<ny-1; sy++) 
                 {
-                    L = stencil.get_L_c(i,j,nx,ny);
-                    diagR[j-1] = L[C];
-                    ndiagR[j-1] = L[N];
-                    ndiagL[j-2] = L[S];
-
-                    rhs[j-1] = resid[j*(nx+1)+i];
+                    operatorL=stencil.getL(C,sx,sy,nx,ny);
+                    diagR[sy-1]=operatorL[C];
+                    ndiagR[sy-1]=operatorL[N];
+                    ndiagL[sy-2]=operatorL[S];
+                    rhs[sy-1]=resid[sy*(nx+1)+sx];
                 }
-                
-                L = stencil.get_L_n(i,ny-1,nx,ny);
-                
-                diagR[ny-2] = L[C];
-                ndiagL[ny-3] = L[S];
-
-                rhs[ny-2] = resid[(ny-1)*(nx+1)+i];
-                
-                // LR-decomposition + transformation of the rhs vector
-                for(size_t k=1; k<ny-1; k++)  
-                {
-                    ndiagL[k-1] = ndiagL[k-1]/diagR[k-1];  
-                    diagR[k] -= ndiagL[k-1] * ndiagR[k-1]; 
-                    rhs[k] = rhs[k] - ndiagL[k-1] * rhs[k-1];  
-                }
-                
-                // solve the linear system of equations R u = rhs
-                temp[i+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];
-                
-                for(size_t k=ny-2; k>0; k--)
-                {
-                    temp[i+(nx+1)*k] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR[k-1] * temp[i+(nx+1)*(k+1)] );
-                }
+                operatorL=stencil.getL(N,sx,ny-1,nx,ny);
+                diagR[ny-2]=operatorL[C];
+                ndiagL[ny-3]=operatorL[S];
+                rhs[ny-2]=resid[(ny-1)*(nx+1)+sx];
+                yLRSolver(temp,sx,nx,ny,rhs,ndiagL,diagR,ndiagR);
             }
-
-            u += omega_ * temp;
+            u+=omega_*temp;
         }
-
         else // if Nx and Ny are too small do one GS_lex step
         {
             gsRedBlack_.relax(u,f,stencil,nx,ny);
@@ -677,698 +399,355 @@ void ZebraLine::xzebra(
     {   
         NumericArray rhs(0.0,nx-1);
         NumericArray temp(0.0,(nx+1)*(ny+1));
-
         NumericArray diagR(0.0,nx-1);
         NumericArray ndiagR1(0.0,nx-2);
         NumericArray ndiagL1(0.0,nx-2);
         NumericArray ndiagR2(0.0,nx-3);
         NumericArray ndiagL2(0.0,nx-3);
-
-        if(stencil.isConstant() == true)
+        if(stencil.isConstant())
         {
             // get const operator L
-            const NumericArray L = stencil.get_L_c(2,2,nx,ny);
-            const PositionArray J_x = stencil.getJx(C);
-            const PositionArray J_y = stencil.getJy(C);
-            
-            NumericArray L_b = stencil.get_L_s(2,1,nx,ny);
-            PositionArray J_b_x = stencil.getJx(S);
-            PositionArray J_b_y = stencil.getJy(S);
-                
-            NumericArray L_c = stencil.get_L_sw(1,1,nx,ny);
-            PositionArray J_c_x = stencil.getJx(SW);
-            PositionArray J_c_y = stencil.getJy(SW);
-
-
-            // setze rechte Seite für Zeile 1                   
-            diagR[0] = L_c[C];
-            ndiagR1[0] = L_c[E];
-            ndiagR2[0] = L_c[NE];
-                                
-            rhs[0] = resid[nx+1+1];
-            
-            ndiagL1[0] = L_b[W];
-            diagR[1] = L_b[C];
-            ndiagR1[1] = L_b[E];                    
-            ndiagR2[1] = L_b[SE];
-
-            rhs[1] = resid[nx+1+2];
-
-            for(size_t j=3; j<nx-2; j++)  
+            const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
+            const PositionArray jX=stencil.getJx(C);
+            const PositionArray jY=stencil.getJy(C);
+            NumericArray operatorLB=stencil.getL(S,2,1,nx,ny);
+            PositionArray jXB=stencil.getJx(S);
+            PositionArray jYB=stencil.getJy(S);
+            NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
+            PositionArray jXC=stencil.getJx(SW);
+            PositionArray jYC=stencil.getJy(SW);
+            // set rhs for line 1
+            diagR[0]=operatorLC[C];
+            ndiagR1[0]=operatorLC[E];
+            ndiagR2[0]=operatorLC[NE];         
+            rhs[0]=resid[nx+1+1];
+            ndiagL1[0]=operatorLB[W];
+            diagR[1]=operatorLB[C];
+            ndiagR1[1]=operatorLB[E];                    
+            ndiagR2[1]=operatorLB[SE];
+            rhs[1]=resid[nx+1+2];
+            for(size_t sx=3; sx<nx-2; sx++)  
             {
-                ndiagL2[j-3] = L_b[NW];
-                ndiagL1[j-2] = L_b[W];
-                diagR[j-1] = L_b[C];
-                ndiagR1[j-1] = L_b[E];                  
-                ndiagR2[j-1] = L_b[SE];
-                    
-                rhs[j-1] = resid[nx+1+j];
+                ndiagL2[sx-3]=operatorLB[NW];
+                ndiagL1[sx-2]=operatorLB[W];
+                diagR[sx-1]=operatorLB[C];
+                ndiagR1[sx-1]=operatorLB[E];                  
+                ndiagR2[sx-1]=operatorLB[SE];
+                rhs[sx-1]=resid[nx+1+sx];
             }
-                
-            ndiagL2[nx-5] = L_b[NW];
-            ndiagL1[nx-4] = L_b[W];
-            diagR[nx-3] = L_b[C];
-            ndiagR1[nx-3] = L_b[E];
-
-            rhs[nx-3] = resid[nx+1+nx-2];
-                
-            L_c = stencil.get_L_se(nx-1,1,nx,ny);
-            J_c_x = stencil.getJx(SE);
-            J_c_y = stencil.getJy(SE);
-
-            ndiagL2[nx-4] = L_c[NW];
-            ndiagL1[nx-3] = L_c[W];
-            diagR[nx-2] = L_c[C];
-
-            rhs[nx-2] = resid[nx+1+nx-1];
-
-            // LR-decomposition + transformation of the rhs
-            for(size_t k=1; k<nx-2; k++)  
+            ndiagL2[nx-5]=operatorLB[NW];
+            ndiagL1[nx-4]=operatorLB[W];
+            diagR[nx-3]=operatorLB[C];
+            ndiagR1[nx-3]=operatorLB[E];
+            rhs[nx-3]=resid[nx+1+nx-2];
+            operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
+            jXC=stencil.getJx(SE);
+            jYC=stencil.getJy(SE);
+            ndiagL2[nx-4]=operatorLC[NW];
+            ndiagL1[nx-3]=operatorLC[W];
+            diagR[nx-2]=operatorLC[C];
+            rhs[nx-2]=resid[nx+1+nx-1];
+            xLRSolver(temp,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
+           // process odd inner lines
+            for(size_t sy=3; sy<ny-2; sy+=2)
             {
-                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
-                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1];
-                
-                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];
-            }
-
-            ndiagL1[nx-2-1] = ndiagL1[nx-2-1]/diagR[nx-2-1];
-            diagR[nx-2] -= ndiagL1[nx-2-1] * ndiagR1[nx-2-1];
-            rhs[nx-2] = rhs[nx-2] - ndiagL1[nx-2-1] * rhs[nx-2-1];
-
-            
-            // solve the linear system of equations R u = rhs
-            temp[nx+1+nx-1] = rhs[nx-2] / diagR[nx-2];
-        
-            for(size_t j=nx-2; j>1; j--)
-            {
-                temp[nx+1+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR1[j-1] * temp[nx+1+j+1] );
-                
-                rhs[j-2] -= ndiagR2[j-2] * temp[(nx+1)+j+1];
-            }
-            temp[nx+1+1] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[nx+1+1+1] );
-
-   // durchlaufe ungerade innere Zeilen
-            
-            for(size_t i=3; i < ny-2; i+=2)
-            {
-                // setze rechte Seite                   
-                L_b = stencil.get_L_w(1,i,nx,ny);
-                J_b_x = stencil.getJx(W);
-                J_b_y = stencil.getJy(W);
-
-                diagR[0] = L_b[C];
-                ndiagR1[0] = L_b[E];
-                ndiagR2[0] = L_b[NE];
-                                
-                rhs[0] = resid[i*(nx+1)+1];
-                                    
-                ndiagL1[0] = L[W];
-                diagR[1] = L[C];
-                ndiagR1[1] = L[E];                  
-                ndiagR2[1] = L[SE];
-
-                rhs[1] = resid[i*(nx+1)+2];
-
-                for(size_t j=3; j<nx-2; j++)  
+                // set rhs
+                operatorLB=stencil.getL(W,1,sy,nx,ny);
+                jXB=stencil.getJx(W);
+                jYB=stencil.getJy(W);
+                diagR[0]=operatorLB[C];
+                ndiagR1[0]=operatorLB[E];
+                ndiagR2[0]=operatorLB[NE];     
+                rhs[0]=resid[sy*(nx+1)+1];             
+                ndiagL1[0]=operatorL[W];
+                diagR[1]=operatorL[C];
+                ndiagR1[1]=operatorL[E];                  
+                ndiagR2[1]=operatorL[SE];
+                rhs[1]=resid[sy*(nx+1)+2];
+                for(size_t sx=3; sx<nx-2; sx++)  
                 {
-                    ndiagL2[j-3] = L[NW];
-                    ndiagL1[j-2] = L[W];
-                    diagR[j-1] = L[C];
-                    ndiagR1[j-1] = L[E];                    
-                    ndiagR2[j-1] = L[SE];
-                    
-                    rhs[j-1] = resid[i*(nx+1)+j];
+                    ndiagL2[sx-3]=operatorL[NW];
+                    ndiagL1[sx-2]=operatorL[W];
+                    diagR[sx-1]=operatorL[C];
+                    ndiagR1[sx-1]=operatorL[E];                    
+                    ndiagR2[sx-1]=operatorL[SE];
+                    rhs[sx-1]=resid[sy*(nx+1)+sx];
                 }
-                
-                ndiagL2[nx-5] = L[NW];
-                ndiagL1[nx-4] = L[W];
-                diagR[nx-3] = L[C];
-                ndiagR1[nx-3] = L[E];
-
-                rhs[nx-3] = resid[i*(nx+1)+nx-2];
-                
-                L_b = stencil.get_L_e(nx-1,i,nx,ny);
-                J_b_x = stencil.getJx(E);
-                J_b_y = stencil.getJy(E);
-
-                ndiagL2[nx-4] = L_b[NW];
-                ndiagL1[nx-3] = L_b[W];
-                diagR[nx-2] = L_b[C];
-
-                rhs[nx-2] = resid[i*(nx+1)+nx-1];
-                
-                // LR-decomposition + transformation of the rhs
-                for(size_t k=1; k<nx-2; k++)  
-                {
-                    ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
-                    diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                    ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                    rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1];
-                    
-                    ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                    ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                    diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                    rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];                      
-                }
-                ndiagL1[nx-2-1] = ndiagL1[nx-2-1]/diagR[nx-2-1];
-                diagR[nx-2] -= ndiagL1[nx-2-1] * ndiagR1[nx-2-1];
-                rhs[nx-2] = rhs[nx-2] - ndiagL1[nx-3] * rhs[nx-3];
-                
-                // solve the linear system of equations R u = rhs
-                temp[i*(nx+1)+nx-1] = rhs[nx-2] / diagR[nx-2];                                  
-                for(size_t j=nx-2; j>1; j--)
-                {
-                    temp[i*(nx+1)+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR1[j-1] * temp[i*(nx+1)+j+1] );                    
-                    rhs[j-2] -= ndiagR2[j-2] * temp[i*(nx+1)+j+1];
-                }
-                temp[i*(nx+1)+1] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[i*(nx+1)+1+1] );
+                ndiagL2[nx-5]=operatorL[NW];
+                ndiagL1[nx-4]=operatorL[W];
+                diagR[nx-3]=operatorL[C];
+                ndiagR1[nx-3]=operatorL[E];
+                rhs[nx-3]=resid[sy*(nx+1)+nx-2];
+                operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
+                jXB=stencil.getJx(E);
+                jYB=stencil.getJy(E);
+                ndiagL2[nx-4]=operatorLB[NW];
+                ndiagL1[nx-3]=operatorLB[W];
+                diagR[nx-2]=operatorLB[C];
+                rhs[nx-2]=resid[sy*(nx+1)+nx-1];
+                xLRSolver(temp,sy,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             }
-
-    //relaxiere oberste Zeile
-            
-            // setze rechte Seite in oberster Zeile                 
-            L_c = stencil.get_L_nw(1,ny-1,nx,ny);
-            J_c_x = stencil.getJx(NW);
-            J_c_y = stencil.getJy(NW);
-
-            diagR[0] = L_c[C];
-            ndiagR1[0] = L_c[E];
-            ndiagR2[0] = L_c[NW];
-                                
-            rhs[0] = resid[(ny-1)*(nx+1)+1];
-            
-            L_b = stencil.get_L_n(2,ny-1,nx,ny);
-            J_b_x = stencil.getJx(N);
-            J_b_y = stencil.getJy(N);
-            
-            ndiagL1[0] = L_b[W];
-            diagR[1] = L_b[C];
-            ndiagR1[1] = L_b[E];                    
-            ndiagR2[1] = L_b[NE];
-
-            rhs[1] = resid[(ny-1)*(nx+1)+2];
-
-            for(size_t j=3; j<nx-2; j++)  
+            //relax top line
+            // set rhs in top line
+            operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
+            jXC=stencil.getJx(NW);
+            jYC=stencil.getJy(NW);
+            diagR[0]=operatorLC[C];
+            ndiagR1[0]=operatorLC[E];
+            ndiagR2[0]=operatorLC[NW];         
+            rhs[0]=resid[(ny-1)*(nx+1)+1];
+            operatorLB=stencil.getL(N,2,ny-1,nx,ny);
+            jXB=stencil.getJx(N);
+            jYB=stencil.getJy(N);
+            ndiagL1[0]=operatorLB[W];
+            diagR[1]=operatorLB[C];
+            ndiagR1[1]=operatorLB[E];                    
+            ndiagR2[1]=operatorLB[NE];
+            rhs[1]=resid[(ny-1)*(nx+1)+2];
+            for(size_t sx=3; sx<nx-2; sx++)  
             {
-                ndiagL2[j-3] = L_b[NW];
-                ndiagL1[j-2] = L_b[W];
-                diagR[j-1] = L_b[C];
-                ndiagR1[j-1] = L_b[E];                  
-                ndiagR2[j-1] = L_b[NE];
-                    
-                rhs[j-1] = resid[(ny-1)*(nx+1)+j];
+                ndiagL2[sx-3]=operatorLB[NW];
+                ndiagL1[sx-2]=operatorLB[W];
+                diagR[sx-1]=operatorLB[C];
+                ndiagR1[sx-1]=operatorLB[E];                  
+                ndiagR2[sx-1]=operatorLB[NE];
+                rhs[sx-1]=resid[(ny-1)*(nx+1)+sx];
             }
-                
-            ndiagL2[nx-5] = L_b[NW];
-            ndiagL1[nx-4] = L_b[W];
-            diagR[nx-3] = L_b[C];
-            ndiagR1[nx-3] = L_b[E];
-
-            rhs[nx-3] = resid[(ny-1)*(nx+1)+nx-2];
-                
-            L_c = stencil.get_L_ne(nx-1,ny-1,nx,ny);
-            J_c_x = stencil.getJx(NE);
-            J_c_y = stencil.getJy(NE);
-
-            ndiagL2[nx-4] = L_c[NW];
-            ndiagL1[nx-3] = L_c[W];
-            diagR[nx-2] = L_c[C];
-
-            rhs[nx-2] = resid[(ny-1)*(nx+1)+nx-1];
-
-            // LR-decomposition + transformation of the rhs
-            for(size_t k=1; k<nx-2; k++)  
+            ndiagL2[nx-5]=operatorLB[NW];
+            ndiagL1[nx-4]=operatorLB[W];
+            diagR[nx-3]=operatorLB[C];
+            ndiagR1[nx-3]=operatorLB[E];
+            rhs[nx-3]=resid[(ny-1)*(nx+1)+nx-2];
+            operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
+            jXC=stencil.getJx(NE);
+            jYC=stencil.getJy(NE);
+            ndiagL2[nx-4]=operatorLC[NW];
+            ndiagL1[nx-3]=operatorLC[W];
+            diagR[nx-2]=operatorLC[C];
+            rhs[nx-2]=resid[(ny-1)*(nx+1)+nx-1];
+            xLRSolver(temp,ny-1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
+            u+=omega_*temp;
+            resid=residuum(u,f,stencil,nx,ny);
+            temp=0.0;
+            // relax even inner lines
+            for(size_t sy=2; sy<ny-1; sy+=2)
             {
-                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
-                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1];
-                    
-                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];                      
-            }
-            ndiagL1[nx-2-1] = ndiagL1[nx-2-1]/diagR[nx-2-1];
-            diagR[nx-2] -= ndiagL1[nx-2-1] * ndiagR1[nx-2-1];
-            rhs[nx-2] = rhs[nx-2] - ndiagL1[nx-3] * rhs[nx-3];
-
-            // solve the linear system of equations R u = rhs
-            temp[(ny-1)*(nx+1)+nx-1] = rhs[nx-2] / diagR[nx-2];
-            for(size_t j=nx-2; j>1; j--)
-            {
-                temp[(ny-1)*(nx+1)+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR1[j-1] * temp[(ny-1)*(nx+1)+j+1] );
-                rhs[j-2] -= ndiagR2[j-2] * temp[(ny-1)*(nx+1)+j+1];
-            }
-            temp[(ny-1)*(nx+1)+1] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[(ny-1)*(nx+1)+1+1] );
-
-            u += omega_ * temp;
-
-            resid = residuum(u,f,stencil,nx,ny);
-
-            temp = 0.0;
-
-            // relaxiere gerade innere Zeilen
-
-            for(size_t i=2; i < ny-1; i+=2)
-            {
-                // setze rechte Seite                   
-                L_b = stencil.get_L_w(1,i,nx,ny);
-                J_b_x = stencil.getJx(W);
-                J_b_y = stencil.getJy(W);
-
-                diagR[0] = L_b[C];
-                ndiagR1[0] = L_b[E];
-                ndiagR2[0] = L_b[NE];
-                                
-                rhs[0] = resid[i*(nx+1)+1];
-                                    
-                ndiagL1[0] = L[W];
-                diagR[1] = L[C];
-                ndiagR1[1] = L[E];                  
-                ndiagR2[1] = L[SE];
-
-                rhs[1] = resid[i*(nx+1)+2];
-
-                for(size_t j=3; j<nx-2; j++)  
+                // set rhs
+                operatorLB=stencil.getL(W,1,sy,nx,ny);
+                jXB=stencil.getJx(W);
+                jYB=stencil.getJy(W);
+                diagR[0]=operatorLB[C];
+                ndiagR1[0]=operatorLB[E];
+                ndiagR2[0]=operatorLB[NE];     
+                rhs[0]=resid[sy*(nx+1)+1];             
+                ndiagL1[0]=operatorL[W];
+                diagR[1]=operatorL[C];
+                ndiagR1[1]=operatorL[E];                  
+                ndiagR2[1]=operatorL[SE];
+                rhs[1]=resid[sy*(nx+1)+2];
+                for(size_t sx=3; sx<nx-2; sx++)  
                 {
-                    ndiagL2[j-3] = L[NW];
-                    ndiagL1[j-2] = L[W];
-                    diagR[j-1] = L[C];
-                    ndiagR1[j-1] = L[E];                    
-                    ndiagR2[j-1] = L[SE];
-                    
-                    rhs[j-1] = resid[i*(nx+1)+j];
+                    ndiagL2[sx-3]=operatorL[NW];
+                    ndiagL1[sx-2]=operatorL[W];
+                    diagR[sx-1]=operatorL[C];
+                    ndiagR1[sx-1]=operatorL[E];                    
+                    ndiagR2[sx-1]=operatorL[SE];
+                    rhs[sx-1]=resid[sy*(nx+1)+sx];
                 }
-                
-                ndiagL2[nx-5] = L[NW];
-                ndiagL1[nx-4] = L[W];
-                diagR[nx-3] = L[C];
-                ndiagR1[nx-3] = L[E];
-
-                rhs[nx-3] = resid[i*(nx+1)+nx-2];
-                
-                L_b = stencil.get_L_e(nx-1,i,nx,ny);
-                J_b_x = stencil.getJx(E);
-                J_b_y = stencil.getJy(E);
-
-                ndiagL2[nx-4] = L_b[NW];
-                ndiagL1[nx-3] = L_b[W];
-                diagR[nx-2] = L_b[C];
-
-                rhs[nx-2] = resid[i*(nx+1)+nx-1];
-                
-                // LR-decomposition + transformation of the rhs
-                for(size_t k=1; k<nx-2; k++)  
-                {
-                    ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
-                    diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                    ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                    rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1];
-                    
-                    ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                    ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                    diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                    rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];                      
-                }
-                ndiagL1[nx-2-1] = ndiagL1[nx-2-1]/diagR[nx-2-1];
-                diagR[nx-2] -= ndiagL1[nx-2-1] * ndiagR1[nx-2-1];
-                rhs[nx-2] = rhs[nx-2] - ndiagL1[nx-3] * rhs[nx-3];
-                
-                // solve the linear system of equations R u = rhs
-                temp[i*(nx+1)+nx-1] = rhs[nx-2] / diagR[nx-2];                                  
-                for(size_t j=nx-2; j>1; j--)
-                {
-                    temp[i*(nx+1)+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR1[j-1] * temp[i*(nx+1)+j+1] );                    
-                    rhs[j-2] -= ndiagR2[j-2] * temp[i*(nx+1)+j+1];
-                }
-                temp[i*(nx+1)+1] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[i*(nx+1)+1+1] );
+                ndiagL2[nx-5]=operatorL[NW];
+                ndiagL1[nx-4]=operatorL[W];
+                diagR[nx-3]=operatorL[C];
+                ndiagR1[nx-3]=operatorL[E];
+                rhs[nx-3]=resid[sy*(nx+1)+nx-2];
+                operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
+                jXB=stencil.getJx(E);
+                jYB=stencil.getJy(E);
+                ndiagL2[nx-4]=operatorLB[NW];
+                ndiagL1[nx-3]=operatorLB[W];
+                diagR[nx-2]=operatorLB[C];
+                rhs[nx-2]=resid[sy*(nx+1)+nx-1];
+                xLRSolver(temp,sy,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             }
-
-            u += omega_ * temp;
+            u+=omega_*temp;
         }
-
-                    
         else // stencil not constant
         {
-            NumericArray L = stencil.get_L_c(2,2,nx,ny);
-            PositionArray J_x = stencil.getJx(C);
-            PositionArray J_y = stencil.getJy(C);
-            
-            NumericArray L_b = stencil.get_L_s(2,1,nx,ny);
-            PositionArray J_b_x = stencil.getJx(S);
-            PositionArray J_b_y = stencil.getJy(S);
-                
-            NumericArray L_c = stencil.get_L_sw(1,1,nx,ny);
-            PositionArray J_c_x = stencil.getJx(SW);
-            PositionArray J_c_y = stencil.getJy(SW);
-            
-
-            diagR[0] = L_c[C];
-            ndiagR1[0] = L_c[E];
-            ndiagR2[0] = L_c[NE];
-                                
-            rhs[0] = resid[nx+1+1];
-            
-            L_b = stencil.get_L_s(2,1,nx,ny);
-            J_b_x = stencil.getJx(S);
-            J_b_y = stencil.getJy(S);
-
-            ndiagL1[0] = L_b[W];
-            diagR[1] = L_b[C];
-            ndiagR1[1] = L_b[E];                    
-            ndiagR2[1] = L_b[SE];
-
-            rhs[1] = resid[nx+1+2];
-
-            for(size_t j=3; j<nx-2; j++)  
+            NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
+            PositionArray jX=stencil.getJx(C);
+            PositionArray jY=stencil.getJy(C);
+            NumericArray operatorLB=stencil.getL(S,2,1,nx,ny);
+            PositionArray jXB=stencil.getJx(S);
+            PositionArray jYB=stencil.getJy(S);
+            NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
+            PositionArray jXC=stencil.getJx(SW);
+            PositionArray jYC=stencil.getJy(SW);
+            diagR[0]=operatorLC[C];
+            ndiagR1[0]=operatorLC[E];
+            ndiagR2[0]=operatorLC[NE];         
+            rhs[0]=resid[nx+1+1];
+            operatorLB=stencil.getL(S,2,1,nx,ny);
+            jXB=stencil.getJx(S);
+            jYB=stencil.getJy(S);
+            ndiagL1[0]=operatorLB[W];
+            diagR[1]=operatorLB[C];
+            ndiagR1[1]=operatorLB[E];                    
+            ndiagR2[1]=operatorLB[SE];
+            rhs[1]=resid[nx+1+2];
+            for(size_t sx=3; sx<nx-2; sx++)  
             {
-                L_b = stencil.get_L_s(j,1,nx,ny);
-                
-                ndiagL2[j-3] = L_b[NW];
-                ndiagL1[j-2] = L_b[W];
-                diagR[j-1] = L_b[C];
-                ndiagR1[j-1] = L_b[E];                  
-                ndiagR2[j-1] = L_b[SE];
-                    
-                rhs[j-1] = resid[nx+1+j];
+                operatorLB=stencil.getL(S,sx,1,nx,ny);
+                ndiagL2[sx-3]=operatorLB[NW];
+                ndiagL1[sx-2]=operatorLB[W];
+                diagR[sx-1]=operatorLB[C];
+                ndiagR1[sx-1]=operatorLB[E];                  
+                ndiagR2[sx-1]=operatorLB[SE];
+                rhs[sx-1]=resid[nx+1+sx];
             }
-            
-            L_b = stencil.get_L_s(nx-2,1,nx,ny);
-
-            ndiagL2[nx-5] = L_b[NW];
-            ndiagL1[nx-4] = L_b[W];
-            diagR[nx-3] = L_b[C];
-            ndiagR1[nx-3] = L_b[E];
-
-            rhs[nx-3] = resid[nx+1+nx-2];
-                
-            L_c = stencil.get_L_se(nx-1,1,nx,ny);
-            J_c_x = stencil.getJx(SE);
-            J_c_y = stencil.getJy(SE);
-
-            ndiagL2[nx-4] = L_c[NW];
-            ndiagL1[nx-3] = L_c[W];
-            diagR[nx-2] = L_c[C];
-
-            rhs[nx-2] = resid[nx+1+nx-1];
-
-            // LR-decomposition + transformation of the rhs
-            // LR-decomposition + transformation of the rhs
-            for(size_t k=1; k<nx-2; k++)  
-            {
-                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
-                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1];
-                
-                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];
-            }
-
-            ndiagL1[nx-2-1] = ndiagL1[nx-2-1]/diagR[nx-2-1];
-            diagR[nx-2] -= ndiagL1[nx-2-1] * ndiagR1[nx-2-1];
-            rhs[nx-2] = rhs[nx-2] - ndiagL1[nx-2-1] * rhs[nx-2-1];
-
-            
-            // solve the linear system of equations R u = rhs
-            temp[nx+1+nx-1] = rhs[nx-2] / diagR[nx-2];
-        
-            for(size_t j=nx-2; j>1; j--)
-            {
-                temp[nx+1+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR1[j-1] * temp[nx+1+j+1] );
-                
-                rhs[j-2] -= ndiagR2[j-2] * temp[(nx+1)+j+1];
-            }
-            temp[nx+1+1] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[nx+1+1+1] );
-
-   // durchlaufe ungerade innere Zeilen
-            
-            for(size_t i=3; i < ny-2; i+=2)
+            operatorLB=stencil.getL(S,nx-2,1,nx,ny);
+            ndiagL2[nx-5]=operatorLB[NW];
+            ndiagL1[nx-4]=operatorLB[W];
+            diagR[nx-3]=operatorLB[C];
+            ndiagR1[nx-3]=operatorLB[E];
+            rhs[nx-3]=resid[nx+1+nx-2];
+            operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
+            jXC=stencil.getJx(SE);
+            jYC=stencil.getJy(SE);
+            ndiagL2[nx-4]=operatorLC[NW];
+            ndiagL1[nx-3]=operatorLC[W];
+            diagR[nx-2]=operatorLC[C];
+            rhs[nx-2]=resid[nx+1+nx-1];
+            xLRSolver(temp,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
+            // process odd inner lines
+            for(size_t sy=3; sy<ny-2; sy+=2)
             {
                 // setze rechte Seite                   
-                L_b = stencil.get_L_w(1,i,nx,ny);
-                J_b_x = stencil.getJx(W);
-                J_b_y = stencil.getJy(W);
-
-                diagR[0] = L_b[C];
-                ndiagR1[0] = L_b[E];
-                ndiagR2[0] = L_b[NE];
-                                
-                rhs[0] = resid[i*(nx+1)+1];
-                
-                L = stencil.get_L_c(2,i,nx,ny);
-
-                ndiagL1[0] = L[W];
-                diagR[1] = L[C];
-                ndiagR1[1] = L[E];                  
-                ndiagR2[1] = L[SE];
-
-                rhs[1] = resid[i*(nx+1)+2];
-
-                for(size_t j=3; j<nx-2; j++)  
+                operatorLB=stencil.getL(W,1,sy,nx,ny);
+                jXB=stencil.getJx(W);
+                jYB=stencil.getJy(W);
+                diagR[0]=operatorLB[C];
+                ndiagR1[0]=operatorLB[E];
+                ndiagR2[0]=operatorLB[NE];     
+                rhs[0]=resid[sy*(nx+1)+1];
+                operatorL=stencil.getL(C,2,sy,nx,ny);
+                ndiagL1[0]=operatorL[W];
+                diagR[1]=operatorL[C];
+                ndiagR1[1]=operatorL[E];                  
+                ndiagR2[1]=operatorL[SE];
+                rhs[1]=resid[sy*(nx+1)+2];
+                for(size_t sx=3; sx<nx-2; sx++)  
                 {
-                    L = stencil.get_L_c(j,i,nx,ny);
-                    
-                    ndiagL2[j-3] = L[NW];
-                    ndiagL1[j-2] = L[W];
-                    diagR[j-1] = L[C];
-                    ndiagR1[j-1] = L[E];                    
-                    ndiagR2[j-1] = L[SE];
-                    
-                    rhs[j-1] = resid[i*(nx+1)+j];
+                    operatorL=stencil.getL(C,sx,sy,nx,ny);
+                    ndiagL2[sx-3]=operatorL[NW];
+                    ndiagL1[sx-2]=operatorL[W];
+                    diagR[sx-1]=operatorL[C];
+                    ndiagR1[sx-1]=operatorL[E];                    
+                    ndiagR2[sx-1]=operatorL[SE];
+                    rhs[sx-1]=resid[sy*(nx+1)+sx];
                 }
-                
-                L = stencil.get_L_c(nx-2,i,nx,ny);
-
-                ndiagL2[nx-5] = L[NW];
-                ndiagL1[nx-4] = L[W];
-                diagR[nx-3] = L[C];
-                ndiagR1[nx-3] = L[E];
-
-                rhs[nx-3] = resid[i*(nx+1)+nx-2];
-                
-                L_b = stencil.get_L_e(nx-1,i,nx,ny);
-                J_b_x = stencil.getJx(E);
-                J_b_y = stencil.getJy(E);
-
-                ndiagL2[nx-4] = L_b[NW];
-                ndiagL1[nx-3] = L_b[W];
-                diagR[nx-2] = L_b[C];
-
-                rhs[nx-2] = resid[i*(nx+1)+nx-1];
-                
-                // LR-decomposition + transformation of the rhs
-                for(size_t k=1; k<nx-2; k++)  
-                {
-                    ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
-                    diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                    ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                    rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1];
-                    
-                    ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                    ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                    diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                    rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];                      
-                }
-                ndiagL1[nx-2-1] = ndiagL1[nx-2-1]/diagR[nx-2-1];
-                diagR[nx-2] -= ndiagL1[nx-2-1] * ndiagR1[nx-2-1];
-                rhs[nx-2] = rhs[nx-2] - ndiagL1[nx-3] * rhs[nx-3];
-                
-                // solve the linear system of equations R u = rhs
-                temp[i*(nx+1)+nx-1] = rhs[nx-2] / diagR[nx-2];                                  
-                for(size_t j=nx-2; j>1; j--)
-                {
-                    temp[i*(nx+1)+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR1[j-1] * temp[i*(nx+1)+j+1] );                    
-                    rhs[j-2] -= ndiagR2[j-2] * temp[i*(nx+1)+j+1];
-                }
-                temp[i*(nx+1)+1] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[i*(nx+1)+1+1] );
+                operatorL=stencil.getL(C,nx-2,sy,nx,ny);
+                ndiagL2[nx-5]=operatorL[NW];
+                ndiagL1[nx-4]=operatorL[W];
+                diagR[nx-3]=operatorL[C];
+                ndiagR1[nx-3]=operatorL[E];
+                rhs[nx-3]=resid[sy*(nx+1)+nx-2];
+                operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
+                jXB=stencil.getJx(E);
+                jYB=stencil.getJy(E);
+                ndiagL2[nx-4]=operatorLB[NW];
+                ndiagL1[nx-3]=operatorLB[W];
+                diagR[nx-2]=operatorLB[C];
+                rhs[nx-2]=resid[sy*(nx+1)+nx-1];
+                xLRSolver(temp,sy,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             }
-
-    //relaxiere oberste Zeile
-            
-            // setze rechte Seite in oberster Zeile                 
-            L_c = stencil.get_L_nw(1,ny-1,nx,ny);
-            J_c_x = stencil.getJx(NW);
-            J_c_y = stencil.getJy(NW);
-
-            diagR[0] = L_c[C];
-            ndiagR1[0] = L_c[E];
-            ndiagR2[0] = L_c[NW];
-                                
-            rhs[0] = resid[(ny-1)*(nx+1)+1];
-            
-            L_b = stencil.get_L_n(2,ny-1,nx,ny);
-
-            J_b_x = stencil.getJx(N);
-            J_b_y = stencil.getJy(N);
-            
-            ndiagL1[0] = L_b[W];
-            diagR[1] = L_b[C];
-            ndiagR1[1] = L_b[E];                    
-            ndiagR2[1] = L_b[NE];
-
-            rhs[1] = resid[(ny-1)*(nx+1)+2];
-
-            for(size_t j=3; j<nx-2; j++)  
+            //relax top line
+            // set rhs in top line
+            operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
+            jXC=stencil.getJx(NW);
+            jYC=stencil.getJy(NW);
+            diagR[0]=operatorLC[C];
+            ndiagR1[0]=operatorLC[E];
+            ndiagR2[0]=operatorLC[NW];         
+            rhs[0]=resid[(ny-1)*(nx+1)+1];
+            operatorLB=stencil.getL(N,2,ny-1,nx,ny);
+            jXB=stencil.getJx(N);
+            jYB=stencil.getJy(N);
+            ndiagL1[0]=operatorLB[W];
+            diagR[1]=operatorLB[C];
+            ndiagR1[1]=operatorLB[E];                    
+            ndiagR2[1]=operatorLB[NE];
+            rhs[1]=resid[(ny-1)*(nx+1)+2];
+            for(size_t sx=3; sx<nx-2; sx++)  
             {
-                L_b = stencil.get_L_n(j,ny-1,nx,ny);
-                
-                ndiagL2[j-3] = L_b[NW];
-                ndiagL1[j-2] = L_b[W];
-                diagR[j-1] = L_b[C];
-                ndiagR1[j-1] = L_b[E];                  
-                ndiagR2[j-1] = L_b[NE];
-                    
-                rhs[j-1] = resid[(ny-1)*(nx+1)+j];
+                operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
+                ndiagL2[sx-3]=operatorLB[NW];
+                ndiagL1[sx-2]=operatorLB[W];
+                diagR[sx-1]=operatorLB[C];
+                ndiagR1[sx-1]=operatorLB[E];                  
+                ndiagR2[sx-1]=operatorLB[NE];
+                rhs[sx-1]=resid[(ny-1)*(nx+1)+sx];
             }
-
-            L_b = stencil.get_L_n(nx-2,ny-1,nx,ny);
-                
-            ndiagL2[nx-5] = L_b[NW];
-            ndiagL1[nx-4] = L_b[W];
-            diagR[nx-3] = L_b[C];
-            ndiagR1[nx-3] = L_b[E];
-
-            rhs[nx-3] = resid[(ny-1)*(nx+1)+nx-2];
-                
-            L_c = stencil.get_L_ne(nx-1,ny-1,nx,ny);
-            J_c_x = stencil.getJx(NE);
-            J_c_y = stencil.getJy(NE);
-
-            ndiagL2[nx-4] = L_c[NW];
-            ndiagL1[nx-3] = L_c[W];
-            diagR[nx-2] = L_c[C];
-
-            rhs[nx-2] = resid[(ny-1)*(nx+1)+nx-1];
-
-            // LR-decomposition + transformation of the rhs
-            for(size_t k=1; k<nx-2; k++)  
-            {
-                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
-                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1];
-                    
-                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];                      
-            }
-            ndiagL1[nx-2-1] = ndiagL1[nx-2-1]/diagR[nx-2-1];
-            diagR[nx-2] -= ndiagL1[nx-2-1] * ndiagR1[nx-2-1];
-            rhs[nx-2] = rhs[nx-2] - ndiagL1[nx-3] * rhs[nx-3];
-
-            // solve the linear system of equations R u = rhs
-            temp[(ny-1)*(nx+1)+nx-1] = rhs[nx-2] / diagR[nx-2];
-            for(size_t j=nx-2; j>1; j--)
-            {
-                temp[(ny-1)*(nx+1)+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR1[j-1] * temp[(ny-1)*(nx+1)+j+1] );
-                rhs[j-2] -= ndiagR2[j-2] * temp[(ny-1)*(nx+1)+j+1];
-            }
-            temp[(ny-1)*(nx+1)+1] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[(ny-1)*(nx+1)+1+1] );
-
+            operatorLB=stencil.getL(N,nx-2,ny-1,nx,ny);
+            ndiagL2[nx-5]=operatorLB[NW];
+            ndiagL1[nx-4]=operatorLB[W];
+            diagR[nx-3]=operatorLB[C];
+            ndiagR1[nx-3]=operatorLB[E];
+            rhs[nx-3]=resid[(ny-1)*(nx+1)+nx-2];
+            operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
+            jXC=stencil.getJx(NE);
+            jYC=stencil.getJy(NE);
+            ndiagL2[nx-4]=operatorLC[NW];
+            ndiagL1[nx-3]=operatorLC[W];
+            diagR[nx-2]=operatorLC[C];
+            rhs[nx-2]=resid[(ny-1)*(nx+1)+nx-1];
+            xLRSolver(temp,ny-1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             u += omega_ * temp;
-
-            resid = residuum(u,f,stencil,nx,ny);
-
-            temp = 0.0;
-
-            // relaxiere gerade innere Zeilen
-
-            for(size_t i=2; i < ny-1; i+=2)
+            resid=residuum(u,f,stencil,nx,ny);
+            temp=0.0;
+            // relax even inner lines
+            for(size_t sy=2; sy<ny-1; sy+=2)
             {
-                // setze rechte Seite                   
-                    L_b = stencil.get_L_w(1,i,nx,ny);
-                    J_b_x = stencil.getJx(W);
-                    J_b_y = stencil.getJy(W);
-
-                    diagR[0] = L_b[C];
-                    ndiagR1[0] = L_b[E];
-                    ndiagR2[0] = L_b[NE];
-                                    
-                    rhs[0] = resid[i*(nx+1)+1];
-                    
-                    L = stencil.get_L_c(2,i,nx,ny);
-
-                    ndiagL1[0] = L[W];
-                    diagR[1] = L[C];
-                    ndiagR1[1] = L[E];                  
-                    ndiagR2[1] = L[SE];
-
-                    rhs[1] = resid[i*(nx+1)+2];
-
-                    for(size_t j=3; j<nx-2; j++)  
-                    { 
-                        L = stencil.get_L_c(j,i,nx,ny);
- 
-                        ndiagL2[j-3] = L[NW];
-                        ndiagL1[j-2] = L[W];
-                        diagR[j-1] = L[C];
-                        ndiagR1[j-1] = L[E];                    
-                        ndiagR2[j-1] = L[SE];
-                        
-                        rhs[j-1] = resid[i*(nx+1)+j];
-                    }
-                    
-                    L = stencil.get_L_c(nx-2,i,nx,ny);
-
-                    ndiagL2[nx-5] = L[NW];
-                    ndiagL1[nx-4] = L[W];
-                    diagR[nx-3] = L[C];
-                    ndiagR1[nx-3] = L[E];
-
-                    rhs[nx-3] = resid[i*(nx+1)+nx-2];
-                    
-                    L_b = stencil.get_L_e(nx-1,i,nx,ny);
-                    J_b_x = stencil.getJx(E);
-                    J_b_y = stencil.getJy(E);
-
-                    ndiagL2[nx-4] = L_b[NW];
-                    ndiagL1[nx-3] = L_b[W];
-                    diagR[nx-2] = L_b[C];
-
-                    rhs[nx-2] = resid[i*(nx+1)+nx-1];
-                    
-                    // LR-decomposition + transformation of the rhs
-                for(size_t k=1; k<nx-2; k++)  
-                {
-                    ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];
-                    diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                    ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                    rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1];
-                    
-                    ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                    ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                    diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                    rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];                      
+                // set rhs
+                operatorLB=stencil.getL(W,1,sy,nx,ny);
+                jXB=stencil.getJx(W);
+                jYB=stencil.getJy(W);
+                diagR[0]=operatorLB[C];
+                ndiagR1[0]=operatorLB[E];
+                ndiagR2[0]=operatorLB[NE];     
+                rhs[0]=resid[sy*(nx+1)+1];
+                operatorL=stencil.getL(C,2,sy,nx,ny);
+                ndiagL1[0]=operatorL[W];
+                diagR[1]=operatorL[C];
+                ndiagR1[1]=operatorL[E];                  
+                ndiagR2[1]=operatorL[SE];
+                rhs[1]=resid[sy*(nx+1)+2];
+                for(size_t sx=3; sx<nx-2; sx++)  
+                { 
+                    operatorL=stencil.getL(C,sx,sy,nx,ny);
+                    ndiagL2[sx-3]=operatorL[NW];
+                    ndiagL1[sx-2]=operatorL[W];
+                    diagR[sx-1]=operatorL[C];
+                    ndiagR1[sx-1]=operatorL[E];                    
+                    ndiagR2[sx-1]=operatorL[SE];
+                    rhs[sx-1] = resid[sy*(nx+1)+sx];
                 }
-                ndiagL1[nx-2-1] = ndiagL1[nx-2-1]/diagR[nx-2-1];
-                diagR[nx-2] -= ndiagL1[nx-2-1] * ndiagR1[nx-2-1];
-                rhs[nx-2] = rhs[nx-2] - ndiagL1[nx-3] * rhs[nx-3];
-                
-                // solve the linear system of equations R u = rhs
-                temp[i*(nx+1)+nx-1] = rhs[nx-2] / diagR[nx-2];                                  
-                for(size_t j=nx-2; j>1; j--)
-                {
-                    temp[i*(nx+1)+j] = 1/diagR[j-1] * ( rhs[j-1] - ndiagR1[j-1] * temp[i*(nx+1)+j+1] );                    
-                    rhs[j-2] -= ndiagR2[j-2] * temp[i*(nx+1)+j+1];
-                }
-                temp[i*(nx+1)+1] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[i*(nx+1)+1+1] );
+                operatorL=stencil.getL(C,nx-2,sy,nx,ny);
+                ndiagL2[nx-5]=operatorL[NW];
+                ndiagL1[nx-4]=operatorL[W];
+                diagR[nx-3]=operatorL[C];
+                ndiagR1[nx-3]=operatorL[E];
+                rhs[nx-3]=resid[sy*(nx+1)+nx-2];
+                operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
+                jXB=stencil.getJx(E);
+                jYB=stencil.getJy(E);
+                ndiagL2[nx-4]=operatorLB[NW];
+                ndiagL1[nx-3]=operatorLB[W];
+                diagR[nx-2]=operatorLB[C];
+                rhs[nx-2]=resid[sy*(nx+1)+nx-1];
+                xLRSolver(temp,sy,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             }
-
-            u += omega_ * temp;
+            u+=omega_*temp;
         }
-
      }
-
      else 
      {
         for(int k=0; k<2; k++)
@@ -1387,675 +766,376 @@ void ZebraLine::yzebra(
 {
     if((ny > 4) && (nx > 4))
     {
-
         NumericArray rhs(0.0,ny-1);
         NumericArray temp(0.0,(nx+1)*(ny+1));
-
-
         NumericArray diagR(0.0,ny-1);
         NumericArray ndiagR1(0.0,ny-2);
         NumericArray ndiagL1(0.0,ny-2);
         NumericArray ndiagR2(0.0,ny-3);
         NumericArray ndiagL2(0.0,ny-3);
-                
-        if(stencil.isConstant() == true)
+        if(stencil.isConstant())
         {
             // get const operator L
-                const NumericArray L = stencil.get_L_c(2,2,nx,ny);
-                const PositionArray J_x = stencil.getJx(C);
-                const PositionArray J_y = stencil.getJy(C);
-                
-                NumericArray L_b = stencil.get_L_w(1,2,nx,ny);
-                PositionArray J_b_x = stencil.getJx(W);
-                PositionArray J_b_y = stencil.getJy(W);
- 
-                NumericArray L_c = stencil.get_L_sw(1,1,nx,ny);
-                PositionArray J_c_x = stencil.getJx(SW);
-                PositionArray J_c_y = stencil.getJy(SW);
-
-                diagR[0] = L_c[C];
-                ndiagR1[0] = L_c[N];
-                ndiagR2[0] = L_c[NW];
-                                
-                rhs[0] = resid[nx+1+1];
-
-                L_b = stencil.get_L_w(1,2,nx,ny);
-                J_b_x = stencil.getJx(W);
-                J_b_y = stencil.getJy(W);
-
-                ndiagL1[0] = L_b[S];
-                diagR[1] = L_b[C];
-                ndiagR1[1] = L_b[N];                    
-                ndiagR2[1] = L_b[NW];
-
-                rhs[1] = resid[2*(nx+1)+1];
-
-                for(size_t j=3; j<ny-2; j++)  
+            const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
+            const PositionArray jX=stencil.getJx(C);
+            const PositionArray jY=stencil.getJy(C);
+            NumericArray operatorLB=stencil.getL(W,1,2,nx,ny);
+            PositionArray jXB=stencil.getJx(W);
+            PositionArray jYB=stencil.getJy(W);
+            NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
+            PositionArray jXC=stencil.getJx(SW);
+            PositionArray jYC=stencil.getJy(SW);
+            diagR[0]=operatorLC[C];
+            ndiagR1[0]=operatorLC[N];
+            ndiagR2[0]=operatorLC[NW];     
+            rhs[0]=resid[nx+1+1];
+            operatorLB=stencil.getL(W,1,2,nx,ny);
+            jXB=stencil.getJx(W);
+            jYB=stencil.getJy(W);
+            ndiagL1[0]=operatorLB[S];
+            diagR[1]=operatorLB[C];
+            ndiagR1[1]=operatorLB[N];                    
+            ndiagR2[1]=operatorLB[NW];
+            rhs[1]=resid[2*(nx+1)+1];
+            for(size_t sy=3; sy<ny-2; sy++)  
+            {
+                ndiagL2[sy-3]=operatorLB[SE];
+                ndiagL1[sy-2]=operatorLB[S];
+                diagR[sy-1]=operatorLB[C];
+                ndiagR1[sy-1]=operatorLB[N];                  
+                ndiagR2[sy-1]=operatorLB[NW];
+                rhs[sy-1]=resid[sy*(nx+1)+1];
+            }
+            ndiagL2[ny-5]=operatorLB[SE];
+            ndiagL1[ny-4]=operatorLB[S];
+            diagR[ny-3]=operatorLB[C];
+            ndiagR1[ny-3]=operatorLB[N];
+            rhs[ny-3]=resid[(ny-2)*(nx+1)+1];
+            operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
+            jXC=stencil.getJx(NW);
+            jYC=stencil.getJy(NW);
+            ndiagL2[ny-4]=operatorLC[NE];
+            ndiagL1[ny-3]=operatorLC[S];
+            diagR[ny-2]=operatorLC[C];
+            rhs[ny-2]=resid[(ny-1)*(nx+1)+1];
+            yLRSolver(temp,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
+////////////////////////////////////////////////////////////////////////////////
+            // process inner columns
+            for(size_t sx=3; sx<nx-2; sx+=2)
+            {
+                // set rhs
+                operatorLB=stencil.getL(S,sx,1,nx,ny);
+                jXB=stencil.getJx(S);
+                jYB=stencil.getJy(S);
+                diagR[0]=operatorLB[C];
+                ndiagR1[0]=operatorLB[N];
+                ndiagR2[0]=operatorLB[NE];
+                rhs[0]=resid[nx+1+sx];
+                ndiagL1[0]=operatorL[S];
+                diagR[1]=operatorL[C];
+                ndiagR1[1]=operatorL[N];                  
+                ndiagR2[1]=operatorL[NE];
+                rhs[1]=resid[2*(nx+1)+sx];                     
+                for(size_t sy=3; sy<ny-2; sy++)
                 {
-                    ndiagL2[j-3] = L_b[SE];
-                    ndiagL1[j-2] = L_b[S];
-                    diagR[j-1] = L_b[C];
-                    ndiagR1[j-1] = L_b[N];                  
-                    ndiagR2[j-1] = L_b[NW];
-                        
-                    rhs[j-1] = resid[j*(nx+1)+1];
-                }
-                    
-                ndiagL2[ny-5] = L_b[SE];
-                ndiagL1[ny-4] = L_b[S];
-                diagR[ny-3] = L_b[C];
-                ndiagR1[ny-3] = L_b[N];
-
-                rhs[ny-3] = resid[(ny-2)*(nx+1)+1];
-                    
-                L_c = stencil.get_L_nw(1,ny-1,nx,ny);
-                J_c_x = stencil.getJx(NW);
-                J_c_y = stencil.getJy(NW);
-
-                ndiagL2[ny-4] = L_c[NE];
-                ndiagL1[ny-3] = L_c[S];
-                diagR[ny-2] = L_c[C];
-
-                rhs[ny-2] = resid[(ny-1)*(nx+1)+1];
-
-                // LR-decomposition + transformation of the rhs
-            for(size_t k=1; k<ny-2; k++)  
-            {
-                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];  
-                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1]; 
-                
-                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];
+                   ndiagL2[sy-3]=operatorL[SW];
+                   ndiagL1[sy-2]=operatorL[S];
+                   diagR[sy-1]=operatorL[C];
+                   ndiagR1[sy-1]=operatorL[N];
+                   ndiagR2[sy-1]=operatorL[NE];
+                   rhs[sy-1]=resid[sy*(nx+1)+sx];                       
+                }       
+                ndiagL2[nx-5]=operatorL[SW];
+                ndiagL1[nx-4]=operatorL[S];
+                diagR[nx-3]=operatorL[C];
+                ndiagR1[nx-3]=operatorL[N];
+                rhs[ny-3]=resid[(ny-2)*(nx+1)+sx];
+                operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
+                jXB=stencil.getJx(N);
+                jYB=stencil.getJy(N);
+                ndiagL2[nx-4]=operatorLB[SW];
+                ndiagL1[nx-3]=operatorLB[S];
+                diagR[nx-2]=operatorLB[C];
+                rhs[ny-2]=resid[(ny-1)*(nx+1)+sx];
+                yLRSolver(temp,sx,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             }
-            ndiagL1[ny-2-1] = ndiagL1[ny-2-1]/diagR[ny-2-1];
-            diagR[ny-2] -= ndiagL1[ny-2-1] * ndiagR1[ny-2-1];
-            rhs[ny-2] = rhs[ny-2] - ndiagL1[ny-2-1] * rhs[ny-3];
-
-            // solve the linear system of equations R u = rhs
-            temp[1+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];
-            for(size_t k=ny-2; k>1; k--)
+////////////////last column//////////////////
+            operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
+            jXC=stencil.getJx(SE);
+            jYC=stencil.getJy(SE);
+            rhs[0]=resid[nx+1+nx-1];
+            operatorLB=stencil.getL(E,nx-1,2,nx,ny);
+            jXB=stencil.getJx(E);
+            jYB=stencil.getJy(E);
+            ndiagL1[0]=operatorLB[S];
+            diagR[1]=operatorLB[C];
+            ndiagR1[1]=operatorLB[N];                    
+            ndiagR2[1]=operatorLB[NE];
+            rhs[1]=resid[2*(nx+1)+nx-1];
+            for(size_t sy=3; sy<ny-2; sy++)  
             {
-                temp[1+k*(nx+1)] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR1[k-1] * temp[1+(k+1)*(nx+1)] );
-
-                rhs[k-2] -= ndiagR2[k-2] * temp[(k+1)*(nx+1)+1];
+                ndiagL2[sy-3]=operatorLB[SE];
+                ndiagL1[sy-2]=operatorLB[S];
+                diagR[sy-1]=operatorLB[C];
+                ndiagR1[sy-1]=operatorLB[N];                  
+                ndiagR2[sy-1]=operatorLB[NE];
+                rhs[sy-1]=resid[sy*(nx+1)+nx-1];
             }
-            temp[nx+1+1] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[2*(nx+1)+1] );
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-
-            // durchlaufe alle inneren Spalten, Spaltenindex i              
-            for(size_t i=3; i < nx-2; i+=2)
+            ndiagL2[ny-5]=operatorLB[SE];
+            ndiagL1[ny-4]=operatorLB[S];
+            diagR[ny-3]=operatorLB[C];
+            ndiagR1[ny-3]=operatorLB[N];
+            rhs[ny-3]=resid[(ny-2)*(nx+1)+nx-1];
+            operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
+            jXC=stencil.getJx(NE);
+            jYC=stencil.getJy(NE);
+            ndiagL2[ny-4]=operatorLC[NE];
+            ndiagL1[ny-3]=operatorLC[S];
+            diagR[ny-2]=operatorLC[C];
+            rhs[ny-2]=resid[(ny-1)*(nx+1)+nx-1];
+            yLRSolver(
+                temp,
+                nx-1,nx,ny,
+                rhs,
+                ndiagL1,ndiagL2,
+                diagR,ndiagR1,ndiagR2);
+            u += omega_ * temp;
+            resid=residuum(u,f,stencil,nx,ny);
+            temp=0.0;
+            // process inner columns
+            for(size_t sx=2; sx<nx-1; sx+=2)
             {
                 // setze rechte Seite                   
-                    L_b = stencil.get_L_s(i,1,nx,ny);
-                    J_b_x = stencil.getJx(S);
-                    J_b_y = stencil.getJy(S);
-
-                    diagR[0] = L_b[C];
-                    ndiagR1[0] = L_b[N];
-                    ndiagR2[0] = L_b[NE];
-       
-                    rhs[0] = resid[nx+1+i];
-
-                    ndiagL1[0] = L[S];
-                    diagR[1] = L[C];
-                    ndiagR1[1] = L[N];                  
-                    ndiagR2[1] = L[NE];
-
-                    rhs[1] = resid[2*(nx+1)+i];                     
-
-                    for(size_t j=3; j<ny-2; j++)
-                    {
-                       ndiagL2[j-3] = L[SW];
-                       ndiagL1[j-2] = L[S];
-                       diagR[j-1] = L[C];
-                       ndiagR1[j-1] = L[N];
-                       ndiagR2[j-1] = L[NE];
- 
-                       rhs[j-1] = resid[j*(nx+1)+i];                       
-                    }
-                                        
-                    ndiagL2[nx-5] = L[SW];
-                    ndiagL1[nx-4] = L[S];
-                    diagR[nx-3] = L[C];
-                    ndiagR1[nx-3] = L[N];
-
-                    rhs[ny-3] = resid[(ny-2)*(nx+1)+i];
-
-                    L_b = stencil.get_L_n(i,ny-1,nx,ny);
-                    J_b_x = stencil.getJx(N);
-                    J_b_y = stencil.getJy(N);
-
-                    ndiagL2[nx-4] = L_b[SW];
-                    ndiagL1[nx-3] = L_b[S];
-                    diagR[nx-2] = L_b[C];
-
-                    rhs[ny-2] = resid[(ny-1)*(nx+1)+i];
-                    
-                    // LR-decomposition + transformation of the rhs
-                for(size_t k=1; k<ny-2; k++)  
+                operatorLB=stencil.getL(S,sx,1,nx,ny);
+                jXB=stencil.getJx(S);
+                jYB=stencil.getJy(S);
+                diagR[0]=operatorLB[C];
+                ndiagR1[0]=operatorLB[N];
+                ndiagR2[0]=operatorLB[NE];
+                rhs[0]=resid[nx+1+sx];
+                ndiagL1[0]=operatorL[S];
+                diagR[1]=operatorL[C];
+                ndiagR1[1]=operatorL[N];                  
+                ndiagR2[1]=operatorL[NE];
+                rhs[1]=resid[2*(nx+1)+sx];                     
+                for(size_t sy=3; sy<ny-2; sy++)
                 {
-                    ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];  
-                    diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                    ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                    rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1]; 
-                    
-                    ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                    ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                    diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                    rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];
-                }
-                ndiagL1[ny-2-1] = ndiagL1[ny-2-1]/diagR[ny-2-1];
-                diagR[ny-2] -= ndiagL1[ny-2-1] * ndiagR1[ny-2-1];
-                rhs[ny-2] = rhs[ny-2] - ndiagL1[ny-2-1] * rhs[ny-3];
-
-                // solve the linear system of equations R u = rhs
-                temp[i+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];                    
-                for(size_t k=ny-2; k>1; k--)
-                {
-                    temp[i+k*(nx+1)] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR1[k-1] * temp[i+(k+1)*(nx+1)] );
-                    rhs[k-2] -= ndiagR2[k-2] * temp[(k+1)*(nx+1)+i];                        
-                }
-                temp[nx+1+i] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[2*(nx+1)+i] );
+                   ndiagL2[sy-3]=operatorL[SW];
+                   ndiagL1[sy-2]=operatorL[S];
+                   diagR[sy-1]=operatorL[C];
+                   ndiagR1[sy-1]=operatorL[N];
+                   ndiagR2[sy-1]=operatorL[NE];
+                   rhs[sy-1]=resid[sy*(nx+1)+sx];                       
+                }       
+                ndiagL2[nx-5]=operatorL[SW];
+                ndiagL1[nx-4]=operatorL[S];
+                diagR[nx-3]=operatorL[C];
+                ndiagR1[nx-3]=operatorL[N];
+                rhs[ny-3]=resid[(ny-2)*(nx+1)+sx];
+                operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
+                jXB=stencil.getJx(N);
+                jYB=stencil.getJy(N);
+                ndiagL2[nx-4]=operatorLB[SW];
+                ndiagL1[nx-3]=operatorLB[S];
+                diagR[nx-2]=operatorLB[C];
+                rhs[ny-2]=resid[(ny-1)*(nx+1)+sx];
+                yLRSolver(
+                    temp,
+                    sx,nx,ny,
+                    rhs,
+                    ndiagL1,ndiagL2,
+                    diagR,ndiagR1,ndiagR2);
             }
-
-////////////////letzte Spalte//////////////////
-            
-            L_c = stencil.get_L_se(nx-1,1,nx,ny);
-            J_c_x = stencil.getJx(SE);
-            J_c_y = stencil.getJy(SE);
-
-            rhs[0] = resid[nx+1+nx-1];
-
-            L_b = stencil.get_L_e(nx-1,2,nx,ny);
-            J_b_x = stencil.getJx(E);
-            J_b_y = stencil.getJy(E);
-
-            ndiagL1[0] = L_b[S];
-            diagR[1] = L_b[C];
-            ndiagR1[1] = L_b[N];                    
-            ndiagR2[1] = L_b[NE];
-
-            rhs[1] = resid[2*(nx+1)+nx-1];
-
-            for(size_t j=3; j<ny-2; j++)  
-            {
-                ndiagL2[j-3] = L_b[SE];
-                ndiagL1[j-2] = L_b[S];
-                diagR[j-1] = L_b[C];
-                ndiagR1[j-1] = L_b[N];                  
-                ndiagR2[j-1] = L_b[NE];
-                    
-                rhs[j-1] = resid[j*(nx+1)+nx-1];
-            }
-                
-            ndiagL2[ny-5] = L_b[SE];
-            ndiagL1[ny-4] = L_b[S];
-            diagR[ny-3] = L_b[C];
-            ndiagR1[ny-3] = L_b[N];
-
-            rhs[ny-3] = resid[(ny-2)*(nx+1)+nx-1];
-                
-            L_c = stencil.get_L_ne(nx-1,ny-1,nx,ny);
-            J_c_x = stencil.getJx(NE);
-            J_c_y = stencil.getJy(NE);
-
-            ndiagL2[ny-4] = L_c[NE];
-            ndiagL1[ny-3] = L_c[S];
-            diagR[ny-2] = L_c[C];
-
-            rhs[ny-2] = resid[(ny-1)*(nx+1)+nx-1];
-
-            // LR-decomposition + transformation of the rhs
-            for(size_t k=1; k<ny-2; k++)  
-            {
-                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];  
-                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1]; 
-                    
-                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];
-            }
-            ndiagL1[ny-2-1] = ndiagL1[ny-2-1]/diagR[ny-2-1];
-            diagR[ny-2] -= ndiagL1[ny-2-1] * ndiagR1[ny-2-1];
-            rhs[ny-2] = rhs[ny-2] - ndiagL1[ny-2-1] * rhs[ny-3];
-
-            // solve the linear system of equations R u = rhs
-            temp[nx-1+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];
-            for(size_t k=ny-2; k>1; k--)
-            {
-                temp[nx-1+k*(nx+1)] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR1[k-1] * temp[nx-1+(k+1)*(nx+1)] );
-                rhs[k-2] -= ndiagR2[k-2] * temp[(k+1)*(nx+1)+nx-1];
-            }
-            temp[nx+1+nx-1] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[2*(nx+1)+nx-1] );
-            
-            u += omega_ * temp;
-
-            resid = residuum(u,f,stencil,nx,ny);
-
-            temp = 0.0;
-
-            // durchlaufe alle inneren Spalten, Spaltenindex i              
-            for(size_t i=2; i < nx-1; i+=2)
-            {
-                // setze rechte Seite                   
-                    L_b = stencil.get_L_s(i,1,nx,ny);
-                    J_b_x = stencil.getJx(S);
-                    J_b_y = stencil.getJy(S);
-
-                    diagR[0] = L_b[C];
-                    ndiagR1[0] = L_b[N];
-                    ndiagR2[0] = L_b[NE];
-       
-                    rhs[0] = resid[nx+1+i];
-
-                    ndiagL1[0] = L[S];
-                    diagR[1] = L[C];
-                    ndiagR1[1] = L[N];                  
-                    ndiagR2[1] = L[NE];
-
-                    rhs[1] = resid[2*(nx+1)+i];                     
-
-                    for(size_t j=3; j<ny-2; j++)
-                    {
-                       ndiagL2[j-3] = L[SW];
-                       ndiagL1[j-2] = L[S];
-                       diagR[j-1] = L[C];
-                       ndiagR1[j-1] = L[N];
-                       ndiagR2[j-1] = L[NE];
- 
-                       rhs[j-1] = resid[j*(nx+1)+i];                       
-                    }
-                                        
-                    ndiagL2[nx-5] = L[SW];
-                    ndiagL1[nx-4] = L[S];
-                    diagR[nx-3] = L[C];
-                    ndiagR1[nx-3] = L[N];
-
-                    rhs[ny-3] = resid[(ny-2)*(nx+1)+i];
-
-                    L_b = stencil.get_L_n(i,ny-1,nx,ny);
-                    J_b_x = stencil.getJx(N);
-                    J_b_y = stencil.getJy(N);
-
-                    ndiagL2[nx-4] = L_b[SW];
-                    ndiagL1[nx-3] = L_b[S];
-                    diagR[nx-2] = L_b[C];
-
-                    rhs[ny-2] = resid[(ny-1)*(nx+1)+i];
-                    
-                    // LR-decomposition + transformation of the rhs
-                for(size_t k=1; k<ny-2; k++)  
-                {
-                    ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];  
-                    diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                    ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                    rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1]; 
-                    
-                    ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                    ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                    diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                    rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];
-                }
-                ndiagL1[ny-2-1] = ndiagL1[ny-2-1]/diagR[ny-2-1];
-                diagR[ny-2] -= ndiagL1[ny-2-1] * ndiagR1[ny-2-1];
-                rhs[ny-2] = rhs[ny-2] - ndiagL1[ny-2-1] * rhs[ny-3];
-
-                // solve the linear system of equations R u = rhs
-                temp[i+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];                    
-                for(size_t k=ny-2; k>1; k--)
-                {
-                    temp[i+k*(nx+1)] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR1[k-1] * temp[i+(k+1)*(nx+1)] );
-                    rhs[k-2] -= ndiagR2[k-2] * temp[(k+1)*(nx+1)+i];                        
-                }
-                temp[nx+1+i] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[2*(nx+1)+i] );
-            }
-
-            u += omega_ * temp;
-
+            u+=omega_*temp;
         }
         else // stencil not constant
+        {
+            NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
+            PositionArray jX=stencil.getJx(C);
+            PositionArray jY=stencil.getJy(C);
+            NumericArray operatorLB=stencil.getL(W,1,2,nx,ny);
+            PositionArray jXB=stencil.getJx(W);
+            PositionArray jYB=stencil.getJy(W);
+            NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
+            PositionArray jXC=stencil.getJx(SW);
+            PositionArray jYC=stencil.getJy(SW);
+            diagR[0]=operatorLC[C];
+            ndiagR1[0]=operatorLC[N];
+            ndiagR2[0]=operatorLC[NW];     
+            rhs[0]=resid[nx+1+1];
+            ndiagL1[0]=operatorLB[S];
+            diagR[1]=operatorLB[C];
+            ndiagR1[1]=operatorLB[N];                    
+            ndiagR2[1]=operatorLB[NW];
+            rhs[1]=resid[2*(nx+1)+1];
+            for(size_t sy=3; sy<ny-2; sy++)  
             {
-                NumericArray L = stencil.get_L_c(2,2,nx,ny);
-                PositionArray J_x = stencil.getJx(C);
-                PositionArray J_y = stencil.getJy(C);
-                
-                NumericArray L_b = stencil.get_L_w(1,2,nx,ny);
-                PositionArray J_b_x = stencil.getJx(W);
-                PositionArray J_b_y = stencil.getJy(W);
- 
-                NumericArray L_c = stencil.get_L_sw(1,1,nx,ny);
-                PositionArray J_c_x = stencil.getJx(SW);
-                PositionArray J_c_y = stencil.getJy(SW);
-
-                
-                diagR[0] = L_c[C];
-                ndiagR1[0] = L_c[N];
-                ndiagR2[0] = L_c[NW];
-                                
-                rhs[0] = resid[nx+1+1];
-                
-                ndiagL1[0] = L_b[S];
-                diagR[1] = L_b[C];
-                ndiagR1[1] = L_b[N];                    
-                ndiagR2[1] = L_b[NW];
-
-                rhs[1] = resid[2*(nx+1)+1];
-
-                for(size_t j=3; j<ny-2; j++)  
-                {
-                    L_b = stencil.get_L_w(1,j,nx,ny);
-
-                    ndiagL2[j-3] = L_b[SE];
-                    ndiagL1[j-2] = L_b[S];
-                    diagR[j-1] = L_b[C];
-                    ndiagR1[j-1] = L_b[N];                  
-                    ndiagR2[j-1] = L_b[NW];
-                        
-                    rhs[j-1] = resid[j*(nx+1)+1];
-                }
-
-                L_b = stencil.get_L_w(1,ny-2,nx,ny);
-                
-                ndiagL2[ny-5] = L_b[SE];
-                ndiagL1[ny-4] = L_b[S];
-                diagR[ny-3] = L_b[C];
-                ndiagR1[ny-3] = L_b[N];
-
-                rhs[ny-3] = resid[(ny-2)*(nx+1)+1];
-                    
-                L_c = stencil.get_L_nw(1,ny-1,nx,ny);
-                J_c_x = stencil.getJx(NW);
-                J_c_y = stencil.getJy(NW);
-
-                ndiagL2[ny-4] = L_c[NE];
-                ndiagL1[ny-3] = L_c[S];
-                diagR[ny-2] = L_c[C];
-
-                rhs[ny-2] = resid[(ny-1)*(nx+1)+1];
-
-                for(size_t k=1; k<ny-2; k++)  
-                {
-                    ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];  
-                    diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                    ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                    rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1]; 
-                    
-                    ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                    ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                    diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                    rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];
-                }
-                ndiagL1[ny-2-1] = ndiagL1[ny-2-1]/diagR[ny-2-1];
-                diagR[ny-2] -= ndiagL1[ny-2-1] * ndiagR1[ny-2-1];
-                rhs[ny-2] = rhs[ny-2] - ndiagL1[ny-2-1] * rhs[ny-3];
-
-                // solve the linear system of equations R u = rhs
-            temp[1+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];
-            for(size_t k=ny-2; k>1; k--)
-            {
-                temp[1+k*(nx+1)] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR1[k-1] * temp[1+(k+1)*(nx+1)] );
-
-                rhs[k-2] -= ndiagR2[k-2] * temp[(k+1)*(nx+1)+1];
+                operatorLB=stencil.getL(W,1,sy,nx,ny);
+                ndiagL2[sy-3]=operatorLB[SE];
+                ndiagL1[sy-2]=operatorLB[S];
+                diagR[sy-1]=operatorLB[C];
+                ndiagR1[sy-1]=operatorLB[N];                  
+                ndiagR2[sy-1]=operatorLB[NW];
+                rhs[sy-1]=resid[sy*(nx+1)+1];
             }
-            temp[nx+1+1] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[2*(nx+1)+1] );
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-
-            // durchlaufe alle inneren Spalten, Spaltenindex i              
-            for(size_t i=3; i < nx-2; i+=2)
+            operatorLB=stencil.getL(W,1,ny-2,nx,ny);
+            ndiagL2[ny-5]=operatorLB[SE];
+            ndiagL1[ny-4]=operatorLB[S];
+            diagR[ny-3]=operatorLB[C];
+            ndiagR1[ny-3]=operatorLB[N];
+            rhs[ny-3]=resid[(ny-2)*(nx+1)+1];
+            operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
+            jXC=stencil.getJx(NW);
+            jYC=stencil.getJy(NW);
+            ndiagL2[ny-4]=operatorLC[NE];
+            ndiagL1[ny-3]=operatorLC[S];
+            diagR[ny-2]=operatorLC[C];
+            rhs[ny-2]=resid[(ny-1)*(nx+1)+1];
+            yLRSolver(temp,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
+////////////////////////////////////////////////////////////////////////////////
+            // process inner columns
+            for(size_t sx=3; sx<nx-2; sx+=2)
             {
-                // setze rechte Seite                   
-                    L_b = stencil.get_L_s(i,1,nx,ny);
-                    J_b_x = stencil.getJx(S);
-                    J_b_y = stencil.getJy(S);
-
-                    diagR[0] = L_b[C];
-                    ndiagR1[0] = L_b[N];
-                    ndiagR2[0] = L_b[NE];
-       
-                    rhs[0] = resid[nx+1+i];
-
-                    L = stencil.get_L_c(i,2,nx,ny);
-
-                    ndiagL1[0] = L[S];
-                    diagR[1] = L[C];
-                    ndiagR1[1] = L[N];                  
-                    ndiagR2[1] = L[NE];
-
-                    rhs[1] = resid[2*(nx+1)+i];  
-
-                    for(size_t j=3; j<ny-2; j++)
-                    {
-                       L = stencil.get_L_c(i,j,nx,ny);
-                       ndiagL2[j-3] = L[SW];
-                       ndiagL1[j-2] = L[S];
-                       diagR[j-1] = L[C];
-                       ndiagR1[j-1] = L[N];
-                       ndiagR2[j-1] = L[NE];
- 
-                       rhs[j-1] = resid[j*(nx+1)+i];
-                    }
-                                        
-                    L = stencil.get_L_c(i,ny-2,nx,ny);
-                    ndiagL2[nx-5] = L[SW];
-                    ndiagL1[nx-4] = L[S];
-                    diagR[nx-3] = L[C];
-                    ndiagR1[nx-3] = L[N];
-
-                    rhs[ny-3] = resid[(ny-2)*(nx+1)+i];
-
-                    L_b = stencil.get_L_n(i,ny-1,nx,ny);
-                    J_b_x = stencil.getJx(N);
-                    J_b_y = stencil.getJy(N);
-
-                    ndiagL2[nx-4] = L_b[SW];
-                    ndiagL1[nx-3] = L_b[S];
-                    diagR[nx-2] = L_b[C];
-
-                    rhs[ny-2] = resid[(ny-1)*(nx+1)+i];
-                    
-                    // LR-decomposition + transformation of the rhs
-                for(size_t k=1; k<ny-2; k++)  
+                // set rhs
+                operatorLB=stencil.getL(S,sx,1,nx,ny);
+                jXB=stencil.getJx(S);
+                jYB=stencil.getJy(S);
+                diagR[0]=operatorLB[C];
+                ndiagR1[0]=operatorLB[N];
+                ndiagR2[0]=operatorLB[NE];
+                rhs[0]=resid[nx+1+sx];
+                operatorL=stencil.getL(C,sx,2,nx,ny);
+                ndiagL1[0]=operatorL[S];
+                diagR[1]=operatorL[C];
+                ndiagR1[1]=operatorL[N];                  
+                ndiagR2[1]=operatorL[NE];
+                rhs[1]=resid[2*(nx+1)+sx];  
+                for(size_t sy=3; sy<ny-2; sy++)
                 {
-                    ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];  
-                    diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                    ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                    rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1]; 
-                    
-                    ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                    ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                    diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                    rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];
-                }
-                ndiagL1[ny-2-1] = ndiagL1[ny-2-1]/diagR[ny-2-1];
-                diagR[ny-2] -= ndiagL1[ny-2-1] * ndiagR1[ny-2-1];
-                rhs[ny-2] = rhs[ny-2] - ndiagL1[ny-2-1] * rhs[ny-3];
-
-                // solve the linear system of equations R u = rhs
-                temp[i+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];                    
-                for(size_t k=ny-2; k>1; k--)
+                   operatorL=stencil.getL(C,sx,sy,nx,ny);
+                   ndiagL2[sy-3]=operatorL[SW];
+                   ndiagL1[sy-2]=operatorL[S];
+                   diagR[sy-1]=operatorL[C];
+                   ndiagR1[sy-1]=operatorL[N];
+                   ndiagR2[sy-1]=operatorL[NE];
+                   rhs[sy-1]=resid[sy*(nx+1)+sx];
+                }       
+                operatorL=stencil.getL(C,sx,ny-2,nx,ny);
+                ndiagL2[nx-5]=operatorL[SW];
+                ndiagL1[nx-4]=operatorL[S];
+                diagR[nx-3]=operatorL[C];
+                ndiagR1[nx-3]=operatorL[N];
+                rhs[ny-3]=resid[(ny-2)*(nx+1)+sx];
+                operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
+                jXB=stencil.getJx(N);
+                jYB=stencil.getJy(N);
+                ndiagL2[nx-4]=operatorLB[SW];
+                ndiagL1[nx-3]=operatorLB[S];
+                diagR[nx-2]=operatorLB[C];
+                rhs[ny-2]=resid[(ny-1)*(nx+1)+sx];
+                yLRSolver(
+                    temp,
+                    sx,nx,ny,
+                    rhs,
+                    ndiagL1,ndiagL2,
+                    diagR,ndiagR1,ndiagR2);
+            }
+////////////////last column//////////////////
+            operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
+            jXC=stencil.getJx(SE);
+            jYC=stencil.getJy(SE);
+            rhs[0]=resid[nx+1+nx-1];
+            operatorLB=stencil.getL(E,nx-1,2,nx,ny);
+            jXB=stencil.getJx(E);
+            jYB=stencil.getJy(E);
+            ndiagL1[0]=operatorLB[S];
+            diagR[1]=operatorLB[C];
+            ndiagR1[1]=operatorLB[N];                    
+            ndiagR2[1]=operatorLB[NE];
+            rhs[1]=resid[2*(nx+1)+nx-1];
+            for(size_t sy=3; sy<ny-2; sy++)  
+            {
+                operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
+                ndiagL2[sy-3]=operatorLB[SE];
+                ndiagL1[sy-2]=operatorLB[S];
+                diagR[sy-1]=operatorLB[C];
+                ndiagR1[sy-1]=operatorLB[N];                  
+                ndiagR2[sy-1]=operatorLB[NE];
+                rhs[sy-1]=resid[sy*(nx+1)+nx-1];
+            }
+            operatorLB=stencil.getL(E,nx-1,ny-2,nx,ny);
+            ndiagL2[ny-5]=operatorLB[SE];
+            ndiagL1[ny-4]=operatorLB[S];
+            diagR[ny-3]=operatorLB[C];
+            ndiagR1[ny-3]=operatorLB[N];
+            rhs[ny-3]=resid[(ny-2)*(nx+1)+nx-1];
+            operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
+            jXC=stencil.getJx(NE);
+            jYC=stencil.getJy(NE);
+            ndiagL2[ny-4]=operatorLC[NE];
+            ndiagL1[ny-3]=operatorLC[S];
+            diagR[ny-2]=operatorLC[C];
+            rhs[ny-2]=resid[(ny-1)*(nx+1)+nx-1];
+            yLRSolver(
+                temp,
+                nx-1,nx,ny,
+                rhs,
+                ndiagL1,ndiagL2,
+                diagR,ndiagR1,ndiagR2);
+            u+=omega_*temp;
+            resid=residuum(u,f,stencil,nx,ny);
+            temp=0.0;
+            // process inner columns
+            for(size_t sx=2; sx<nx-1; sx+=2)
+            {
+                // set rhs
+                operatorLB=stencil.getL(S,sx,1,nx,ny);
+                jXB=stencil.getJx(S);
+                jYB=stencil.getJy(S);
+                diagR[0]=operatorLB[C];
+                ndiagR1[0]=operatorLB[N];
+                ndiagR2[0]=operatorLB[NE];
+                rhs[0]=resid[nx+1+sx];
+                operatorL=stencil.getL(C,sx,2,nx,ny);
+                ndiagL1[0]=operatorL[S];
+                diagR[1]=operatorL[C];
+                ndiagR1[1]=operatorL[N];                  
+                ndiagR2[1]=operatorL[NE];
+                rhs[1]=resid[2*(nx+1)+sx];  
+                for(size_t sy=3; sy<ny-2; sy++)
                 {
-                    temp[i+k*(nx+1)] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR1[k-1] * temp[i+(k+1)*(nx+1)] );
-                    rhs[k-2] -= ndiagR2[k-2] * temp[(k+1)*(nx+1)+i];                        
-                }
-                temp[nx+1+i] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[2*(nx+1)+i] );
+                   operatorL=stencil.getL(C,sx,sy,nx,ny);
+                   ndiagL2[sy-3]=operatorL[SW];
+                   ndiagL1[sy-2]=operatorL[S];
+                   diagR[sy-1]=operatorL[C];
+                   ndiagR1[sy-1]=operatorL[N];
+                   ndiagR2[sy-1]=operatorL[NE];
+                   rhs[sy-1]=resid[sy*(nx+1)+sx];
+                }       
+                operatorL=stencil.getL(C,sx,ny-2,nx,ny);
+                ndiagL2[nx-5]=operatorL[SW];
+                ndiagL1[nx-4]=operatorL[S];
+                diagR[nx-3]=operatorL[C];
+                ndiagR1[nx-3]=operatorL[N];
+                rhs[ny-3]=resid[(ny-2)*(nx+1)+sx];
+                operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
+                jXB=stencil.getJx(N);
+                jYB=stencil.getJy(N);
+                ndiagL2[nx-4]=operatorLB[SW];
+                ndiagL1[nx-3]=operatorLB[S];
+                diagR[nx-2]=operatorLB[C];
+                rhs[ny-2]=resid[(ny-1)*(nx+1)+sx];
+                yLRSolver(
+                    temp,
+                    sx,nx,ny,
+                    rhs,
+                    ndiagL1,ndiagL2,
+                    diagR,ndiagR1,ndiagR2);
             }
-
-////////////////letzte Spalte//////////////////
-            
-            L_c = stencil.get_L_se(nx-1,1,nx,ny);
-            J_c_x = stencil.getJx(SE);
-            J_c_y = stencil.getJy(SE);
-
-            rhs[0] = resid[nx+1+nx-1];
-
-            L_b = stencil.get_L_e(nx-1,2,nx,ny);
-            J_b_x = stencil.getJx(E);
-            J_b_y = stencil.getJy(E);
-
-            ndiagL1[0] = L_b[S];
-            diagR[1] = L_b[C];
-            ndiagR1[1] = L_b[N];                    
-            ndiagR2[1] = L_b[NE];
-
-            rhs[1] = resid[2*(nx+1)+nx-1];
-
-            for(size_t j=3; j<ny-2; j++)  
-            {
-                L_b = stencil.get_L_e(nx-1,j,nx,ny);
-                
-                ndiagL2[j-3] = L_b[SE];
-                ndiagL1[j-2] = L_b[S];
-                diagR[j-1] = L_b[C];
-                ndiagR1[j-1] = L_b[N];                  
-                ndiagR2[j-1] = L_b[NE];
-                    
-                rhs[j-1] = resid[j*(nx+1)+nx-1];
-            }
-                
-            L_b = stencil.get_L_e(nx-1,ny-2,nx,ny);
-
-            ndiagL2[ny-5] = L_b[SE];
-            ndiagL1[ny-4] = L_b[S];
-            diagR[ny-3] = L_b[C];
-            ndiagR1[ny-3] = L_b[N];
-
-            rhs[ny-3] = resid[(ny-2)*(nx+1)+nx-1];
-                
-            L_c = stencil.get_L_ne(nx-1,ny-1,nx,ny);
-            J_c_x = stencil.getJx(NE);
-            J_c_y = stencil.getJy(NE);
-
-            ndiagL2[ny-4] = L_c[NE];
-            ndiagL1[ny-3] = L_c[S];
-            diagR[ny-2] = L_c[C];
-
-            rhs[ny-2] = resid[(ny-1)*(nx+1)+nx-1];
-
-            // LR-decomposition + transformation of the rhs
-            for(size_t k=1; k<ny-2; k++)  
-            {
-                ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];  
-                diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1]; 
-                    
-                ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];
-            }
-            ndiagL1[ny-2-1] = ndiagL1[ny-2-1]/diagR[ny-2-1];
-            diagR[ny-2] -= ndiagL1[ny-2-1] * ndiagR1[ny-2-1];
-            rhs[ny-2] = rhs[ny-2] - ndiagL1[ny-2-1] * rhs[ny-3];
-
-            // solve the linear system of equations R u = rhs
-            temp[nx-1+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];
-            for(size_t k=ny-2; k>1; k--)
-            {
-                temp[nx-1+k*(nx+1)] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR1[k-1] * temp[nx-1+(k+1)*(nx+1)] );
-                rhs[k-2] -= ndiagR2[k-2] * temp[(k+1)*(nx+1)+nx-1];
-            }
-            temp[nx+1+nx-1] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[2*(nx+1)+nx-1] );
-            
-            u += omega_ * temp;
-
-            resid = residuum(u,f,stencil,nx,ny);
-
-            temp = 0.0;
-
-            // durchlaufe alle inneren Spalten, Spaltenindex i              
-            for(size_t i=2; i < nx-1; i+=2)
-            {
-                // setze rechte Seite                   
-                    L_b = stencil.get_L_s(i,1,nx,ny);
-                    J_b_x = stencil.getJx(S);
-                    J_b_y = stencil.getJy(S);
-
-                    diagR[0] = L_b[C];
-                    ndiagR1[0] = L_b[N];
-                    ndiagR2[0] = L_b[NE];
-       
-                    rhs[0] = resid[nx+1+i];
-
-                    L = stencil.get_L_c(i,2,nx,ny);
-
-                    ndiagL1[0] = L[S];
-                    diagR[1] = L[C];
-                    ndiagR1[1] = L[N];                  
-                    ndiagR2[1] = L[NE];
-
-                    rhs[1] = resid[2*(nx+1)+i];  
-
-                    for(size_t j=3; j<ny-2; j++)
-                    {
-                       L = stencil.get_L_c(i,j,nx,ny);
-                       ndiagL2[j-3] = L[SW];
-                       ndiagL1[j-2] = L[S];
-                       diagR[j-1] = L[C];
-                       ndiagR1[j-1] = L[N];
-                       ndiagR2[j-1] = L[NE];
- 
-                       rhs[j-1] = resid[j*(nx+1)+i];
-                    }
-                                        
-                    L = stencil.get_L_c(i,ny-2,nx,ny);
-                    ndiagL2[nx-5] = L[SW];
-                    ndiagL1[nx-4] = L[S];
-                    diagR[nx-3] = L[C];
-                    ndiagR1[nx-3] = L[N];
-
-                    rhs[ny-3] = resid[(ny-2)*(nx+1)+i];
-
-                    L_b = stencil.get_L_n(i,ny-1,nx,ny);
-                    J_b_x = stencil.getJx(N);
-                    J_b_y = stencil.getJy(N);
-
-                    ndiagL2[nx-4] = L_b[SW];
-                    ndiagL1[nx-3] = L_b[S];
-                    diagR[nx-2] = L_b[C];
-
-                    rhs[ny-2] = resid[(ny-1)*(nx+1)+i];
-                    
-                    // LR-decomposition + transformation of the rhs
-                for(size_t k=1; k<ny-2; k++)  
-                {
-                    ndiagL1[k-1] = ndiagL1[k-1]/diagR[k-1];  
-                    diagR[k] -= ndiagL1[k-1] * ndiagR1[k-1];
-                    ndiagR1[k] -= ndiagL1[k-1] * ndiagR2[k-1];
-                    rhs[k] = rhs[k] - ndiagL1[k-1] * rhs[k-1]; 
-                    
-                    ndiagL2[k-1] = ndiagL2[k-1]/diagR[k-1];
-                    ndiagL1[k] -= ndiagL2[k-1] * ndiagR1[k-1];
-                    diagR[k+1] -= ndiagL2[k-1] * ndiagR2[k-1];
-                    rhs[k+1] = rhs[k+1] - ndiagL2[k-1] * rhs[k-1];
-                }
-                ndiagL1[ny-2-1] = ndiagL1[ny-2-1]/diagR[ny-2-1];
-                diagR[ny-2] -= ndiagL1[ny-2-1] * ndiagR1[ny-2-1];
-                rhs[ny-2] = rhs[ny-2] - ndiagL1[ny-2-1] * rhs[ny-3];
-
-                // solve the linear system of equations R u = rhs
-                temp[i+(nx+1)*(ny-1)] = rhs[ny-2] / diagR[ny-2];                    
-                for(size_t k=ny-2; k>1; k--)
-                {
-                    temp[i+k*(nx+1)] = 1/diagR[k-1] * ( rhs[k-1] - ndiagR1[k-1] * temp[i+(k+1)*(nx+1)] );
-                    rhs[k-2] -= ndiagR2[k-2] * temp[(k+1)*(nx+1)+i];                        
-                }
-                temp[nx+1+i] = 1/diagR[0] * ( rhs[0] - ndiagR1[0] * temp[2*(nx+1)+i] );
-            }
-
-            u += omega_ * temp;
+            u+=omega_*temp;
         }
     }
-    else //parameter zu klein
+    else //nx,ny too small
     {
         for(int k=0; k<2; k++)
         {
