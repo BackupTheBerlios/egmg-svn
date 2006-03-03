@@ -6,10 +6,9 @@
 #ifndef ZEBRALINE_H_
 #define ZEBRALINE_H_
 
-
 #include "LineRelaxation.h"
 #include "../Stencil/Stencil.h"
-
+#include "GSRedBlack.h"
 
 namespace mg
 {
@@ -20,6 +19,7 @@ class ZebraLine : public mg::LineRelaxation
 {
 private:
     const Precision omega_;
+    const GSRedBlack gsRedBlack_;
     void ninepointxzebra(
         NumericArray &u,
         const NumericArray &f, 
@@ -66,7 +66,7 @@ public:
         const Direction direction =ALTDIR,
         const Precision omega =1.0)
         : LineRelaxation(preSmoothingSteps,postSmoothingSteps,direction),
-          omega_(omega) {}
+          omega_(omega),gsRedBlack_() {}
     virtual ~ZebraLine() {}
     
 	/**

@@ -7,6 +7,7 @@
 #define LINEJAC_H_
 
 #include "LineRelaxation.h"
+#include "Jacobi.h"
 
 namespace mg
 {
@@ -17,6 +18,7 @@ class LineJAC : public mg::LineRelaxation
 {
 private:
     const Precision omega_;
+    const Jacobi jacobi_;
     void ninepointxline(
         NumericArray &u,
         const NumericArray &f, 
@@ -63,7 +65,7 @@ public:
         const Direction direction =ALTDIR,
         const Precision omega =1.0)
         : LineRelaxation(preSmoothingSteps,postSmoothingSteps,direction),
-          omega_(omega) {}
+          omega_(omega), jacobi_(preSmoothingSteps,postSmoothingSteps,omega) {}
 	virtual ~LineJAC() {}
     
     /**

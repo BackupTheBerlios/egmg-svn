@@ -2,6 +2,8 @@
  * \author Andre Oeckerath
  * \brief ZebraLineGS.cpp contains the implementation of the class ZebraLineGS.
  * \see ZebraLineGS.h
+ * \todo clean up ninepointxzebra, ninepointyzebra, xzebra and yzebra by
+ *       doing redudant things in seperate functions
  */
 #include<iostream>
 #include "ZebraLineGS.h"
@@ -82,10 +84,6 @@ void ZebraLineGS::relax(
         }
     }
 }
-/**
- * \todo clean up ninepointxzebra, ninepointyzebra, xzebra and yzebra by
- *       doing redudant things in seperate functions
- */
 void ZebraLineGS::ninepointxzebra(
     NumericArray &u,
     const NumericArray &f, 

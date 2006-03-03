@@ -2,6 +2,8 @@
  * \author Andre Oeckerath
  * \brief LineGS.cpp contains the implementation of the class LineGS.
  * \see LineGS.h
+ * \todo clean up ninepointxline, ninepointyline, xline and yline by
+ *       doing redudant things in seperate functions
  */
  
 #include<iostream>
