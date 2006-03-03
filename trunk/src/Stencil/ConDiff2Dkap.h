@@ -284,6 +284,9 @@ public:
             lCorner_[4]=-1.0*epsilon_*ny*ny+a2_*ny/2;
             lCorner_[5]=lCorner_[6]=0.0;
             return lCorner_;
+        default:
+            lCorner_=1.0;
+            return lCorner_;
         }
     }
 

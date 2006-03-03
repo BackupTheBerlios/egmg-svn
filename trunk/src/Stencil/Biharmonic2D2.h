@@ -326,6 +326,7 @@ public:
             +2.0*nx*nx*ny*ny*u[(sy+1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx+1]
             +2.0*nx*nx*ny*ny*u[(sy-1)*(nx+1)+sx-1];
+        default: return 1.0;
         }
     }
 
@@ -350,7 +351,9 @@ public:
         case SW:
         case NE:
         case SE:
-            return (7.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny);   
+            return (7.0*nx*nx*nx*nx+7.0*ny*ny*ny*ny+8.0*nx*nx*ny*ny);  
+        default:
+            return 1.0; 
         }
     }
 
@@ -471,6 +474,9 @@ public:
             lCorner_[5]=+1.0*ny*ny*ny*ny;
             lCorner_[7]=lCorner_[8]=+2.0*nx*nx*ny*ny;
             lCorner_[9]=lCorner_[10]=+2.0*nx*nx*ny*ny;
+            return lCorner_;
+        default:
+            lCorner_=1.0;
             return lCorner_;
         }
     }

@@ -23,7 +23,7 @@ class BicubicInterpolation : public Prolongation
 {
 private:
     const NumericArray i_;
-    NumericArray iBorder_;
+    mutable NumericArray iBorder_;
     const PositionArray jx_;
     const PositionArray jy_;
 
@@ -91,7 +91,7 @@ public:
         const size_t sy,
         const size_t nx,
         const size_t ny,
-        const Stencil&)
+        const Stencil&) const
     {
         if (sy==1)        // unterer Rand
         {

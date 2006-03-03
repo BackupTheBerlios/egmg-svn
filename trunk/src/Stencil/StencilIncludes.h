@@ -3,6 +3,7 @@
 
 #include "Biharmonic2D2.h"
 #include "ConDiff2D1.h"
+#include "ConDiff2Dkap.h"
 #include "ConvectionDiffusion2D1.h"
 #include "Helmholtz2D2.h"
 #include "Laplacian2D2.h"
