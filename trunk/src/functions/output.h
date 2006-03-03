@@ -1,6 +1,7 @@
 /** \file output.h
  * \author Matthias Rettenmeier
  * \brief contains the interface of the functions output and outputvalue
+ * \todo Change this
  */
 #ifndef OUTPUT_H_
 #define OUTPUT_H_

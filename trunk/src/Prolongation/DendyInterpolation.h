@@ -4,10 +4,10 @@
  * 
  * This file contains the interface of DendyInterpolation. The
  * implementation is in DendyInterpolation.cpp
+ * \todo This file needs cleanup
+ * \todo make this work with all type of stencils
  */
-
-//TODO: This file needs cleanup
-
+ 
 #ifndef DENDY_INTERPOLATION_H_
 #define DENDY_INTERPOLATION_H_
 
@@ -74,137 +74,7 @@ public:
         const size_t sy, 
         const size_t nx,
         const size_t ny,
-        const Stencil& stencil)
-    {
-        PositionArray jx=stencil.getJx(C);
-        PositionArray jy=stencil.getJy(C);
-        std::valarray<size_t> position(9);
-
-        for (size_t i=0; i<jx.size(); ++i)
-            position[(jx[i]+1)+3*(jy[i]+1)]=i;
-
-        Precision scale=0;
-        Precision weight1=0;
-        Precision weight2=0;
-        Precision erg=0;
-
-        // C
-        t_[0]=1.0;
-
-        // W
-        NumericArray stencilL=stencil.getL(C,sx-1,sy,nx,ny);
-        scale=-stencilL[0];
-        weight2=0;
-        if (position[S]!=0)
-            scale-=stencilL[position[S]];
-        if (position[N]!=0)
-            scale-=stencilL[position[N]];
-        if (position[E]!=0)
-            weight2+=stencilL[position[E]];
-        if (position[SE]!=0)
-            weight2+=stencilL[position[SE]];
-        if (position[NE]!=0)
-            weight2+=stencilL[position[NE]];
-        t_[1]=weight2/scale; 
-
-        // N
-        stencilL=stencil.getL(C,sx,sy+1,nx,ny);
-        scale=-stencilL[0];
-        weight1=0;
-        if (position[W]!=0)
-            scale-=stencilL[position[W]];
-        if (position[E]!=0)
-            scale-=stencilL[position[E]];
-        if (position[S]!=0)
-            weight1+=stencilL[position[S]];
-        if (position[SW]!=0)
-            weight1+=stencilL[position[SW]];
-        if (position[SE]!=0)
-            weight1+=stencilL[position[SE]];
-        t_[2]=weight1/scale;
-
-        // E
-        stencilL=stencil.getL(C,sx+1,sy,nx,ny);
-        scale=-stencilL[0];
-        weight1=0;
-        if (position[S]!=0)
-            scale-=stencilL[position[S]];
-        if (position[N]!=0)
-            scale-=stencilL[position[N]];
-        if (position[W]!=0)
-            weight1+=stencilL[position[W]];
-        if (position[SW]!=0)
-            weight1+=stencilL[position[SW]];
-        if (position[NW]!=0)
-            weight1+=stencilL[position[NW]];
-        t_[3]=weight1/scale;      
-
-        // S
-        stencilL=stencil.getL(C,sx,sy-1,nx,ny);
-        scale=-stencilL[0];
-        weight2=0;
-        if (position[W]!=0)
-            scale-=stencilL[position[W]];
-        if (position[E]!=0)
-            scale-=stencilL[position[E]];
-        if (position[N]!=0)
-            weight2+=stencilL[position[N]];
-        if (position[NW]!=0)
-            weight2+=stencilL[position[NW]];
-        if (position[NE]!=0)
-            weight2+=stencilL[position[NE]];
-        t_[4]=weight2/scale;
-
-        // NW
-        stencilL=stencil.getL(C,sx-1,sy+1,nx,ny);
-        scale=-stencilL[0];
-        erg=0;
-        if (position[E]!=0)
-            erg+=stencilL[position[E]]*t_[2];
-        if (position[S]!=0)
-            erg+=stencilL[position[S]]*t_[1];
-        if (position[SE]!=0)
-            erg+=stencilL[position[SE]];
-        t_[5]=erg/scale;
-
-        // NE
-        stencilL=stencil.getL(C,sx+1,sy+1,nx,ny);
-        scale=-stencilL[0];
-        erg=0;
-        if (position[W]!=0)
-            erg+=stencilL[position[W]]*t_[2];
-        if (position[S]!=0)
-            erg+=stencilL[position[S]]*t_[3];
-        if (position[SW]!=0)
-            erg+=stencilL[position[SW]];
-        t_[6]=erg/scale;
-
-        // SE
-        stencilL=stencil.getL(C,sx+1,sy-1,nx,ny);
-        scale=-stencilL[0];
-        erg=0;
-        if (position[W]!=0)
-            erg+=stencilL[position[W]]*t_[4];
-        if (position[N]!=0)
-            erg+=stencilL[position[N]]*t_[3];
-        if (position[NW]!=0)
-            erg+=stencilL[position[NW]];
-        t_[7]=erg/scale;
-
-        // SW
-        stencilL=stencil.getL(C,sx-1,sy-1,nx,ny);
-        scale=-stencilL[0];
-        erg=0;
-        if (position[E]!=0)
-            erg+=stencilL[position[E]]*t_[4];
-        if (position[N]!=0)
-            erg+=stencilL[position[N]]*t_[1];
-        if (position[NE]!=0)
-            erg+=stencilL[position[NE]];
-        t_[8]=erg/scale;      
-
-        return t_;          
-    }
+        const Stencil& stencil);
 
     const PositionArray& getJx() const
     {

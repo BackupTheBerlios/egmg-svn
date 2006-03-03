@@ -1,4 +1,4 @@
-Objects = error.o putbval.o putrhs.o residuum.o max_residuum.o twonorm_residuum.o output.o
+Objects = error.o putbval.o putrhs.o residuum.o max_residuum.o twonorm_residuum.o
 
 %.o: %.h %.cpp
 	$(CXX) $(CXXFLAGS) -c $*.cpp
