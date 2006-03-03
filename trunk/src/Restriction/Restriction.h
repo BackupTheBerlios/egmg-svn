@@ -5,7 +5,7 @@
 #ifndef RESTRICTION_H_
 #define RESTRICTION_H_
 
-
+#include "../general/TransferOperator.h"
 #include "../general/parameters.h"
 #include "../Prolongation/Prolongation.h"
 #include "../Stencil/Stencil.h"

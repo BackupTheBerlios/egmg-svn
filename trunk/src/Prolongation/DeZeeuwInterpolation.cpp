@@ -169,7 +169,7 @@ NumericArray DeZeeuwInterpolation::prolongate(
         }
     return result;
 }
-const NumericArray& DeZeeuwInterpolation::get_I(
+const NumericArray& DeZeeuwInterpolation::getI(
     const size_t sx,
     const size_t sy, 
     const size_t nx,

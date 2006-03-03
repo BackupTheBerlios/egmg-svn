@@ -17,6 +17,7 @@ namespace mg
  */
 class TransferOperator
 {
+public:
 	/**
 	 * \brief getI returns the stencil representation of the TransferOperator
 	 * 
@@ -56,7 +57,7 @@ class TransferOperator
 	 * 						dependend TransferOperators
 	 * \return				the coefficients of the TransferOperator
 	 */
-	virtual const NumericArray& get_I(
+	virtual const NumericArray& getI(
 		const size_t sx,
 		const size_t sy,
 		const size_t nx,

@@ -76,7 +76,7 @@ public:
         const size_t nx,
         const size_t ny) const;
 
-    const NumericArray& get(
+    const NumericArray& getI(
         const size_t,
         const size_t,
         const size_t,
