@@ -82,6 +82,7 @@ int main()
 		iterations++;
 	}
 	//print out the defects history
+    convergenceRates(residues);
 	std::cout<<"Fehler = "<<error(u,nx,ny,g)<<" It = "<<iterations<<std::endl;
 	return 0;
 }

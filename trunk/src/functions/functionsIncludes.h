@@ -11,5 +11,6 @@
 #include "residuum.h"
 #include "twonormResiduum.h"
 #include "zero.h"
+#include "output.h"
 
 #endif /*FUNCTIONSINCLUDES_H_*/

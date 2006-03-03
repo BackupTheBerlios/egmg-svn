@@ -14,6 +14,7 @@ namespace mg
 
 /**
  * \brief Relaxation is a 2D Relaxation operator
+ * \todo Implement ILU Smoother
  */
 class Relaxation
 {

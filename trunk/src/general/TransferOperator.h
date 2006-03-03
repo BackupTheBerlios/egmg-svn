@@ -14,6 +14,7 @@ namespace mg
 
 /**
  * \brief TransferOperator is the interface of a 2D transfer operator
+ * \todo Fix/Implement Matrix Dependent Transfer Operators
  */
 class TransferOperator
 {
