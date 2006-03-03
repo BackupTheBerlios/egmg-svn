@@ -93,9 +93,21 @@ Funktionen werden wie Variablen benannt.
 Die folgenden Namen sollten einheitlich verwendet werden.
 </para>
 <table>
+<title>Typen Namen</title>
+<tgroup cols="2">
+<thead><row><entry>Type</entry><entry>Verwendung</entry></row></thead>
+<tbody>
+<row><entry>Precision</entry><entry>Für reelle Zahlen</entry></row>
+<row><entry>Index</entry><entry>Für das zugreifen auf Elemente von Vektoren</entry></row>
+<row><entry>NumericArray</entry><entry>reeller Vektor</entry></row>
+<row><entry>PositionArray</entry><entry>Ganzzahliger Vektor</entry></row>
+</tbody>
+</tgroup>
+</table>
+<table>
 <title>Allgemeine Namen</title>
 <tgroup cols="3">
-<thead><row><entry>Name</entry><entry>Type</entry><entry>Meaning</entry></row></thead>
+<thead><row><entry>Name</entry><entry>Type</entry><entry>Bedeutung</entry></row></thead>
 <tbody>
 <row><entry>nx</entry><entry>size_t</entry><entry>Anzahl (number) der Gitterpunkte in X-Richtung</entry></row>
 <row><entry>ny</entry><entry>size_t</entry><entry>Anzahl (number) der Gitterpunkte in Y-Richtung</entry></row>
@@ -110,6 +122,7 @@ Die folgenden Namen sollten einheitlich verwendet werden.
 </tbody>
 </tgroup>
 </table>
+
 </sect2>
 </sect1>
 <sect1><title>Formatierung</title>

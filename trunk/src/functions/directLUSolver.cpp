@@ -13,6 +13,6 @@ void directLUSolver(
     const Index nx,
     const Index ny)
 {
-    
+    NumericArray matrixA(0.0,u.size()*u.size());
 }  
 }
