@@ -18,22 +18,22 @@ NumericArray BilinearInterpolation::prolongate(
     NumericArray result(0.0,(nxNew+1)*(nxNew+1));
 
     //"interpolation" of coarse grid points
-    for (size_t j=0; j<=ny; ++j)
-        for (size_t i=0; i<=nx; ++i)
-            result[2*j*(nxNew+1)+2*i]=u[j*(nx+1)+i];
+    for (size_t sy=0; sy<=ny; ++sy)
+        for (size_t sx=0; sx<=nx; ++sx)
+            result[2*sy*(nxNew+1)+2*sx]=u[sy*(nx+1)+sx];
 
     //interpolation of fine grid points on coarse grid lines
-    for (size_t j=0; j<=nyNew; j+=2)
-        for (size_t i=1; i<=nxNew; i+=2)
-            result[j*(nxNew+1)+i]=
-                1./2*(result[j*(nxNew+1)+i-1]
-                     +result[j*(nxNew+1)+i+1]);
+    for (size_t sy=0; sy<=nyNew; sy+=2)
+        for (size_t sx=1; sx<=nxNew; sx+=2)
+            result[sy*(nxNew+1)+sx]=
+                1./2*(result[sy*(nxNew+1)+sx-1]
+                     +result[sy*(nxNew+1)+sx+1]);
     //interpolation of fine grid points on fine grid lines
-    for (size_t j=1; j<=nyNew; j+=2)
-        for (size_t i=0; i<=nxNew; ++i)
-            result[j*(nxNew+1)+i]=
-                1./2*(result[(j-1)*(nxNew+1)+i]
-                     +result[(j+1)*(nxNew+1)+i]);
+    for (size_t sy=1; sy<=nyNew; sy+=2)
+        for (size_t sx=0; sx<=nxNew; ++sx)
+            result[sy*(nxNew+1)+sx]=
+                1./2*(result[(sy-1)*(nxNew+1)+sx]
+                     +result[(sy+1)*(nxNew+1)+sx]);
     return result;
 }
 

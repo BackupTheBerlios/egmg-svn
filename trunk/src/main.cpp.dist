@@ -1,8 +1,3 @@
-/** \file main.cpp
- * \author <a href="mailto:mail@jirikraus.de">Jiri Kraus</a>
- * \brief library test program
- * \todo Python bindings
- */
 #include<valarray>
 #include<vector>
 #include<cmath>
@@ -14,67 +9,6 @@
 #include "./functions/functionsIncludes.h"
 #include "./CycleTypeIncludes.h"
 #include "./general/parameters.h"
-
-
-/** \mainpage Multigrid
- * 
- * \section Introduction
- * The goal of this project is the development of an evaluation and educational multigrid
- * library. At the moment it is possilbe to solve a pde:
- * \f[
- * 	L_hu_h = f_h
- * \f]
- * on the domain \f$ [0,1]\times [0,1] \f$. Here \f$L_h\f$ is given with a stencil of with
- * the maximum size of 2, i.e. nothing lager than a compact 25 point stencil is supported.\n
- * To sove this problems this library provides multigrid components which work with standart
- * coarsening.
- * 
- * \section Download
- * The latest development version can be downloaded from:\n
- * <a href="../mg-files/multigrid.zip">multigrid.zip</a>\n
- * CAVEAT: To execute all make targes you need to create the subdirs:\n
- * doc, bin and profiles in the directory Multigrid.
- * 
- * \section Naming-Conventions
- * Here comes a list of comonly used an sometimes not self explaining variable names
- * <table border="0">
- * <tr>
- * <td>Name</td><td>Type</td><td>Meaning</td>
- * </tr><tr>
- * <td>Nx</td><td>size_t</td><td>Number of gridpoints in x direction</td>
- * </tr><tr>
- * <td>Ny</td><td>size_t</td><td>Number of gridpoints in y direction</td>
- * </tr><tr>
- * <td>hx</td><td>precision</td><td>Stepsize in x direction</td>
- * </tr><tr>
- * <td>hy</td><td>precision</td><td>Stepsize in y direction</td>
- * </tr><tr>
- * <td>i</td><td>size_t</td><td>Number of steps in x direction</td>
- * </tr><tr>
- * <td>j</td><td>size_t</td><td>Number of steps in y direction</td>
- * </tr><tr>
- * <td>x</td><td>precision</td><td>x coordinate x = i*hx</td>
- * </tr><tr>
- * <td>y</td><td>precision</td><td>y coordinate y = j*hy</td>
- * </tr><tr>
- * <td>eps</td><td>precision</td><td>wanted residu reduction</td>
- * </tr><tr>
- * <td>itmax</td><td>size_t</td><td>Max. number of iterations</td>
- * </tr><tr>
- * <td>nreld</td><td>int</td><td>number of presomothing steps</td>
- * </tr><tr>
- * <td>nrelu</td><td>int</td><td>number of postsomothing steps</td>
- * </tr><tr>
- * <td>resnew</td><td>precision</td><td>the current residuum</td>
- * </tr><tr>
- * <td>resold</td><td>precision</td><td>the last residuum</td>
- * </tr><tr>
- * <td>resnull</td><td>precision</td><td>the start residuum</td>
- * </tr><tr>
- * <td>fv</td><td>valarray\<precision\></td><td>right hand side</td>
- * </tr></table>
- */
-
 
 using namespace mg;
 

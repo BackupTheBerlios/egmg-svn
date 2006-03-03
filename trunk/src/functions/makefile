@@ -1,12 +1,12 @@
-Objects = error.o putbval.o putrhs.o residuum.o max_residuum.o twonorm_residuum.o
+Objects = error.o putbval.o putrhs.o residuum.o maxResiduum.o twonormResiduum.o
 
 %.o: %.h %.cpp
 	$(CXX) $(CXXFLAGS) -c $*.cpp
 	
 cycle.h: ../Prolongation/Prolongation.h ../Relaxation/Relaxation.h ../Restriction/Restriction.h
 
-cycle.h error.h f.h g.h zero.h putbval.h putrhs.h max_residuum.h residuum.h output.h twonorm_residuum.h: ../general/parameters.h
-cycle.h max_residuum.h residuum.h twonorm_residuum.h: ../Stencil/Stencil.h
+cycle.h error.h f.h g.h zero.h putbval.h putrhs.h maxResiduum.h residuum.h output.h twonormResiduum.h: ../general/parameters.h
+cycle.h maxResiduum.h residuum.h twonormResiduum.h: ../Stencil/Stencil.h
 
 all: $(Objects)
 

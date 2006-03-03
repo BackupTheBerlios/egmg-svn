@@ -19,7 +19,7 @@ namespace mg
      * \f[ d_h = f_h - L_h\cdot u_h \f]
      * 
      * \param[in] u         the acctual approximation of the solution
-     * \param[in] fv        the right hand side of the pde
+     * \param[in] f         the right hand side of the pde
      * \param[in] stencil   the stencil rep. of the pde
      * \param[in] nx        number of steps in x direction
      * \param[in] ny        number of steps in y direction
@@ -27,7 +27,7 @@ namespace mg
      */
     NumericArray residuum(
         const NumericArray& u,
-        const NumericArray& fv,
+        const NumericArray& f,
         const Stencil& stencil,
         const size_t nx,
         const size_t ny);

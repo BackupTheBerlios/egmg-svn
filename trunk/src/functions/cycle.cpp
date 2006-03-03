@@ -1,6 +1,6 @@
 /** \file cycle.cpp
- * \author <a href="mailto:mail@jirikraus.de">Jiri Kraus</a>, Matthias Rettenmeier
- * \brief Contains the implimentation of the function cycle.
+ * \author <a href="mailto:mail@jirikraus.de">Jiri Kraus</a>
+ * \brief Contains the implementation of the template function cycle.
  * \see cycle.h
  */
 

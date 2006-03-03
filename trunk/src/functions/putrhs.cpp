@@ -14,8 +14,8 @@ namespace mg
     {
         const Precision hx=1.0/nx;
         const Precision hy=1.0/ny;
-        for (size_t j=0; j<=ny; j++)
-            for (size_t i=0; i<=nx; i++)
-                fv[j*(nx+1)+i]=f(i*hx,j*hy);
+        for (size_t sy=0; sy<=ny; sy++)
+            for (size_t sx=0; sx<=nx; sx++)
+                fv[sy*(nx+1)+sx]=f(sx*hx,sy*hy);
     }
 }

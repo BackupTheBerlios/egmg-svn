@@ -5,11 +5,11 @@
 #include "error.h"
 #include "f.h"
 #include "g.h"
-#include "max_residuum.h"
+#include "maxResiduum.h"
 #include "putbval.h"
 #include "putrhs.h"
 #include "residuum.h"
-#include "twonorm_residuum.h"
+#include "twonormResiduum.h"
 #include "zero.h"
 
 #endif /*FUNCTIONSINCLUDES_H_*/

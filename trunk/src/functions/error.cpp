@@ -18,10 +18,10 @@ namespace mg
         Precision result=0.0;
         const Precision hx=1.0/nx;
         const Precision hy=1.0/ny;
-        for (size_t j=1; j<nx; j++)
-            for(size_t i=1; i<ny; i++)
+        for (size_t sx=1; sx<nx; sx++)
+            for(size_t sy=1; sy<ny; sy++)
             {
-                Precision temp=std::fabs(solution(i*hx,j*hy)-u[j*(nx+1)+i]);
+                Precision temp=std::fabs(solution(sy*hx,sx*hy)-u[sx*(nx+1)+sy]);
                 result=std::max(result,temp);
             }
             
