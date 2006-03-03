@@ -20,8 +20,8 @@ void cycle(
     const Prolongation& prolongation,
     const Restriction& restriction,
     Relaxation& relaxation,
-    const size_t nx,
-    const size_t ny)
+    const Index nx,
+    const Index ny)
 {
     if (cycleType.solve())
     {
@@ -48,8 +48,8 @@ void cycle(
             //the transfer operators
             stencil.pushProlongation(prolongation);
             stencil.pushRestriction(restriction);
-            const size_t nxNew = nx/2;
-            const size_t nyNew = ny/2;
+            const Index nxNew = nx/2;
+            const Index nyNew = ny/2;
             NumericArray coarsGridCor
                     (0.0,(nxNew+1)*(nyNew+1));
             //do a multigrid cycle on the coars grid

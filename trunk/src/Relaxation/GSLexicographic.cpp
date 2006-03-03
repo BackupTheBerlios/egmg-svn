@@ -13,14 +13,14 @@ void GSLexicographic::relax(
     NumericArray& u,
     const NumericArray& f,
     const Stencil& stencil,
-    const size_t nx,
-    const size_t ny) const
+    const Index nx,
+    const Index ny) const
 {
 	Precision factor = 1.0;
 	if (stencil.size() < 2)
 	{
-		for (size_t sy=1;sy<ny;sy++)
-			for (size_t sx=1;sx<nx;sx++)
+		for (Index sy=1;sy<ny;sy++)
+			for (Index sx=1;sx<nx;sx++)
 			{
 				factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny);
 				u[sy*(nx+1)+sx]+=factor*(f[sy*(nx+1)+sx]
@@ -32,7 +32,7 @@ void GSLexicographic::relax(
 		factor = 1.0/stencil.getCenter(SW,1,1,nx,ny);
 		u[1*(nx+1)+1]+=factor*(f[1*(nx+1)+1]
 				-stencil.apply(u,SW,1,1,nx,ny));
-		for (size_t sx=2;sx<(nx-1);sx++)
+		for (Index sx=2;sx<(nx-1);sx++)
 		{
 			factor = 1.0/stencil.getCenter(S,sx,1,nx,ny);
 			u[1*(nx+1)+sx]+=factor*(f[1*(nx+1)+sx]
@@ -42,12 +42,12 @@ void GSLexicographic::relax(
 		u[1*(nx+1)+(nx-1)]+=factor*(f[1*(nx+1)+(nx-1)]
 				-stencil.apply(u,SE,(nx-1),1,nx,ny));
 		//everything up to north west corner
-		for (size_t sy=2;sy<(ny-1);sy++)
+		for (Index sy=2;sy<(ny-1);sy++)
 		{
 			factor = 1.0/stencil.getCenter(W,1,sy,nx,ny);
 			u[sy*(nx+1)+1]+=factor*(f[sy*(nx+1)+1]
 				-stencil.apply(u,W,1,sy,nx,ny));
-			for (size_t sx=2;sx<(nx-1);sx++)
+			for (Index sx=2;sx<(nx-1);sx++)
 			{
 				factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny);
 				u[sy*(nx+1)+sx]+=factor*(f[sy*(nx+1)+sx]
@@ -60,7 +60,7 @@ void GSLexicographic::relax(
 		factor = 1.0/stencil.getCenter(NW,1,(nx-1),nx,ny);
 		u[(nx-1)*(nx+1)+1]+=factor*(f[(nx-1)*(nx+1)+1]
 				-stencil.apply(u,NW,1,(ny-1),nx,ny));
-		for (size_t sx=2;sx<(nx-1);sx++)
+		for (Index sx=2;sx<(nx-1);sx++)
 		{
 			factor = 1.0/stencil.getCenter(N,sx,(nx-1),nx,ny);
 			u[(nx-1)*(nx+1)+sx]+=factor*(f[(nx-1)*(nx+1)+sx]

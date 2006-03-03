@@ -52,8 +52,8 @@ public:
         NumericArray& u,
         const NumericArray& f,
         const Stencil& stencil,
-        const size_t nx,
-        const size_t ny) const;
+        const Index nx,
+        const Index ny) const;
 };
 
 }

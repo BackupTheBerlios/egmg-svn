@@ -26,7 +26,7 @@ void convergenceRates(std::vector<Precision>& vec)
     std::cout<<std::setw(10)<<"CFI"<<" | "
              <<std::setw(10)<<"CF5"<<" | "
              <<std::setw(10)<<"CF"<<std::endl;
-    for(size_t i=1; i<vec.size(); i++)
+    for(Index i=1; i<vec.size(); i++)
     {
         Precision tempRes1=vec.at(i);
         Precision tempRes2=vec.at(i-1);

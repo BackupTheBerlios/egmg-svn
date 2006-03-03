@@ -70,10 +70,10 @@ public:
     inline Precision apply(
         const NumericArray& u,
         const Position,
-        const size_t sx,
-        const size_t sy,
-        const size_t nx,
-        const size_t ny) const
+        const Index sx,
+        const Index sy,
+        const Index nx,
+        const Index ny) const
     {
         return 
              (2.0*ax_*nx*nx+2.0*ay_*ny*ny+c_)*u[sy*(nx+1)+sx]
@@ -85,20 +85,20 @@ public:
 
     inline Precision getCenter(
         const Position,
-        const size_t,
-        const size_t,
-        const size_t nx,
-        const size_t ny) const
+        const Index,
+        const Index,
+        const Index nx,
+        const Index ny) const
     {
         return 2.0*ax_*nx*nx+2.0*ay_*ny*ny+c_;
     }
 
     inline const NumericArray& getL(
         const Position,
-        const size_t,
-        const size_t,
-        const size_t nx,
-        const size_t ny) const
+        const Index,
+        const Index,
+        const Index nx,
+        const Index ny) const
     {
         l_[0]=2.0*ax_*nx*nx+2.0*ay_*ny*ny+c_;
         l_[1]=l_[3]=-1.0*ax_*nx*nx;
@@ -145,7 +145,7 @@ public:
      * 
      * \return  1
      */
-    inline size_t size() const
+    inline Index size() const
     {
         return 1;
     }

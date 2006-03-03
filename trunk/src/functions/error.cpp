@@ -11,15 +11,15 @@ namespace mg
 {
     Precision error(
         const NumericArray& u,
-        const size_t nx,
-        const size_t ny,
+        const Index nx,
+        const Index ny,
         const function2D solution)
     {
         Precision result=0.0;
         const Precision hx=1.0/nx;
         const Precision hy=1.0/ny;
-        for (size_t sx=1; sx<nx; sx++)
-            for(size_t sy=1; sy<ny; sy++)
+        for (Index sx=1; sx<nx; sx++)
+            for(Index sy=1; sy<ny; sy++)
             {
                 Precision temp=std::fabs(solution(sy*hx,sx*hy)-u[sx*(nx+1)+sy]);
                 result=std::max(result,temp);

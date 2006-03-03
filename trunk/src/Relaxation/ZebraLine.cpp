@@ -17,8 +17,8 @@ void ZebraLine::relax(
     NumericArray &u,
     const NumericArray &f, 
     const Stencil &stencil,
-    const size_t nx,
-    const size_t ny) const
+    const Index nx,
+    const Index ny) const
 {
 	// valarray needed for LR-decomposition of a tridiagonal matrix
 	NumericArray resid=residuum(u,f,stencil,nx,ny);
@@ -94,8 +94,8 @@ void ZebraLine::ninepointxzebra(
     const NumericArray &f, 
     NumericArray resid,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const
+    const Index nx, 
+    const Index ny) const
 { 
     NumericArray rhs(0.0,nx+1);
     NumericArray temp(0.0,(nx+1)*(ny+1));
@@ -112,9 +112,9 @@ void ZebraLine::ninepointxzebra(
         // for each line: correction of the rhs given by 
         // rhs = fv - [L[n]  0  L[s]]^t * u and elimination of the 
         // boundary condition in first and last inner point
-        for(size_t sy=1; sy<ny ; sy+=2) 
+        for(Index sy=1; sy<ny ; sy+=2) 
         {
-            for(size_t sx=0; sx<nx-1; sx++)  
+            for(Index sx=0; sx<nx-1; sx++)  
             {
                 rhs[sx]=resid[sy*(nx+1)+sx+1];
             }                       
@@ -129,9 +129,9 @@ void ZebraLine::ninepointxzebra(
         resid=residuum(u,f,stencil,nx,ny);
         temp=0.0;
         // same for even lines 
-        for(size_t sy=2; sy<ny ; sy+=2)
+        for(Index sy=2; sy<ny ; sy+=2)
         {
-            for(size_t sx=0; sx<nx-1; sx++)  
+            for(Index sx=0; sx<nx-1; sx++)  
             {
                 rhs[sx] = resid[sy*(nx+1)+sx+1];
             }   
@@ -155,7 +155,7 @@ void ZebraLine::ninepointxzebra(
             diagR[0]=operatorL[C];
             ndiagR[0]=operatorL[E];
             rhs[0]=resid[nx+1+1];
-            for(size_t sx=2; sx<nx-1; sx++)
+            for(Index sx=2; sx<nx-1; sx++)
             {
                 operatorL=stencil.getL(S,sx,1,nx,ny);
                 diagR[sx-1]=operatorL[C];
@@ -168,13 +168,13 @@ void ZebraLine::ninepointxzebra(
             ndiagL[nx-3]=operatorL[W];
             rhs[nx-2]=resid[nx+1+nx-1];
             xLRSolver(temp,1,nx,rhs,ndiagL,diagR,ndiagR);
-            for(size_t sy=3; sy<ny-1 ; sy+=2)
+            for(Index sy=3; sy<ny-1 ; sy+=2)
             {
                 operatorL=stencil.getL(W,1,sy,nx,ny);
                 diagR[0]=operatorL[C];
                 ndiagR[0]=operatorL[E];
                 rhs[0]=resid[sy*(nx+1)+1];
-                for(size_t sx=2; sx<nx-1; sx++)
+                for(Index sx=2; sx<nx-1; sx++)
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sx-1]=operatorL[C];
@@ -192,7 +192,7 @@ void ZebraLine::ninepointxzebra(
             diagR[0]=operatorL[C];
             ndiagR[0]=operatorL[E];
             rhs[0]=resid[(ny-1)*(nx+1)+1];
-            for(size_t sx=2; sx<nx-1; sx++)
+            for(Index sx=2; sx<nx-1; sx++)
             {
                 operatorL=stencil.getL(N,sx,ny-1,nx,ny);
                 diagR[sx-1]=operatorL[C];
@@ -209,14 +209,14 @@ void ZebraLine::ninepointxzebra(
             resid = residuum(u,f,stencil,nx,ny);
             temp = 0.0;
             //even lines
-            for(size_t sy=2; sy<ny ; sy+=2) 
+            for(Index sy=2; sy<ny ; sy+=2) 
             {                   
                 operatorL=stencil.getL(W,1,sy,nx,ny);
                 diagR[0]=operatorL[C];
                 ndiagR[0]=operatorL[E];
                 rhs[0]=resid[sy*(nx+1)+1];
                 // operatorL in the center Point (sx,sy)
-                for(size_t sx=2; sx<nx-1; sx++)  
+                for(Index sx=2; sx<nx-1; sx++)  
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sx-1]=operatorL[C];
@@ -243,8 +243,8 @@ void ZebraLine::ninepointyzebra(
     const NumericArray &f, 
     NumericArray resid,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const
+    const Index nx, 
+    const Index ny) const
 { 
     NumericArray rhs(0.0,ny+1);
     NumericArray temp(0.0,(nx+1)*(ny+1));
@@ -261,9 +261,9 @@ void ZebraLine::ninepointyzebra(
         // for each line: correction of the rhs given by
         // rhs = fv - [L[w]  0  L[e]] * u and elimination of the 
         // boundary condition in first and last inner point
-        for(size_t sx=1; sx<nx ; sx+=2) 
+        for(Index sx=1; sx<nx ; sx+=2) 
         {
-            for(size_t sy=0; sy<ny-1; sy++)  
+            for(Index sy=0; sy<ny-1; sy++)  
             {
                 rhs[sy] = resid[(sy+1)*(nx+1)+sx];
             }
@@ -278,9 +278,9 @@ void ZebraLine::ninepointyzebra(
         resid=residuum(u,f,stencil,nx,ny);
         temp=0.0;
         // same for each even line
-        for(size_t sx=2; sx<nx ; sx+=2) 
+        for(Index sx=2; sx<nx ; sx+=2) 
         {
-            for(size_t sy=0; sy<ny-1; sy++)  
+            for(Index sy=0; sy<ny-1; sy++)  
             {
                 rhs[sy]=resid[(sy+1)*(nx+1)+sx];
             }
@@ -306,7 +306,7 @@ void ZebraLine::ninepointyzebra(
             diagR[0]=operatorL[C];
             ndiagR[0]=operatorL[N];           
             rhs[0]=resid[nx+1+1];
-            for(size_t sy=2; sy<ny-1; sy++) 
+            for(Index sy=2; sy<ny-1; sy++) 
             {
                 operatorL=stencil.getL(W,1,sy,nx,ny);
                 diagR[sy-1]=operatorL[C];
@@ -319,13 +319,13 @@ void ZebraLine::ninepointyzebra(
             ndiagL[ny-3]=operatorL[S];
             rhs[ny-2]=resid[(ny-1)*(nx+1)+1];
             yLRSolver(temp,1,nx,ny,rhs,ndiagL,diagR,ndiagR);
-            for(size_t sx=3; sx<nx-1 ; sx+=2)
+            for(Index sx=3; sx<nx-1 ; sx+=2)
             {
                 operatorL=stencil.getL(S,sx,1,nx,ny);
                 diagR[0]=operatorL[C];
                 ndiagR[0]=operatorL[N];   
                 rhs[0]=resid[nx+1+sx];
-                for(size_t sy=2; sy<ny-1; sy++) 
+                for(Index sy=2; sy<ny-1; sy++) 
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sy-1]=operatorL[C];
@@ -343,7 +343,7 @@ void ZebraLine::ninepointyzebra(
             diagR[0]=operatorL[C];
             ndiagR[0]=operatorL[N];   
             rhs[0]=resid[nx+1+nx-1];
-            for(size_t sy=2; sy<ny-1; sy++) 
+            for(Index sy=2; sy<ny-1; sy++) 
             {
                 operatorL=stencil.getL(E,nx-1,sy,nx,ny);
                 diagR[sy-1]=operatorL[C];
@@ -359,13 +359,13 @@ void ZebraLine::ninepointyzebra(
             u+=omega_*temp;
             resid=residuum(u,f,stencil,nx,ny);
             temp=0.0;
-            for(size_t sx=2; sx<nx-1 ; sx+=2)
+            for(Index sx=2; sx<nx-1 ; sx+=2)
             {
                 operatorL=stencil.getL(S,sx,1,nx,ny);
                 diagR[0]=operatorL[C];
                 ndiagR[0]=operatorL[N];   
                 rhs[0]=resid[nx+1+sx];
-                for(size_t sy=2; sy<ny-1; sy++) 
+                for(Index sy=2; sy<ny-1; sy++) 
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sy-1]=operatorL[C];
@@ -392,8 +392,8 @@ void ZebraLine::xzebra(
     const NumericArray &f, 
     NumericArray resid,
     const Stencil &stencil, 
-    const size_t nx, 
-    const size_t ny) const
+    const Index nx, 
+    const Index ny) const
 {
     if((ny > 4) && (nx > 4))
     {   
@@ -426,7 +426,7 @@ void ZebraLine::xzebra(
             ndiagR1[1]=operatorLB[E];                    
             ndiagR2[1]=operatorLB[SE];
             rhs[1]=resid[nx+1+2];
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 ndiagL2[sx-3]=operatorLB[NW];
                 ndiagL1[sx-2]=operatorLB[W];
@@ -449,7 +449,7 @@ void ZebraLine::xzebra(
             rhs[nx-2]=resid[nx+1+nx-1];
             xLRSolver(temp,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
            // process odd inner lines
-            for(size_t sy=3; sy<ny-2; sy+=2)
+            for(Index sy=3; sy<ny-2; sy+=2)
             {
                 // set rhs
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
@@ -464,7 +464,7 @@ void ZebraLine::xzebra(
                 ndiagR1[1]=operatorL[E];                  
                 ndiagR2[1]=operatorL[SE];
                 rhs[1]=resid[sy*(nx+1)+2];
-                for(size_t sx=3; sx<nx-2; sx++)  
+                for(Index sx=3; sx<nx-2; sx++)  
                 {
                     ndiagL2[sx-3]=operatorL[NW];
                     ndiagL1[sx-2]=operatorL[W];
@@ -504,7 +504,7 @@ void ZebraLine::xzebra(
             ndiagR1[1]=operatorLB[E];                    
             ndiagR2[1]=operatorLB[NE];
             rhs[1]=resid[(ny-1)*(nx+1)+2];
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 ndiagL2[sx-3]=operatorLB[NW];
                 ndiagL1[sx-2]=operatorLB[W];
@@ -530,7 +530,7 @@ void ZebraLine::xzebra(
             resid=residuum(u,f,stencil,nx,ny);
             temp=0.0;
             // relax even inner lines
-            for(size_t sy=2; sy<ny-1; sy+=2)
+            for(Index sy=2; sy<ny-1; sy+=2)
             {
                 // set rhs
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
@@ -545,7 +545,7 @@ void ZebraLine::xzebra(
                 ndiagR1[1]=operatorL[E];                  
                 ndiagR2[1]=operatorL[SE];
                 rhs[1]=resid[sy*(nx+1)+2];
-                for(size_t sx=3; sx<nx-2; sx++)  
+                for(Index sx=3; sx<nx-2; sx++)  
                 {
                     ndiagL2[sx-3]=operatorL[NW];
                     ndiagL1[sx-2]=operatorL[W];
@@ -593,7 +593,7 @@ void ZebraLine::xzebra(
             ndiagR1[1]=operatorLB[E];                    
             ndiagR2[1]=operatorLB[SE];
             rhs[1]=resid[nx+1+2];
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
                 ndiagL2[sx-3]=operatorLB[NW];
@@ -618,7 +618,7 @@ void ZebraLine::xzebra(
             rhs[nx-2]=resid[nx+1+nx-1];
             xLRSolver(temp,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             // process odd inner lines
-            for(size_t sy=3; sy<ny-2; sy+=2)
+            for(Index sy=3; sy<ny-2; sy+=2)
             {
                 // setze rechte Seite                   
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
@@ -634,7 +634,7 @@ void ZebraLine::xzebra(
                 ndiagR1[1]=operatorL[E];                  
                 ndiagR2[1]=operatorL[SE];
                 rhs[1]=resid[sy*(nx+1)+2];
-                for(size_t sx=3; sx<nx-2; sx++)  
+                for(Index sx=3; sx<nx-2; sx++)  
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     ndiagL2[sx-3]=operatorL[NW];
@@ -676,7 +676,7 @@ void ZebraLine::xzebra(
             ndiagR1[1]=operatorLB[E];                    
             ndiagR2[1]=operatorLB[NE];
             rhs[1]=resid[(ny-1)*(nx+1)+2];
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
                 ndiagL2[sx-3]=operatorLB[NW];
@@ -704,7 +704,7 @@ void ZebraLine::xzebra(
             resid=residuum(u,f,stencil,nx,ny);
             temp=0.0;
             // relax even inner lines
-            for(size_t sy=2; sy<ny-1; sy+=2)
+            for(Index sy=2; sy<ny-1; sy+=2)
             {
                 // set rhs
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
@@ -720,7 +720,7 @@ void ZebraLine::xzebra(
                 ndiagR1[1]=operatorL[E];                  
                 ndiagR2[1]=operatorL[SE];
                 rhs[1]=resid[sy*(nx+1)+2];
-                for(size_t sx=3; sx<nx-2; sx++)  
+                for(Index sx=3; sx<nx-2; sx++)  
                 { 
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     ndiagL2[sx-3]=operatorL[NW];
@@ -761,8 +761,8 @@ void ZebraLine::yzebra(
     const NumericArray &f, 
     NumericArray resid,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const
+    const Index nx, 
+    const Index ny) const
 {
     if((ny > 4) && (nx > 4))
     {
@@ -797,7 +797,7 @@ void ZebraLine::yzebra(
             ndiagR1[1]=operatorLB[N];                    
             ndiagR2[1]=operatorLB[NW];
             rhs[1]=resid[2*(nx+1)+1];
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 ndiagL2[sy-3]=operatorLB[SE];
                 ndiagL1[sy-2]=operatorLB[S];
@@ -821,7 +821,7 @@ void ZebraLine::yzebra(
             yLRSolver(temp,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process inner columns
-            for(size_t sx=3; sx<nx-2; sx+=2)
+            for(Index sx=3; sx<nx-2; sx+=2)
             {
                 // set rhs
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
@@ -836,7 +836,7 @@ void ZebraLine::yzebra(
                 ndiagR1[1]=operatorL[N];                  
                 ndiagR2[1]=operatorL[NE];
                 rhs[1]=resid[2*(nx+1)+sx];                     
-                for(size_t sy=3; sy<ny-2; sy++)
+                for(Index sy=3; sy<ny-2; sy++)
                 {
                    ndiagL2[sy-3]=operatorL[SW];
                    ndiagL1[sy-2]=operatorL[S];
@@ -872,7 +872,7 @@ void ZebraLine::yzebra(
             ndiagR1[1]=operatorLB[N];                    
             ndiagR2[1]=operatorLB[NE];
             rhs[1]=resid[2*(nx+1)+nx-1];
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 ndiagL2[sy-3]=operatorLB[SE];
                 ndiagL1[sy-2]=operatorLB[S];
@@ -903,7 +903,7 @@ void ZebraLine::yzebra(
             resid=residuum(u,f,stencil,nx,ny);
             temp=0.0;
             // process inner columns
-            for(size_t sx=2; sx<nx-1; sx+=2)
+            for(Index sx=2; sx<nx-1; sx+=2)
             {
                 // setze rechte Seite                   
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
@@ -918,7 +918,7 @@ void ZebraLine::yzebra(
                 ndiagR1[1]=operatorL[N];                  
                 ndiagR2[1]=operatorL[NE];
                 rhs[1]=resid[2*(nx+1)+sx];                     
-                for(size_t sy=3; sy<ny-2; sy++)
+                for(Index sy=3; sy<ny-2; sy++)
                 {
                    ndiagL2[sy-3]=operatorL[SW];
                    ndiagL1[sy-2]=operatorL[S];
@@ -968,7 +968,7 @@ void ZebraLine::yzebra(
             ndiagR1[1]=operatorLB[N];                    
             ndiagR2[1]=operatorLB[NW];
             rhs[1]=resid[2*(nx+1)+1];
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
                 ndiagL2[sy-3]=operatorLB[SE];
@@ -994,7 +994,7 @@ void ZebraLine::yzebra(
             yLRSolver(temp,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process inner columns
-            for(size_t sx=3; sx<nx-2; sx+=2)
+            for(Index sx=3; sx<nx-2; sx+=2)
             {
                 // set rhs
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
@@ -1010,7 +1010,7 @@ void ZebraLine::yzebra(
                 ndiagR1[1]=operatorL[N];                  
                 ndiagR2[1]=operatorL[NE];
                 rhs[1]=resid[2*(nx+1)+sx];  
-                for(size_t sy=3; sy<ny-2; sy++)
+                for(Index sy=3; sy<ny-2; sy++)
                 {
                    operatorL=stencil.getL(C,sx,sy,nx,ny);
                    ndiagL2[sy-3]=operatorL[SW];
@@ -1053,7 +1053,7 @@ void ZebraLine::yzebra(
             ndiagR1[1]=operatorLB[N];                    
             ndiagR2[1]=operatorLB[NE];
             rhs[1]=resid[2*(nx+1)+nx-1];
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
                 ndiagL2[sy-3]=operatorLB[SE];
@@ -1086,7 +1086,7 @@ void ZebraLine::yzebra(
             resid=residuum(u,f,stencil,nx,ny);
             temp=0.0;
             // process inner columns
-            for(size_t sx=2; sx<nx-1; sx+=2)
+            for(Index sx=2; sx<nx-1; sx+=2)
             {
                 // set rhs
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
@@ -1102,7 +1102,7 @@ void ZebraLine::yzebra(
                 ndiagR1[1]=operatorL[N];                  
                 ndiagR2[1]=operatorL[NE];
                 rhs[1]=resid[2*(nx+1)+sx];  
-                for(size_t sy=3; sy<ny-2; sy++)
+                for(Index sy=3; sy<ny-2; sy++)
                 {
                    operatorL=stencil.getL(C,sx,sy,nx,ny);
                    ndiagL2[sy-3]=operatorL[SW];

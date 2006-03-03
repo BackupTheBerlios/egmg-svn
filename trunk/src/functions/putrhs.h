@@ -20,8 +20,8 @@ namespace mg
      */
     void putrhs(
         NumericArray& fv,
-        const size_t nx,
-        const size_t ny,
+        const Index nx,
+        const Index ny,
         const function2D f);
 }
 

@@ -20,10 +20,10 @@ namespace mg
 class WCycle //: interface mg::CycleType
 {
 private:
-    const size_t gamma_;
-    size_t repeats_;
-    const size_t maximalDepth_;
-    const size_t currentDepth_;
+    const Index gamma_;
+    Index repeats_;
+    const Index maximalDepth_;
+    const Index currentDepth_;
 public:
     /**
      * \brief The constructor of a WCycle object
@@ -32,7 +32,7 @@ public:
      * \param[in] maximalDepth  Number of Grid Levels
      * \param[in] gamma         Number of repeats on each grid level
      */
-    WCycle(const size_t maximalDepth,const size_t gamma)
+    WCycle(const Index maximalDepth,const Index gamma)
         : gamma_(gamma),
           repeats_(0),
           maximalDepth_(maximalDepth),
@@ -89,8 +89,8 @@ public:
         NumericArray&,
         const NumericArray&,
         const Stencil&,
-        const size_t,
-        const size_t)
+        const Index,
+        const Index)
     {}
 };
 

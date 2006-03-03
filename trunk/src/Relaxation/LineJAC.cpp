@@ -17,8 +17,8 @@ void LineJAC::relax(
     NumericArray &u,
     const NumericArray &f, 
     const Stencil &stencil,
-    const size_t nx,
-    const size_t ny) const
+    const Index nx,
+    const Index ny) const
 {
     // valarray needed for LR-decomposition of a tridiagonal matrix
     NumericArray resid=residuum(u,f,stencil,nx,ny);
@@ -94,8 +94,8 @@ void LineJAC::ninepointxline(
     const NumericArray &f, 
     NumericArray resid,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const
+    const Index nx, 
+    const Index ny) const
                    
 { 
     NumericArray rhs(0.0,nx-1);
@@ -110,9 +110,9 @@ void LineJAC::ninepointxline(
         const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
         const PositionArray jX=stencil.getJx(C);
         const PositionArray jY=stencil.getJy(C);
-        for(size_t sy=1; sy<ny ; sy++) 
+        for(Index sy=1; sy<ny ; sy++) 
         {
-            for(size_t sx=0; sx<nx-1; sx++)  
+            for(Index sx=0; sx<nx-1; sx++)  
             {
                 rhs[sx]=resid[sy*(nx+1)+sx+1];
             }                               
@@ -138,7 +138,7 @@ void LineJAC::ninepointxline(
             diagR[0]=operatorL[C];
             ndiagR[0]=operatorL[E];
             rhs[0]=resid[nx+1+1];
-            for(size_t sx=2; sx<nx-1; sx++)
+            for(Index sx=2; sx<nx-1; sx++)
             {
                 operatorL=stencil.getL(S,sx,1,nx,ny);
                 diagR[sx-1]=operatorL[C];
@@ -151,13 +151,13 @@ void LineJAC::ninepointxline(
             ndiagL[nx-3]=operatorL[W];
             rhs[nx-2]=resid[nx+1+nx-1];
             xLRSolver(temp,1,nx,rhs,ndiagL,diagR,ndiagR);
-            for(size_t sy=2; sy<ny-1 ; sy++)
+            for(Index sy=2; sy<ny-1 ; sy++)
             {
                 operatorL=stencil.getL(W,1,sy,nx,ny);
                 diagR[0]=operatorL[C];
                 ndiagR[0]=operatorL[E];
                 rhs[0]=resid[sy*(nx+1)+1];
-                for(size_t sx=2; sx<nx-1; sx++)
+                for(Index sx=2; sx<nx-1; sx++)
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sx-1]=operatorL[C];
@@ -175,7 +175,7 @@ void LineJAC::ninepointxline(
             diagR[0]=operatorL[C];
             ndiagR[0]=operatorL[E];
             rhs[0]=resid[(ny-1)*(nx+1)+1];
-            for(size_t sx=2; sx<nx-1; sx++)
+            for(Index sx=2; sx<nx-1; sx++)
             {
                 operatorL=stencil.getL(N,sx,ny-1,nx,ny);
                 diagR[sx-1]=operatorL[C];
@@ -201,8 +201,8 @@ void LineJAC::ninepointyline(
     const NumericArray &f, 
     NumericArray resid,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const             
+    const Index nx, 
+    const Index ny) const             
 { 
     NumericArray rhs(0.0,ny+1);
     NumericArray temp(0.0,(nx+1)*(ny+1));
@@ -219,9 +219,9 @@ void LineJAC::ninepointyline(
         // for each line: correction of the rhs given by 
         // rhs = fv - [L[w]  0  L[e]] * u and elimination of the 
         // boundary condition in first and last inner point
-        for(size_t sx=1; sx<nx ; sx++) 
+        for(Index sx=1; sx<nx ; sx++) 
         {
-            for(size_t sy=0; sy<ny-1; sy++)  
+            for(Index sy=0; sy<ny-1; sy++)  
             {
                 rhs[sy]=resid[(sy+1)*(nx+1)+sx];
             }
@@ -247,7 +247,7 @@ void LineJAC::ninepointyline(
             diagR[0]=operatorL[C];
             ndiagR[0]=operatorL[N];           
             rhs[0]=resid[nx+1+1];
-            for(size_t sy=2; sy<ny-1; sy++) 
+            for(Index sy=2; sy<ny-1; sy++) 
             {
                 operatorL=stencil.getL(W,1,sy,nx,ny);
                 diagR[sy-1]=operatorL[C];
@@ -260,13 +260,13 @@ void LineJAC::ninepointyline(
             ndiagL[ny-3]=operatorL[S]; 
             rhs[ny-2]=resid[(ny-1)*(nx+1)+1];
             yLRSolver(temp,1,nx,ny,rhs,ndiagL,diagR,ndiagR);
-            for(size_t sx=2; sx<nx-1 ; sx++)
+            for(Index sx=2; sx<nx-1 ; sx++)
             {
                 operatorL=stencil.getL(S,sx,1,nx,ny);
                 diagR[0]=operatorL[C];
                 ndiagR[0]=operatorL[N];   
                 rhs[0]=resid[nx+1+sx];
-                for(size_t sy=2; sy<ny-1; sy++) 
+                for(Index sy=2; sy<ny-1; sy++) 
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sy-1]=operatorL[C];
@@ -284,7 +284,7 @@ void LineJAC::ninepointyline(
             diagR[0]=operatorL[C];
             ndiagR[0]=operatorL[N];   
             rhs[0]=resid[nx+1+nx-1];
-            for(size_t sy=2; sy<ny-1; sy++) 
+            for(Index sy=2; sy<ny-1; sy++) 
             {
                 operatorL=stencil.getL(E,nx-1,sy,nx,ny);
                 diagR[sy-1]=operatorL[C];
@@ -310,8 +310,8 @@ void LineJAC::xline(
     const NumericArray &f, 
     NumericArray resid,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const
+    const Index nx, 
+    const Index ny) const
 
 {
     if((ny > 4) && (nx > 4))
@@ -345,7 +345,7 @@ void LineJAC::xline(
             ndiagR1[1]=operatorLB[E];                    
             ndiagR2[1]=operatorLB[SE];
             rhs[1]=resid[nx+1+2];
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 ndiagL2[sx-3]=operatorLB[NW];
                 ndiagL1[sx-2]=operatorLB[W];
@@ -370,7 +370,7 @@ void LineJAC::xline(
             xLRSolver(temp,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process all inner lines
-            for(size_t sy=2; sy<ny-1; sy++)
+            for(Index sy=2; sy<ny-1; sy++)
             {
                 // set rhs
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
@@ -385,7 +385,7 @@ void LineJAC::xline(
                 ndiagR1[1]=operatorL[E];                  
                 ndiagR2[1]=operatorL[SE];
                 rhs[1]=resid[sy*(nx+1)+2];
-                for(size_t sx=3; sx<nx-2; sx++)  
+                for(Index sx=3; sx<nx-2; sx++)  
                 {
                     ndiagL2[sx-3]=operatorL[NW];
                     ndiagL1[sx-2]=operatorL[W];
@@ -425,7 +425,7 @@ void LineJAC::xline(
             ndiagR1[1]=operatorLB[E];                    
             ndiagR2[1]=operatorLB[NE];
             rhs[1]=resid[(ny-1)*(nx+1)+2];
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 ndiagL2[sx-3]=operatorLB[NW];
                 ndiagL1[sx-2]=operatorLB[W];
@@ -469,7 +469,7 @@ void LineJAC::xline(
             ndiagR1[1]=operatorLB[E];                    
             ndiagR2[1]=operatorLB[SE];
             rhs[1]=resid[nx+1+2];
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 operatorLB=stencil.getL(S,sx,1,nx,ny);   
                 ndiagL2[sx-3]=operatorLB[NW];
@@ -495,7 +495,7 @@ void LineJAC::xline(
             xLRSolver(temp,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process all inner lines                
-            for(size_t sy=2; sy<ny-1; sy++)
+            for(Index sy=2; sy<ny-1; sy++)
             {
                 // set rhs
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
@@ -511,7 +511,7 @@ void LineJAC::xline(
                 ndiagR1[1]=operatorL[E];                  
                 ndiagR2[1]=operatorL[SE];
                 rhs[1]=resid[sy*(nx+1)+2];
-                for(size_t sx=3; sx<nx-2; sx++)  
+                for(Index sx=3; sx<nx-2; sx++)  
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     ndiagL2[sx-3]=operatorL[NW];
@@ -553,7 +553,7 @@ void LineJAC::xline(
             ndiagR1[1]=operatorLB[E];                    
             ndiagR2[1]=operatorLB[NE];
             rhs[1]=resid[(ny-1)*(nx+1)+2];
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
                 ndiagL2[sx-3]=operatorLB[NW];
@@ -593,8 +593,8 @@ void LineJAC::yline(
     const NumericArray &f, 
     NumericArray resid,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const
+    const Index nx, 
+    const Index ny) const
 {
     if((ny > 4) && (nx > 4))
     {
@@ -626,7 +626,7 @@ void LineJAC::yline(
             ndiagR1[1]=operatorLB[N];                    
             ndiagR2[1]=operatorLB[NW];
             rhs[1]=resid[2*(nx+1)+1];
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 ndiagL2[sy-3]=operatorLB[SE];
                 ndiagL1[sy-2]=operatorLB[S];
@@ -650,7 +650,7 @@ void LineJAC::yline(
             yLRSolver(temp,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process all inner lines             
-            for(size_t sx=2; sx<nx-1; sx++)
+            for(Index sx=2; sx<nx-1; sx++)
             {
                 // set rhs
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
@@ -665,7 +665,7 @@ void LineJAC::yline(
                 ndiagR1[1]=operatorL[N];                  
                 ndiagR2[1]=operatorL[NE];
                 rhs[1]=resid[2*(nx+1)+sx];                     
-                for(size_t sy=3; sy<ny-2; sy++)
+                for(Index sy=3; sy<ny-2; sy++)
                 {
                    ndiagL2[sy-3]=operatorL[SW];
                    ndiagL1[sy-2]=operatorL[S];
@@ -701,7 +701,7 @@ void LineJAC::yline(
             ndiagR1[1]=operatorLB[N];                    
             ndiagR2[1]=operatorLB[NE];
             rhs[1]=resid[2*(nx+1)+nx-1];
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 ndiagL2[sy-3]=operatorLB[SE];
                 ndiagL1[sy-2]=operatorLB[S];
@@ -750,7 +750,7 @@ void LineJAC::yline(
             ndiagR1[1]=operatorLB[N];                    
             ndiagR2[1]=operatorLB[NW];
             rhs[1]=resid[2*(nx+1)+1];
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
                 ndiagL2[sy-3]=operatorLB[SE];
@@ -776,7 +776,7 @@ void LineJAC::yline(
             yLRSolver(temp,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process all inner columns  
-            for(size_t sx=2; sx<nx-1; sx++)
+            for(Index sx=2; sx<nx-1; sx++)
             {
                 // set rhs
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
@@ -792,7 +792,7 @@ void LineJAC::yline(
                 ndiagR1[1]=operatorL[N];                  
                 ndiagR2[1]=operatorL[NE];
                 rhs[1]=resid[2*(nx+1)+sx];  
-                for(size_t sy=3; sy<ny-2; sy++)
+                for(Index sy=3; sy<ny-2; sy++)
                 {
                    operatorL=stencil.getL(C,sx,sy,nx,ny);
                    ndiagL2[sy-3]=operatorL[SW];
@@ -835,7 +835,7 @@ void LineJAC::yline(
             ndiagR1[1]=operatorLB[N];                    
             ndiagR2[1]=operatorLB[NE];
             rhs[1]=resid[2*(nx+1)+nx-1];
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
                 ndiagL2[sy-3]=operatorLB[SE];

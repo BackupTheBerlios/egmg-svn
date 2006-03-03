@@ -41,8 +41,8 @@ public:
         const NumericArray& u,
         const Stencil& stencil,
         const Prolongation& prolongation, 
-        const size_t nx,
-        const size_t ny) const =0;
+        const Index nx,
+        const Index ny) const =0;
 };
 
 }

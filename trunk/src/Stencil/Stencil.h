@@ -45,10 +45,10 @@ public:
     virtual Precision apply(
         const NumericArray& u,
         const Position pos,
-        const size_t sx,
-        const size_t sy,
-        const size_t nx,
-        const size_t ny) const =0;
+        const Index sx,
+        const Index sy,
+        const Index nx,
+        const Index ny) const =0;
         
     /**
      * \brief returns the coefficient of the center element at the given point
@@ -69,10 +69,10 @@ public:
      */
     virtual Precision getCenter(
         const Position pos,
-        const size_t sx,
-        const size_t sy,
-        const size_t nx,
-        const size_t ny) const =0;
+        const Index sx,
+        const Index sy,
+        const Index nx,
+        const Index ny) const =0;
         
     /**
      * \brief retruns the coefficents of the stencil at the given point
@@ -139,10 +139,10 @@ public:
      */
     virtual const NumericArray& getL(
         const Position pos,
-        const size_t sx,
-        const size_t sy,
-        const size_t nx,
-        const size_t ny) const =0;
+        const Index sx,
+        const Index sy,
+        const Index nx,
+        const Index ny) const =0;
     
     /**
      * \brief returns the coordinate vector in x dir. for the coefficient vector
@@ -208,7 +208,7 @@ public:
      * 
      * \return  the size of the stencil
      */
-    virtual size_t size() const =0;
+    virtual Index size() const =0;
     
     /**
      * \brief isConstant says if the stencil has constant coefficients

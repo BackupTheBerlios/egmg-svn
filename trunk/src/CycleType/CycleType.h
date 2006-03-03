@@ -26,7 +26,7 @@ public:
      * A CylcleType object needs a constructor with at least these parameters:
      * \param[in] maximalDepth  Number of Grid Levels
      */
-    CycleType(const size_t maximalDepth);
+    CycleType(const Index maximalDepth);
     
     /**
      * \brief The copy constructor of a CycleType object
@@ -72,8 +72,8 @@ public:
         NumericArray& u,
         const NumericArray& f,
         const Stencil& stencil,
-        const size_t nx,
-        const size_t ny);
+        const Index nx,
+        const Index ny);
 };
 
 }

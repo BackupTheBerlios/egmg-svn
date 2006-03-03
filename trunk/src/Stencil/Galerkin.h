@@ -18,9 +18,9 @@ private:
     class Quadruple
     {
     private:
-        const size_t i_, j_, k_, l_;
+        const Index i_, j_, k_, l_;
     public:
-        Quadruple(const size_t i,const size_t j,const size_t k,const size_t l)
+        Quadruple(const Index i,const Index j,const Index k,const Index l)
             :i_(i),j_(j),k_(k),l_(l) {}
 
         bool operator==(const Quadruple& rhs) const
@@ -57,7 +57,7 @@ private:
     std::vector<PositionArray > jx_;
     std::vector<PositionArray > jy_;
     const Stencil& stencil_;
-    size_t size_;
+    Index size_;
     std::vector<const Prolongation*> prolongations_;
     std::vector<const Restriction*> restrictions_;
     std::vector<PositionArray > initJx_(const Stencil&);
@@ -73,24 +73,24 @@ public:
     virtual Precision apply(
         const NumericArray&,
         const Position,
-        const size_t,
-        const size_t,
-        const size_t,
-        const size_t) const;
+        const Index,
+        const Index,
+        const Index,
+        const Index) const;
 
     virtual Precision getCenter(
         const Position,
-        const size_t,
-        const size_t,
-        const size_t,
-        const size_t) const;
+        const Index,
+        const Index,
+        const Index,
+        const Index) const;
 
     virtual const NumericArray& getL(
         const Position,
-        const size_t,
-        const size_t,
-        const size_t,
-        const size_t) const;
+        const Index,
+        const Index,
+        const Index,
+        const Index) const;
 
     inline const PositionArray& getJx(const Position p) const
     {
@@ -130,7 +130,7 @@ public:
         updateJxJy_();
     }
 
-    inline size_t size() const
+    inline Index size() const
     {
         return size_;
     }

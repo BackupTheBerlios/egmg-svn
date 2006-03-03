@@ -17,8 +17,8 @@ namespace mg
 class FCycle //: interface mg::CycleType
 {
 private:
-    const size_t maximumDepth_;
-    const size_t currentDepth_;
+    const Index maximumDepth_;
+    const Index currentDepth_;
     enum State_{INIT,FCYCLE,VCYCLE};
     State_ currentState_;
     State_ lastState_;
@@ -30,7 +30,7 @@ public:
      * FCycle constructs a FCycle object with:
      * \param[in] maximalDepth  Number of Grid Levels
      */
-    FCycle(size_t maximumDepth)
+    FCycle(Index maximumDepth)
         : maximumDepth_(maximumDepth),
           currentDepth_(0),
           currentState_(INIT),
@@ -86,8 +86,8 @@ public:
         NumericArray&,
         const NumericArray&,
         const Stencil&,
-        const size_t,
-        const size_t)
+        const Index,
+        const Index)
     {}
 };
 }

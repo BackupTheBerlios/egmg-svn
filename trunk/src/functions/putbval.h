@@ -21,8 +21,8 @@ namespace mg
      */
     void putbval(
         NumericArray& u,
-        const size_t nx,
-        const size_t ny,
+        const Index nx,
+        const Index ny,
         const function2D g);
 }
 

@@ -24,29 +24,29 @@ private:
         const NumericArray &f, 
         NumericArray &rhs,
         const Stencil &stencil,
-        const size_t nx, 
-        const size_t ny) const;
+        const Index nx, 
+        const Index ny) const;
     void ninepointyline(
         NumericArray &u,
         const NumericArray &f, 
         NumericArray &rhs,
         const Stencil &stencil,
-        const size_t nx, 
-        const size_t ny) const;
+        const Index nx, 
+        const Index ny) const;
     void xline(
         NumericArray &u,
         const NumericArray &f, 
         NumericArray &rhs,
         const Stencil &stencil,
-        const size_t nx, 
-        const size_t ny) const;
+        const Index nx, 
+        const Index ny) const;
     void yline(
         NumericArray &u,
         const NumericArray &f, 
         NumericArray &rhs,
         const Stencil &stencil,
-        const size_t nx, 
-        const size_t ny) const;
+        const Index nx, 
+        const Index ny) const;
 public:
     /**
      * \brief The constructor of a LineGS object
@@ -83,8 +83,8 @@ public:
         NumericArray &u,
         const NumericArray &f, 
         const Stencil &stencil,
-        const size_t nx,
-        const size_t ny) const;
+        const Index nx,
+        const Index ny) const;
 };
 
 }

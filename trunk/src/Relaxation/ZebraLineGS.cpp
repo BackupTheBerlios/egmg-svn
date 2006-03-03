@@ -14,8 +14,8 @@ void ZebraLineGS::relax(
     NumericArray &u,
     const NumericArray &f, 
     const Stencil &stencil,
-    const size_t nx,
-    const size_t ny) const
+    const Index nx,
+    const Index ny) const
 {
     // valarrays needed for LR-decomposition of a tridiagonal matrix
     NumericArray rhs(0.0,u.size());
@@ -89,8 +89,8 @@ void ZebraLineGS::ninepointxzebra(
     const NumericArray &f, 
     NumericArray &rhs,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const                      
+    const Index nx, 
+    const Index ny) const                      
 { 
     //valarrays needed for saving the tridiagonal matrix A of linear system
     //A u = rhs
@@ -108,23 +108,23 @@ void ZebraLineGS::ninepointxzebra(
         // rhs = fv - [L[n]  0  L[s]]^t * u and elimination of the 
         // boundary condition in first and last inner point
         // odd lines
-        for(size_t sy=1; sy<ny ; sy+=2) 
+        for(Index sy=1; sy<ny ; sy+=2) 
         {
             rhs[1+sy*(nx+1)] = f[1+sy*(nx+1)]
                     -operatorL[N]*u[1+(sy+jY[N])*(nx+1)]
                     -operatorL[S]*u[1+(sy+jY[S])*(nx+1)]
                     -operatorL[W]*u[sy*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[1+sy*(nx+1)]-=
                                 operatorL[i]*u[1+jX[i]+(sy+jY[i])*(nx+1)];
             }
-            for(size_t sx=2; sx<nx-1; sx++)  
+            for(Index sx=2; sx<nx-1; sx++)  
             {
                 rhs[sx+sy*(nx+1)] = f[sx+sy*(nx+1)] 
                     -operatorL[N]*u[sx+(sy+jY[N])*(nx+1)]
                     -operatorL[S]*u[sx+(sy+jY[S])*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+sy*(nx+1)]-=
                                 operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -134,7 +134,7 @@ void ZebraLineGS::ninepointxzebra(
                     -operatorL[N]*u[nx-1+(sy+jY[N])*(nx+1)] 
                     -operatorL[S]*u[nx-1+(sy+jY[S])*(nx+1)]
                     -operatorL[E]*u[nx+sy*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[nx-1+sy*(nx+1)]-=
                                 operatorL[i]*u[nx-1+jX[i]+(sy+jY[i])*(nx+1)];
@@ -148,22 +148,22 @@ void ZebraLineGS::ninepointxzebra(
             xLRSolver(u,sy,nx,rhs,ndiagL,diagR,ndiagR);
         }
         // same for even lines 
-        for(size_t sy=2; sy<ny ; sy+=2)
+        for(Index sy=2; sy<ny ; sy+=2)
         {
             rhs[1+sy*(nx+1)] = f[1+sy*(nx+1)]
                 -operatorL[N]*u[1+(sy+jY[N])*(nx+1)]
                 -operatorL[S]*u[1+(sy+jY[S])*(nx+1)] 
                 -operatorL[W]*u[sy*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[1+sy*(nx+1)]-=operatorL[i]*u[1+jX[i]+(sy+jY[i])*(nx+1)];
             }
-            for(size_t sx=2; sx<nx-1; sx++) 
+            for(Index sx=2; sx<nx-1; sx++) 
             {
                 rhs[sx+sy*(nx+1)] = f[sx+sy*(nx+1)]
                     -operatorL[N]*u[sx+(sy+jY[N])*(nx+1)]
                     -operatorL[S]*u[sx+(sy+jY[S])*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -173,7 +173,7 @@ void ZebraLineGS::ninepointxzebra(
                 -operatorL[N]*u[nx-1+(sy+jY[N])*(nx+1)]
                 -operatorL[S]*u[nx-1+(sy+jY[S])*(nx+1)] 
                 -operatorL[E]*u[nx+sy*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[nx-1+sy*(nx+1)]-=
                                    operatorL[i]*u[nx-1+jX[i]+(sy+jY[i])*(nx+1)];
@@ -200,11 +200,11 @@ void ZebraLineGS::ninepointxzebra(
                 -operatorL[N]*u[1+(1+jY[N])*(nx+1)]
                 -operatorL[S]*u[1+(1+jY[S])*(nx+1)] 
                 -operatorL[W]*u[nx+1];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[1+nx+1]-=operatorL[i]*u[1+jX[i]+(1+jY[i])*(nx+1)];
             }
-            for(size_t sx=2; sx<nx-1; sx++)
+            for(Index sx=2; sx<nx-1; sx++)
             {
                 operatorL=stencil.getL(S,sx,1,nx,ny);
                 diagR[sx-1]=operatorL[C];
@@ -213,7 +213,7 @@ void ZebraLineGS::ninepointxzebra(
                 rhs[sx+nx+1]=f[sx+nx+1]
                     -operatorL[N]*u[sx+(1+jY[N])*(nx+1)]
                     -operatorL[S]*u[sx+(1+jY[S])*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorL[i]*u[sx+jX[i]+(1+jY[i])*(nx+1)];
                 }
@@ -225,12 +225,12 @@ void ZebraLineGS::ninepointxzebra(
                 -operatorL[N]*u[nx-1+(1+jY[N])*(nx+1)]
                 -operatorL[S]*u[nx-1+(1+jY[S])*(nx+1)] 
                 -operatorL[E]*u[nx+(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[nx-1+(nx+1)]-=operatorL[i]*u[nx-1+jX[i]+(1+jY[i])*(nx+1)];
             }
             xLRSolver(u,1,nx,rhs,ndiagL,diagR,ndiagR);
-            for(size_t sy=3; sy<ny-1 ; sy+=2)
+            for(Index sy=3; sy<ny-1 ; sy+=2)
             {
                 operatorL=stencil.getL(W,1,sy,nx,ny);
                 diagR[0]=operatorL[C];
@@ -239,11 +239,11 @@ void ZebraLineGS::ninepointxzebra(
                     -operatorL[N]*u[1+(sy+jY[N])*(nx+1)]
                     -operatorL[S]*u[1+(sy+jY[S])*(nx+1)] 
                     -operatorL[W]*u[sy*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=operatorL[i]*u[1+jX[i]+(sy+jY[i])*(nx+1)];
                 }
-                for(size_t sx=2; sx<nx-1; sx++)
+                for(Index sx=2; sx<nx-1; sx++)
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sx-1]=operatorL[C];
@@ -252,7 +252,7 @@ void ZebraLineGS::ninepointxzebra(
                     rhs[sx+sy*(nx+1)]=f[sx+sy*(nx+1)]
                         -operatorL[N]*u[sx+(sy+jY[N])*(nx+1)]
                         -operatorL[S]*u[sx+(sy+jY[S])*(nx+1)];
-                    for(size_t i=5; i<operatorL.size(); i++)
+                    for(Index i=5; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -265,7 +265,7 @@ void ZebraLineGS::ninepointxzebra(
                     -operatorL[N]*u[nx-1+(sy+jY[N])*(nx+1)]
                     -operatorL[S]*u[nx-1+(sy+jY[S])*(nx+1)] 
                     -operatorL[E]*u[nx+sy*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                                    operatorL[i]*u[nx-1+jX[i]+(sy+jY[i])*(nx+1)];
@@ -279,12 +279,12 @@ void ZebraLineGS::ninepointxzebra(
                 -operatorL[N]*u[1+(ny-1+jY[N])*(nx+1)]
                 -operatorL[S]*u[1+(ny-1+jY[S])*(nx+1)] 
                 -operatorL[W]*u[(ny-1)*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[1+(ny-1)*(nx+1)]-=
                                     operatorL[i]*u[1+jX[i]+(ny-1+jY[i])*(nx+1)];
             }
-            for(size_t sx=2; sx<nx-1; sx++)
+            for(Index sx=2; sx<nx-1; sx++)
             {
                 operatorL=stencil.getL(N,sx,ny-1,nx,ny);
                 diagR[sx-1]=operatorL[C];
@@ -293,7 +293,7 @@ void ZebraLineGS::ninepointxzebra(
                 rhs[sx+(ny-1)*(nx+1)] = f[sx+(ny-1)*(nx+1)]
                     -operatorL[N]*u[sx+(ny-1+jY[N])*(nx+1)]
                     -operatorL[S]*u[sx+(ny-1+jY[S])*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                    operatorL[i]*u[sx+jX[i]+(ny-1+jY[i])*(nx+1)];
@@ -306,14 +306,14 @@ void ZebraLineGS::ninepointxzebra(
                 -operatorL[N]*u[nx-1+(ny-1+jY[N])*(nx+1)]
                 -operatorL[S]*u[nx-1+(ny-1+jY[S])*(nx+1)] 
                 -operatorL[E]*u[nx+(ny-1)*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[nx-1+(ny-1)*(nx+1)]-=
                                 operatorL[i]*u[nx-1+jX[i]+(ny-1+jY[i])*(nx+1)];
             }
             xLRSolver(u,(ny-1),nx,rhs,ndiagL,diagR,ndiagR);
             //even lines
-            for(size_t sy=2; sy<ny ; sy+=2) 
+            for(Index sy=2; sy<ny ; sy+=2) 
             {                   
                 operatorL=stencil.getL(W,1,sy,nx,ny);
                 diagR[0]=operatorL[C];
@@ -322,12 +322,12 @@ void ZebraLineGS::ninepointxzebra(
                     -operatorL[N]*u[1+(sy+jY[N])*(nx+1)]
                     -operatorL[S]*u[1+(sy+jY[S])*(nx+1)] 
                     -operatorL[W]*u[sy*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=operatorL[i]*u[1+jX[i]+(sy+jY[i])*(nx+1)];
                 }
                 // L im Zentrum im Punkt (j/i)
-                for(size_t sx=2; sx<nx-1; sx++)  
+                for(Index sx=2; sx<nx-1; sx++)  
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sx-1]=operatorL[C];
@@ -336,7 +336,7 @@ void ZebraLineGS::ninepointxzebra(
                     rhs[sx+sy*(nx+1)]=f[sx+sy*(nx+1)]
                         -operatorL[N]*u[sx+(sy+jY[N])*(nx+1)]
                         -operatorL[S]*u[sx+(sy+jY[S])*(nx+1)];
-                    for(size_t i=5; i<operatorL.size(); i++)
+                    for(Index i=5; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -349,7 +349,7 @@ void ZebraLineGS::ninepointxzebra(
                     -operatorL[N]*u[nx-1+(sy+jY[N])*(nx+1)]
                     -operatorL[S]*u[nx-1+(sy+jY[S])*(nx+1)] 
                     -operatorL[E]*u[nx+sy*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                                    operatorL[i]*u[nx-1+jX[i]+(sy+jY[i])*(nx+1)];
@@ -368,8 +368,8 @@ void ZebraLineGS::ninepointyzebra(
     const NumericArray &f, 
     NumericArray &rhs,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const
+    const Index nx, 
+    const Index ny) const
 { 
     //valarrays needed for saving the tridiagonal matrix A of linear system
     //A u = rhs
@@ -385,22 +385,22 @@ void ZebraLineGS::ninepointyzebra(
         // for each odd line correction of the rhs given by
         // rhs = fv + [1  0  1] * u and elimination of the 
         // boundary condition in first and last inner point  
-        for(size_t sx=1; sx<nx ; sx+=2)
+        for(Index sx=1; sx<nx ; sx+=2)
         {
             rhs[sx+(nx+1)]=f[sx+(nx+1)]
                 -operatorL[W]*u[sx+jX[W]+(nx+1)]
                 -operatorL[E]*u[sx+jX[E]+(nx+1)]
                 -operatorL[S]*u[sx+(1+jY[S])*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[sx+nx+1]-=operatorL[i]*u[sx+jX[i]+(1+jY[i])*(nx+1)];
             }
-            for(size_t sy=2; sy<ny-1; sy++)
+            for(Index sy=2; sy<ny-1; sy++)
             {
                 rhs[sx+sy*(nx+1)]=f[sx+sy*(nx+1)]
                     -operatorL[W]*u[sx+jX[W]+sy*(nx+1)]
                     -operatorL[E]*u[sx+jX[E]+sy*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -410,7 +410,7 @@ void ZebraLineGS::ninepointyzebra(
                 -operatorL[W]*u[sx+jX[W]+(ny-1)*(nx+1)]
                 -operatorL[E]*u[sx+jX[E]+(ny-1)*(nx+1)] 
                 -operatorL[N]*u[sx+(ny-1+jY[N])*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[sx+(ny-1)*(nx+1)]-=
                                    operatorL[i]*u[sx+jX[i]+(ny-1+jY[i])*(nx+1)];
@@ -423,22 +423,22 @@ void ZebraLineGS::ninepointyzebra(
             yLRSolver(u,sx,nx,ny,rhs,ndiagL,diagR,ndiagR);
         }
         // same for each even line
-        for(size_t sx=2; sx<nx ; sx+=2) 
+        for(Index sx=2; sx<nx ; sx+=2) 
         {
             rhs[sx+(nx+1)]=f[sx+(nx+1)]
                 -operatorL[W]*u[sx+jX[W]+(nx+1)]
                 -operatorL[E]*u[sx+jX[E]+(nx+1)] 
                 -operatorL[S]*u[sx+(1+jY[S])*(nx+1)]; 
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[sx+nx+1]-=operatorL[i]*u[sx+jX[i]+(1+jY[i])*(nx+1)];
             }
-            for(size_t sy=2; sy<ny-1; sy++) 
+            for(Index sy=2; sy<ny-1; sy++) 
             {
                 rhs[sx+sy*(nx+1)]=f[sx+sy*(nx+1)]
                     -operatorL[W]*u[sx+jX[W]+sy*(nx+1)]
                     -operatorL[E]*u[sx+jX[E]+sy*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -448,7 +448,7 @@ void ZebraLineGS::ninepointyzebra(
                 -operatorL[W]*u[sx+jX[W]+(ny-1)*(nx+1)] 
                 -operatorL[E]*u[sx+jX[E]+(ny-1)*(nx+1)]
                 -operatorL[N]*u[sx+(ny-1+jY[N])*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[sx+(ny-1)*(nx+1)]-=
                                    operatorL[i]*u[sx+jX[i]+(ny-1+jY[i])*(nx+1)];
@@ -475,11 +475,11 @@ void ZebraLineGS::ninepointyzebra(
                 -operatorL[W]*u[1+jX[W]+(nx+1)]
                 -operatorL[E]*u[1+jX[E]+(nx+1)] 
                 -operatorL[S]*u[1+(1+jY[S])*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                     rhs[1+nx+1]-=operatorL[i]*u[1+jX[i]+(1+jY[i])*(nx+1)];
             }
-            for(size_t sy=2; sy<ny-1; sy++) 
+            for(Index sy=2; sy<ny-1; sy++) 
             {
                 operatorL = stencil.getL(W,1,sy,nx,ny);
                 diagR[sy-1]=operatorL[C];
@@ -488,7 +488,7 @@ void ZebraLineGS::ninepointyzebra(
                 rhs[1+sy*(nx+1)]=f[1+sy*(nx+1)]
                     -operatorL[W]*u[1+jX[W]+sy*(nx+1)]
                     -operatorL[E]*u[1+jX[E]+sy*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=operatorL[i]*u[1+jX[i]+(sy+jY[i])*(nx+1)];
                 }        
@@ -500,13 +500,13 @@ void ZebraLineGS::ninepointyzebra(
                 -operatorL[W]*u[1+jX[W]+(ny-1)*(nx+1)] 
                 -operatorL[E]*u[1+jX[E]+(ny-1)*(nx+1)]
                 -operatorL[N]*u[1+(ny-1+jY[N])*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[1+(ny-1)*(nx+1)]-=
                                     operatorL[i]*u[1+jX[i]+(ny-1+jY[i])*(nx+1)];
             }
             yLRSolver(u,1,nx,ny,rhs,ndiagL,diagR,ndiagR);
-            for(size_t sx=3; sx<nx-1 ; sx+=2)
+            for(Index sx=3; sx<nx-1 ; sx+=2)
             {
                 operatorL=stencil.getL(S,sx,1,nx,ny);
                 diagR[0]=operatorL[C];
@@ -515,11 +515,11 @@ void ZebraLineGS::ninepointyzebra(
                     -operatorL[W]*u[sx+jX[W]+(nx+1)]
                     -operatorL[E]*u[sx+jX[E]+(nx+1)] 
                     -operatorL[S]*u[sx+(1+jY[S])*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorL[i]*u[sx+jX[i]+(1+jY[i])*(nx+1)];
                 }
-                for(size_t sy=2; sy<ny-1; sy++) 
+                for(Index sy=2; sy<ny-1; sy++) 
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sy-1]=operatorL[C];
@@ -528,7 +528,7 @@ void ZebraLineGS::ninepointyzebra(
                     rhs[sx+sy*(nx+1)]=f[sx+sy*(nx+1)]
                         -operatorL[W]*u[sx+jX[W]+sy*(nx+1)]
                         -operatorL[E]*u[sx+jX[E]+sy*(nx+1)];
-                    for(size_t i=5; i<operatorL.size(); i++)
+                    for(Index i=5; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -541,7 +541,7 @@ void ZebraLineGS::ninepointyzebra(
                     -operatorL[W]*u[sx+jX[W]+(ny-1)*(nx+1)] 
                     -operatorL[E]*u[sx+jX[E]+(ny-1)*(nx+1)]
                     -operatorL[N]*u[sx+(ny-1+jY[N])*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                    operatorL[i]*u[sx+jX[i]+(ny-1+jY[i])*(nx+1)];
@@ -555,11 +555,11 @@ void ZebraLineGS::ninepointyzebra(
                 -operatorL[W]*u[nx-1+jX[W]+(nx+1)]
                 -operatorL[E]*u[nx-1+jX[E]+(nx+1)] 
                 -operatorL[S]*u[nx-1+(1+jY[S])*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[nx-1+nx+1]-=operatorL[i]*u[nx-1+jX[i]+(1+jY[i])*(nx+1)];
             }
-            for(size_t sy=2; sy<ny-1; sy++) 
+            for(Index sy=2; sy<ny-1; sy++) 
             {
                 operatorL=stencil.getL(E,nx-1,sy,nx,ny);
                 diagR[sy-1]=operatorL[C];
@@ -568,7 +568,7 @@ void ZebraLineGS::ninepointyzebra(
                 rhs[nx-1+sy*(nx+1)]=f[nx-1+sy*(nx+1)]
                     -operatorL[W]*u[nx-1+jX[W]+sy*(nx+1)]
                     -operatorL[E]*u[nx-1+jX[E]+sy*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                                    operatorL[i]*u[nx-1+jX[i]+(sy+jY[i])*(nx+1)];
@@ -581,13 +581,13 @@ void ZebraLineGS::ninepointyzebra(
                 -operatorL[W]*u[nx-1+jX[W]+(ny-1)*(nx+1)] 
                 -operatorL[E]*u[nx-1+jX[E]+(ny-1)*(nx+1)]
                 -operatorL[N]*u[nx-1+(ny-1+jY[N])*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[nx-1+(ny-1)*(nx+1)]-=
                                 operatorL[i]*u[nx-1+jX[i]+(ny-1+jY[i])*(nx+1)];
             }
             yLRSolver(u,nx-1,nx,ny,rhs,ndiagL,diagR,ndiagR);
-            for(size_t sx=2; sx<nx ; sx+=2)
+            for(Index sx=2; sx<nx ; sx+=2)
             {
                 operatorL=stencil.getL(S,sx,1,nx,ny);
                 diagR[0]=operatorL[C];
@@ -596,11 +596,11 @@ void ZebraLineGS::ninepointyzebra(
                     -operatorL[W]*u[sx+jX[W]+(nx+1)]
                     -operatorL[E]*u[sx+jX[E]+(nx+1)] 
                     -operatorL[S]*u[sx+(1+jY[S])*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorL[i]*u[sx+jX[i]+(1+jY[i])*(nx+1)];
                 }
-                for(size_t sy=2; sy<ny-1; sy++) 
+                for(Index sy=2; sy<ny-1; sy++) 
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sy-1]=operatorL[C];
@@ -609,7 +609,7 @@ void ZebraLineGS::ninepointyzebra(
                     rhs[sx+sy*(nx+1)]=f[sx+sy*(nx+1)]
                         -operatorL[W]*u[sx+jX[W]+sy*(nx+1)]
                         -operatorL[E]*u[sx+jX[E]+sy*(nx+1)]; 
-                    for(size_t i=5; i<operatorL.size(); i++)
+                    for(Index i=5; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -622,7 +622,7 @@ void ZebraLineGS::ninepointyzebra(
                     -operatorL[W]*u[sx+jX[W]+(ny-1)*(nx+1)] 
                     -operatorL[E]*u[sx+jX[E]+(ny-1)*(nx+1)]
                     -operatorL[N]*u[sx+(ny-1+jY[N])*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                    operatorL[i]*u[sx+jX[i]+(ny-1+jY[i])*(nx+1)];
@@ -641,8 +641,8 @@ void ZebraLineGS::xzebra(
     const NumericArray &f, 
     NumericArray &rhs,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const
+    const Index nx, 
+    const Index ny) const
 {
     if((ny > 4) && (nx > 4))
     {   
@@ -672,7 +672,7 @@ void ZebraLineGS::xzebra(
                 -operatorLC[S]*u[1+(1+jYC[S])*(nx+1)]
                 -operatorLC[W]*u[nx+1]
                 -operatorLC[NW]*u[1+(1+jYC[NW])*(nx+1)];  
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+nx+1]-=operatorLC[i]*u[1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
@@ -685,11 +685,11 @@ void ZebraLineGS::xzebra(
                 -operatorLB[S]*u[2+(1+jYB[S])*(nx+1)]
                 -operatorLB[NE]*u[2+(1+jYB[NE])*(nx+1)]
                 -operatorLB[NW]*u[2+jXB[NW]+nx+1];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[2+nx+1]-=operatorLB[i]*u[2+jXB[i]+(1+jYB[i])*(nx+1)];
             }
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 ndiagL2[sx-3]=operatorLB[NW];
                 ndiagL1[sx-2]=operatorLB[W];
@@ -700,7 +700,7 @@ void ZebraLineGS::xzebra(
                     -operatorLB[N]*u[sx+(1+jYB[N])*(nx+1)]
                     -operatorLB[S]*u[sx+(1+jYB[S])*(nx+1)]
                     -operatorLB[NE]*u[sx+(1+jYB[NE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorLB[i]*u[sx+jXB[i]+(1+jYB[i])*(nx+1)];
                 }
@@ -714,7 +714,7 @@ void ZebraLineGS::xzebra(
                 -operatorLB[S]*u[nx-2+(1+jYB[S])*(nx+1)]
                 -operatorLB[NE]*u[nx-2+(1+jYB[NE])*(nx+1)]
                 -operatorLB[SE]*u[nx-2+jXB[SE]+nx+1];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-2+nx+1]-=operatorLB[i]*u[nx-2+jXB[i]+(1+jYB[i])*(nx+1)];
             }
@@ -729,13 +729,13 @@ void ZebraLineGS::xzebra(
                 -operatorLC[S]*u[nx-1+(1+jYC[S])*(nx+1)]
                 -operatorLC[E]*u[nx+nx+1]
                 -operatorLC[NE]*u[nx-1+(1+jYC[NE])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+(nx+1)]-=
                                 operatorLC[i]*u[nx-1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
             xLRSolver(u,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
-            for(size_t sy=3; sy<ny-2; sy+=2)
+            for(Index sy=3; sy<ny-2; sy+=2)
             {                   
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
                 jXB=stencil.getJx(W);
@@ -749,7 +749,7 @@ void ZebraLineGS::xzebra(
                     -operatorLB[W]*u[sy*(nx+1)]
                     -operatorLB[NW]*u[1+(sy+jYB[NW])*(nx+1)]
                     -operatorLB[SE]*u[1+(sy+jYB[SE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=
                                    operatorLB[i]*u[1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -764,11 +764,11 @@ void ZebraLineGS::xzebra(
                     -operatorL[NE]*u[2+(sy+jY[NE])*(nx+1)]
                     -operatorL[SW]*u[2+(sy+jY[SW])*(nx+1)]
                     -operatorL[NW]*u[2+jX[NW]+sy*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[2+sy*(nx+1)]-=operatorL[i]*u[2+jX[i]+(sy+jY[i])*(nx+1)];
                 }
-                for(size_t sx=3; sx<nx-2; sx++)  
+                for(Index sx=3; sx<nx-2; sx++)  
                 {
                     ndiagL2[sx-3]=operatorL[NW];
                     ndiagL1[sx-2]=operatorL[W];
@@ -780,7 +780,7 @@ void ZebraLineGS::xzebra(
                         -operatorL[S]*u[sx+(sy+jY[S])*(nx+1)]
                         -operatorL[NE]*u[sx+(sy+jY[NE])*(nx+1)]
                         -operatorL[SW]*u[sx+(sy+jY[SW])*(nx+1)];
-                    for(size_t i=9; i<operatorL.size(); i++)
+                    for(Index i=9; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -796,7 +796,7 @@ void ZebraLineGS::xzebra(
                     -operatorL[NE]*u[nx-2+(sy+jY[NE])*(nx+1)]
                     -operatorL[SW]*u[nx-2+(sy+jY[SW])*(nx+1)]
                     -operatorL[SE]*u[nx-2+jX[SE]+sy*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[nx-2+sy*(nx+1)]-=
                                    operatorL[i]*u[nx-2+jX[i]+(sy+jY[i])*(nx+1)];
@@ -813,7 +813,7 @@ void ZebraLineGS::xzebra(
                     -operatorLB[E]*u[nx+sy*(nx+1)]
                     -operatorLB[NE]*u[nx-1+(sy+jYB[NE])*(nx+1)]
                     -operatorLB[SE]*u[nx-1+(sy+jYB[SE])*(nx+1)];
-                for(size_t i=9; i<operatorLB.size(); i++)
+                for(Index i=9; i<operatorLB.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                                 operatorLB[i]*u[nx-1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -833,7 +833,7 @@ void ZebraLineGS::xzebra(
                 -operatorLC[S]*u[1+(ny-1+jYC[S])*(nx+1)]
                 -operatorLC[W]*u[(ny-1)*(nx+1)]
                 -operatorLC[NE]*u[1+(ny-1+jYC[NE])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+(ny-1)*(nx+1)]-=
                                 operatorLC[i]*u[1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
@@ -850,12 +850,12 @@ void ZebraLineGS::xzebra(
                 -operatorLB[S]*u[2+(ny-1+jYB[S])*(nx+1)]
                 -operatorLB[SE]*u[2+(ny-1+jYB[SE])*(nx+1)]
                 -operatorLB[NW]*u[2+jXB[NW]+(ny-1)*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[2+(ny-1)*(nx+1)]-=
                                 operatorLB[i]*u[2+jXB[i]+(ny-1+jYB[i])*(nx+1)];
             }
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 ndiagL2[sx-3]=operatorLB[NW];
                 ndiagL1[sx-2]=operatorLB[W];
@@ -866,7 +866,7 @@ void ZebraLineGS::xzebra(
                     -operatorLB[N]*u[sx+(ny-1+jYB[N])*(nx+1)]
                     -operatorLB[S]*u[sx+(ny-1+jYB[S])*(nx+1)]
                     -operatorLB[SE]*u[sx+(ny-1+jYB[SE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                 operatorLB[i]*u[sx+jXB[i]+(ny-1+jYB[i])*(nx+1)];
@@ -881,7 +881,7 @@ void ZebraLineGS::xzebra(
                 -operatorLB[S]*u[nx-2+(ny-1+jYB[S])*(nx+1)]
                 -operatorLB[SE]*u[nx-2+(ny-1+jYB[SE])*(nx+1)]
                 -operatorLB[NE]*u[nx-2+jXB[NE]+(ny-1)*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-2+(ny-1)*(nx+1)]-=
                             operatorLB[i]*u[nx-2+jXB[i]+(ny-1+jYB[i])*(nx+1)];
@@ -897,14 +897,14 @@ void ZebraLineGS::xzebra(
                 -operatorLC[S]*u[nx-1+(ny-1+jYC[S])*(nx+1)]
                 -operatorLC[E]*u[nx+(ny-1)*(nx+1)]
                 -operatorLC[NE]*u[nx-1+(ny-1+jYC[NE])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+(ny-1)*(nx+1)]-=
                             operatorLC[i]*u[nx-1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
             }
             xLRSolver(u,ny-1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             // relax even inner lines
-            for(size_t sy=2; sy < ny-1; sy+=2)
+            for(Index sy=2; sy < ny-1; sy+=2)
             {
                 // set rhs           
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
@@ -919,7 +919,7 @@ void ZebraLineGS::xzebra(
                     -operatorLB[W]*u[sy*(nx+1)]
                     -operatorLB[NW]*u[1+(sy+jYB[NW])*(nx+1)]
                     -operatorLB[SE]*u[1+(sy+jYB[SE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=
                                 operatorLB[i]*u[1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -934,11 +934,11 @@ void ZebraLineGS::xzebra(
                     -operatorL[NE]*u[2+(sy+jY[NE])*(nx+1)]
                     -operatorL[SW]*u[2+(sy+jY[SW])*(nx+1)]
                     -operatorL[NW]*u[2+jX[NW]+sy*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[2+sy*(nx+1)]-=operatorL[i]*u[2+jX[i]+(sy+jY[i])*(nx+1)];
                 }
-                for(size_t sx=3; sx<nx-2; sx++)  
+                for(Index sx=3; sx<nx-2; sx++)  
                 {
                     ndiagL2[sx-3]=operatorL[NW];
                     ndiagL1[sx-2]=operatorL[W];
@@ -950,7 +950,7 @@ void ZebraLineGS::xzebra(
                         -operatorL[S]*u[sx+(sy+jY[S])*(nx+1)]
                         -operatorL[NE]*u[sx+(sy+jY[NE])*(nx+1)]
                         -operatorL[SW]*u[sx+(sy+jY[SW])*(nx+1)];
-                    for(size_t i=9; i<operatorL.size(); i++)
+                    for(Index i=9; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -966,7 +966,7 @@ void ZebraLineGS::xzebra(
                     -operatorL[NE]*u[nx-2+(sy+jY[NE])*(nx+1)]
                     -operatorL[SW]*u[nx-2+(sy+jY[SW])*(nx+1)]
                     -operatorL[SE]*u[nx-2+jX[SE]+sy*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[nx-2+sy*(nx+1)]-=
                                 operatorL[i]*u[nx-2+jX[i]+(sy+jY[i])*(nx+1)];
@@ -983,7 +983,7 @@ void ZebraLineGS::xzebra(
                     -operatorLB[E]*u[nx+sy*(nx+1)]
                     -operatorLB[NE]*u[nx-1+(sy+jYB[NE])*(nx+1)]
                     -operatorLB[SE]*u[nx-1+(sy+jYB[SE])*(nx+1)];
-                for(size_t i=9; i<operatorLB.size(); i++)
+                for(Index i=9; i<operatorLB.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                                 operatorLB[i]*u[nx-1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -1010,7 +1010,7 @@ void ZebraLineGS::xzebra(
                 -operatorLC[S]*u[1+(1+jYC[S])*(nx+1)]
                 -operatorLC[W]*u[nx+1]
                 -operatorLC[NW]*u[1+(1+jYC[NW])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+nx+1]-=operatorLC[i]*u[1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
@@ -1026,11 +1026,11 @@ void ZebraLineGS::xzebra(
                 -operatorLB[S]*u[2+(1+jYB[S])*(nx+1)]
                 -operatorLB[NE]*u[2+(1+jYB[NE])*(nx+1)]
                 -operatorLB[NW]*u[2+jXB[NW]+nx+1];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[2+nx+1]-=operatorLB[i]*u[2+jXB[i]+(1+jYB[i])*(nx+1)];
             }
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
                 ndiagL2[sx-3]=operatorLB[NW];
@@ -1042,7 +1042,7 @@ void ZebraLineGS::xzebra(
                     -operatorLB[N]*u[sx+(1+jYB[N])*(nx+1)]
                     -operatorLB[S]*u[sx+(1+jYB[S])*(nx+1)]
                     -operatorLB[NE]*u[sx+(1+jYB[NE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorLB[i]*u[sx+jXB[i]+(1+jYB[i])*(nx+1)];
                 }
@@ -1057,7 +1057,7 @@ void ZebraLineGS::xzebra(
                 -operatorLB[S]*u[nx-2+(1+jYB[S])*(nx+1)]
                 -operatorLB[NE]*u[nx-2+(1+jYB[NE])*(nx+1)]
                 -operatorLB[SE]*u[nx-2+jXB[SE]+nx+1];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-2+nx+1]-=operatorLB[i]*u[nx-2+jXB[i]+(1+jYB[i])*(nx+1)];
             }
@@ -1072,14 +1072,14 @@ void ZebraLineGS::xzebra(
                 -operatorLC[S]*u[nx-1+(1+jYC[S])*(nx+1)]
                 -operatorLC[E]*u[nx+nx+1]
                 -operatorLC[NE]*u[nx-1+(1+jYC[NE])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+(nx+1)]-=
                                 operatorLC[i]*u[nx-1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
             xLRSolver(u,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             // do odd inner lines
-            for(size_t sy=3; sy < ny-2; sy+=2)
+            for(Index sy=3; sy < ny-2; sy+=2)
             {
                 // set rhs                   
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
@@ -1094,7 +1094,7 @@ void ZebraLineGS::xzebra(
                     -operatorLB[W]*u[sy*(nx+1)]
                     -operatorLB[NW]*u[1+(sy+jYB[NW])*(nx+1)]
                     -operatorLB[SE]*u[1+(sy+jYB[SE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=
                                 operatorLB[i]*u[1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -1110,11 +1110,11 @@ void ZebraLineGS::xzebra(
                     -operatorL[NE]*u[2+(sy+jY[NE])*(nx+1)]
                     -operatorL[SW]*u[2+(sy+jY[SW])*(nx+1)]
                     -operatorL[NW]*u[2+jX[NW]+sy*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[2+sy*(nx+1)]-=operatorL[i]*u[2+jX[i]+(sy+jY[i])*(nx+1)];
                 }
-                for(size_t sx=3; sx<nx-2; sx++)  
+                for(Index sx=3; sx<nx-2; sx++)  
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     ndiagL2[sx-3]=operatorL[NW];
@@ -1127,7 +1127,7 @@ void ZebraLineGS::xzebra(
                         -operatorL[S]*u[sx+(sy+jY[S])*(nx+1)]
                         -operatorL[NE]*u[sx+(sy+jY[NE])*(nx+1)]
                         -operatorL[SW]*u[sx+(sy+jY[SW])*(nx+1)];
-                    for(size_t i=9; i<operatorL.size(); i++)
+                    for(Index i=9; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -1144,7 +1144,7 @@ void ZebraLineGS::xzebra(
                     -operatorL[NE]*u[nx-2+(sy+jY[NE])*(nx+1)]
                     -operatorL[SW]*u[nx-2+(sy+jY[SW])*(nx+1)]
                     -operatorL[SE]*u[nx-2+jX[SE]+sy*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[nx-2+sy*(nx+1)]-=
                                 operatorL[i]*u[nx-2+jX[i]+(sy+jY[i])*(nx+1)];
@@ -1161,7 +1161,7 @@ void ZebraLineGS::xzebra(
                     -operatorLB[E]*u[nx+sy*(nx+1)]
                     -operatorLB[NE]*u[nx-1+(sy+jYB[NE])*(nx+1)]
                     -operatorLB[SE]*u[nx-1+(sy+jYB[SE])*(nx+1)];
-                for(size_t i=9; i<operatorLB.size(); i++)
+                for(Index i=9; i<operatorLB.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                                 operatorLB[i]*u[nx-1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -1181,7 +1181,7 @@ void ZebraLineGS::xzebra(
                 -operatorLC[S]*u[1+(ny-1+jYC[S])*(nx+1)]
                 -operatorLC[W]*u[(ny-1)*(nx+1)]
                 -operatorLC[NE]*u[1+(ny-1+jYC[NE])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+(ny-1)*(nx+1)]-=
                             operatorLC[i]*u[1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
@@ -1198,12 +1198,12 @@ void ZebraLineGS::xzebra(
                 -operatorLB[S]*u[2+(ny-1+jYB[S])*(nx+1)]
                 -operatorLB[SE]*u[2+(ny-1+jYB[SE])*(nx+1)]
                 -operatorLB[NW]*u[2+jXB[NW]+(ny-1)*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[2+(ny-1)*(nx+1)]-=
                                 operatorLB[i]*u[2+jXB[i]+(ny-1+jYB[i])*(nx+1)];
             }
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
                 ndiagL2[sx-3]=operatorLB[NW];
@@ -1215,7 +1215,7 @@ void ZebraLineGS::xzebra(
                     -operatorLB[N]*u[sx+(ny-1+jYB[N])*(nx+1)]
                     -operatorLB[S]*u[sx+(ny-1+jYB[S])*(nx+1)]
                     -operatorLB[SE]*u[sx+(ny-1+jYB[SE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                 operatorLB[i]*u[sx+jXB[i]+(ny-1+jYB[i])*(nx+1)];
@@ -1231,7 +1231,7 @@ void ZebraLineGS::xzebra(
                 -operatorLB[S]*u[nx-2+(ny-1+jYB[S])*(nx+1)]
                 -operatorLB[SE]*u[nx-2+(ny-1+jYB[SE])*(nx+1)]
                 -operatorLB[NE]*u[nx-2+jXB[NE]+(ny-1)*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-2+(ny-1)*(nx+1)]-=
                             operatorLB[i]*u[nx-2+jXB[i]+(ny-1+jYB[i])*(nx+1)];
@@ -1247,14 +1247,14 @@ void ZebraLineGS::xzebra(
                 -operatorLC[S]*u[nx-1+(ny-1+jYC[S])*(nx+1)]
                 -operatorLC[E]*u[nx+(ny-1)*(nx+1)]
                 -operatorLC[NE]*u[nx-1+(ny-1+jYC[NE])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+(ny-1)*(nx+1)]-=
                             operatorLC[i]*u[nx-1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
             }
             xLRSolver(u,ny-1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             // relax even inner lines
-            for(size_t sy=2; sy<ny-1; sy+=2)
+            for(Index sy=2; sy<ny-1; sy+=2)
             {
                 // set rhs                   
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
@@ -1269,7 +1269,7 @@ void ZebraLineGS::xzebra(
                     -operatorLB[W]*u[sy*(nx+1)]
                     -operatorLB[NW]*u[1+(sy+jYB[NW])*(nx+1)]
                     -operatorLB[SE]*u[1+(sy+jYB[SE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=
                                 operatorLB[i]*u[1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -1285,11 +1285,11 @@ void ZebraLineGS::xzebra(
                     -operatorL[NE]*u[2+(sy+jY[NE])*(nx+1)]
                     -operatorL[SW]*u[2+(sy+jY[SW])*(nx+1)]
                     -operatorL[NW]*u[2+jX[NW]+sy*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[2+sy*(nx+1)]-=operatorL[i]*u[2+jX[i]+(sy+jY[i])*(nx+1)];
                 }
-                for(size_t sx=3; sx<nx-2; sx++)  
+                for(Index sx=3; sx<nx-2; sx++)  
                 { 
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     ndiagL2[sx-3]=operatorL[NW];
@@ -1302,7 +1302,7 @@ void ZebraLineGS::xzebra(
                         -operatorL[S]*u[sx+(sy+jY[S])*(nx+1)]
                         -operatorL[NE]*u[sx+(sy+jY[NE])*(nx+1)]
                         -operatorL[SW]*u[sx+(sy+jY[SW])*(nx+1)];
-                    for(size_t i=9; i<operatorL.size(); i++)
+                    for(Index i=9; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -1319,7 +1319,7 @@ void ZebraLineGS::xzebra(
                     -operatorL[NE]*u[nx-2+(sy+jY[NE])*(nx+1)]
                     -operatorL[SW]*u[nx-2+(sy+jY[SW])*(nx+1)]
                     -operatorL[SE]*u[nx-2+jX[SE]+sy*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[nx-2+sy*(nx+1)]-=
                                 operatorL[i]*u[nx-2+jX[i]+(sy+jY[i])*(nx+1)];
@@ -1336,7 +1336,7 @@ void ZebraLineGS::xzebra(
                     -operatorLB[E]*u[nx+sy*(nx+1)]
                     -operatorLB[NE]*u[nx-1+(sy+jYB[NE])*(nx+1)]
                     -operatorLB[SE]*u[nx-1+(sy+jYB[SE])*(nx+1)];
-                for(size_t i=9; i<operatorLB.size(); i++)
+                for(Index i=9; i<operatorLB.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                                 operatorLB[i]*u[nx-1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -1358,8 +1358,8 @@ void ZebraLineGS::yzebra(
     const NumericArray &f, 
     NumericArray &rhs,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const
+    const Index nx, 
+    const Index ny) const
 {
     if((ny > 4) && (nx > 4))
     {
@@ -1388,7 +1388,7 @@ void ZebraLineGS::yzebra(
                 -operatorLC[W]*u[nx+1]
                 -operatorLC[E]*u[2+nx+1]
                 -operatorLC[NE]*u[1+jXC[NE]+nx+1];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+nx+1]-=operatorLC[i]*u[1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
@@ -1404,11 +1404,11 @@ void ZebraLineGS::yzebra(
                 -operatorLB[E]*u[2+2*(nx+1)]
                 -operatorLB[NE]*u[1+jXB[NE]+2*(nx+1)]
                 -operatorLB[SE]*u[1+(2+jYB[SE])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[1+2*(nx+1)]-=operatorLB[i]*u[1+jXB[i]+(2+jYB[i])*(nx+1)];
             }
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 ndiagL2[sy-3]=operatorLB[SE];
                 ndiagL1[sy-2]=operatorLB[S];
@@ -1419,7 +1419,7 @@ void ZebraLineGS::yzebra(
                     -operatorLB[W]*u[1+jXB[W]+sy*(nx+1)]
                     -operatorLB[E]*u[1+jXB[E]+sy*(nx+1)]
                     -operatorLB[NE]*u[1+jXB[NE]+sy*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=
                                 operatorLB[i]*u[1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -1434,7 +1434,7 @@ void ZebraLineGS::yzebra(
                 -operatorLB[E]*u[2+(ny-2)*(nx+1)]
                 -operatorLB[NE]*u[1+jXB[NE]+(ny-2)*(nx+1)]
                 -operatorLB[NW]*u[1+(ny-2+jYB[NW])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[1+(ny-2)*(nx+1)]-=
                                 operatorLB[i]*u[1+jXB[i]+(ny-2+jYB[i])*(nx+1)];
@@ -1450,7 +1450,7 @@ void ZebraLineGS::yzebra(
                 -operatorLC[E]*u[2+(ny-1)*(nx+1)]
                 -operatorLC[NW]*u[1+jXC[NW]+(ny-1)*(nx+1)]
                 -operatorLC[N]*u[1+(ny-1+jYC[N])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+(ny-1)*(nx+1)]-=
                             operatorLC[i]*u[1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
@@ -1458,7 +1458,7 @@ void ZebraLineGS::yzebra(
             yLRSolver(u,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process all odd inner columns
-            for(size_t sx=3; sx < nx-2; sx+=2)
+            for(Index sx=3; sx < nx-2; sx+=2)
             {
                 // set rhs
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
@@ -1473,7 +1473,7 @@ void ZebraLineGS::yzebra(
                     -operatorLB[E]*u[sx+jXB[E]+nx+1]
                     -operatorLB[NW]*u[sx+jXB[NW]+nx+1]
                     -operatorLB[SE]*u[sx+jXB[SE]+(nx+1)];
-                for(size_t i=7; i<operatorLB.size(); i++)
+                for(Index i=7; i<operatorLB.size(); i++)
                 {
                     rhs[sx+nx+1]-=
                                operatorLB[i]*u[sx+jXB[i]+(1+jYB[i])*(nx+1)];
@@ -1488,12 +1488,12 @@ void ZebraLineGS::yzebra(
                     -operatorL[NW]*u[sx+jX[NW]+2*(nx+1)]
                     -operatorL[SE]*u[sx+jX[SE]+2*(nx+1)]
                     -operatorL[SW]*u[sx+(2+jY[SW])*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[sx+2*(nx+1)]-=
                                 operatorL[i]*u[sx+jX[i]+(2+jY[i])*(nx+1)];
                 }
-                for(size_t sy=3; sy<ny-2; sy++)
+                for(Index sy=3; sy<ny-2; sy++)
                 {
                     ndiagL2[sy-3]=operatorL[SW];
                     ndiagL1[sy-2]=operatorL[S];
@@ -1505,7 +1505,7 @@ void ZebraLineGS::yzebra(
                         -operatorL[E]*u[sx+jX[E]+sy*(nx+1)]
                         -operatorL[NW]*u[sx+jX[NW]+sy*(nx+1)]
                         -operatorL[SE]*u[sx+jX[SE]+sy*(nx+1)];
-                   for(size_t i=9; i<operatorL.size(); i++)
+                   for(Index i=9; i<operatorL.size(); i++)
                    {
                        rhs[sx+sy*(nx+1)]-=
                                 operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -1521,7 +1521,7 @@ void ZebraLineGS::yzebra(
                     -operatorL[NW]*u[sx+jX[NW]+(ny-2)*(nx+1)]
                     -operatorL[SE]*u[sx+jX[SE]+(ny-2)*(nx+1)]
                     -operatorL[NE]*u[sx+(ny-2+jY[NE])*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[sx+(ny-2)*(nx+1)]-=
                                operatorL[i]*u[sx+jX[i]+(ny-2+jY[i])*(nx+1)];
@@ -1538,7 +1538,7 @@ void ZebraLineGS::yzebra(
                     -operatorLB[E]*u[sx+jXB[E]+(ny-1)*(nx+1)]
                     -operatorLB[NW]*u[sx+jXB[NW]+(ny-1)*(nx+1)]
                     -operatorLB[SE]*u[sx+jXB[SE]+(ny-1)*(nx+1)];
-                for(size_t i=9; i<operatorLB.size(); i++)
+                for(Index i=9; i<operatorLB.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                             operatorLB[i]*u[sx+jXB[i]+(ny-1+jYB[i])*(nx+1)];
@@ -1554,7 +1554,7 @@ void ZebraLineGS::yzebra(
                 -operatorLC[W]*u[nx-2+nx+1]
                 -operatorLC[E]*u[nx+nx+1]
                 -operatorLC[NW]*u[nx-1+jXC[NW]+nx+1];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+nx+1]-=
                             operatorLC[i]*u[nx-1+jXC[i]+(1+jYC[i])*(nx+1)];
@@ -1571,12 +1571,12 @@ void ZebraLineGS::yzebra(
                 -operatorLB[E]*u[nx+2*(nx+1)]
                 -operatorLB[NW]*u[nx-1+jXB[NW]+2*(nx+1)]
                 -operatorLB[SE]*u[nx-1+(2+jYB[SE])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-1+2*(nx+1)]-=
                             operatorLB[i]*u[nx-1+jXB[i]+(2+jYB[i])*(nx+1)];
             }
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 ndiagL2[sy-3]=operatorLB[SE];
                 ndiagL1[sy-2]=operatorLB[S];
@@ -1587,7 +1587,7 @@ void ZebraLineGS::yzebra(
                     -operatorLB[W]*u[nx-1+jXB[W]+sy*(nx+1)]
                     -operatorLB[E]*u[nx-1+jXB[E]+sy*(nx+1)]
                     -operatorLB[NW]*u[nx-1+jXB[NW]+sy*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                             operatorLB[i]*u[nx-1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -1602,7 +1602,7 @@ void ZebraLineGS::yzebra(
                 -operatorLB[E]*u[nx+(ny-2)*(nx+1)]
                 -operatorLB[NW]*u[nx-1+jXB[NW]+(ny-2)*(nx+1)]
                 -operatorLB[NE]*u[nx-1+(ny-2+jYB[NE])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-1+(ny-2)*(nx+1)]-=
                         operatorLB[i]*u[nx-1+jXB[i]+(ny-2+jYB[i])*(nx+1)];
@@ -1618,14 +1618,14 @@ void ZebraLineGS::yzebra(
                 -operatorLC[E]*u[nx+(ny-1)*(nx+1)]
                 -operatorLC[NW]*u[nx-1+jXC[NW]+(ny-1)*(nx+1)]
                 -operatorLC[N]*u[nx-1+(ny-1+jYC[N])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+(ny-1)*(nx+1)]-=
                         operatorLC[i]*u[nx-1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
             }
             yLRSolver(u,nx-1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             // process all even inner columns
-            for(size_t sx=2; sx < nx-1; sx+=2)
+            for(Index sx=2; sx < nx-1; sx+=2)
             {
                 // set rhs
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
@@ -1640,7 +1640,7 @@ void ZebraLineGS::yzebra(
                     -operatorLB[E]*u[sx+jXB[E]+nx+1]
                     -operatorLB[NW]*u[sx+jXB[NW]+nx+1]
                     -operatorLB[SE]*u[sx+jXB[SE]+(nx+1)];
-                for(size_t i=7; i<operatorLB.size(); i++)
+                for(Index i=7; i<operatorLB.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorLB[i]*u[sx+jXB[i]+(1+jYB[i])*(nx+1)];
                 }
@@ -1654,11 +1654,11 @@ void ZebraLineGS::yzebra(
                     -operatorL[NW]*u[sx+jX[NW]+2*(nx+1)]
                     -operatorL[SE]*u[sx+jX[SE]+2*(nx+1)]
                     -operatorL[SW]*u[sx+(2+jY[SW])*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[sx+2*(nx+1)]-=operatorL[i]*u[sx+jX[i]+(2+jY[i])*(nx+1)];
                 }
-                for(size_t sy=3; sy<ny-2; sy++)
+                for(Index sy=3; sy<ny-2; sy++)
                 {
                     ndiagL2[sy-3]=operatorL[SW];
                     ndiagL1[sy-2]=operatorL[S];
@@ -1670,7 +1670,7 @@ void ZebraLineGS::yzebra(
                         -operatorL[E]*u[sx+jX[E]+sy*(nx+1)]
                         -operatorL[NW]*u[sx+jX[NW]+sy*(nx+1)]
                         -operatorL[SE]*u[sx+jX[SE]+sy*(nx+1)];
-                    for(size_t i=9; i<operatorL.size(); i++)
+                    for(Index i=9; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -1686,7 +1686,7 @@ void ZebraLineGS::yzebra(
                     -operatorL[NW]*u[sx+jX[NW]+(ny-2)*(nx+1)]
                     -operatorL[SE]*u[sx+jX[SE]+(ny-2)*(nx+1)]
                     -operatorL[NE]*u[sx+(ny-2+jY[NE])*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[sx+(ny-2)*(nx+1)]-=
                                 operatorL[i]*u[sx+jX[i]+(ny-2+jY[i])*(nx+1)];
@@ -1703,7 +1703,7 @@ void ZebraLineGS::yzebra(
                     -operatorLB[E]*u[sx+jXB[E]+(ny-1)*(nx+1)]
                     -operatorLB[NW]*u[sx+jXB[NW]+(ny-1)*(nx+1)]
                     -operatorLB[SE]*u[sx+jXB[SE]+(ny-1)*(nx+1)];
-                for(size_t i=9; i<operatorLB.size(); i++)
+                for(Index i=9; i<operatorLB.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                 operatorLB[i]*u[sx+jXB[i]+(ny-1+jYB[i])*(nx+1)];
@@ -1730,7 +1730,7 @@ void ZebraLineGS::yzebra(
                 -operatorLC[W]*u[nx+1]
                 -operatorLC[E]*u[2+nx+1]
                 -operatorLC[NE]*u[1+jXC[NE]+nx+1];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+nx+1]-=operatorLC[i]*u[1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
@@ -1746,11 +1746,11 @@ void ZebraLineGS::yzebra(
                 -operatorLB[E]*u[2+2*(nx+1)]
                 -operatorLB[NE]*u[1+jXB[NE]+2*(nx+1)]
                 -operatorLB[SE]*u[1+(2+jYB[SE])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[1+2*(nx+1)]-=operatorLB[i]*u[1+jXB[i]+(2+jYB[i])*(nx+1)];
             }
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
                 ndiagL2[sy-3]=operatorLB[SE];
@@ -1762,7 +1762,7 @@ void ZebraLineGS::yzebra(
                     -operatorLB[W]*u[1+jXB[W]+sy*(nx+1)]
                     -operatorLB[E]*u[1+jXB[E]+sy*(nx+1)]
                     -operatorLB[NE]*u[1+jXB[NE]+sy*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=
                                 operatorLB[i]*u[1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -1778,7 +1778,7 @@ void ZebraLineGS::yzebra(
                 -operatorLB[E]*u[2+(ny-2)*(nx+1)]
                 -operatorLB[NE]*u[1+jXB[NE]+(ny-2)*(nx+1)]
                 -operatorLB[NW]*u[1+(ny-2+jYB[NW])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[1+(ny-2)*(nx+1)]-=
                                 operatorLB[i]*u[1+jXB[i]+(ny-2+jYB[i])*(nx+1)];
@@ -1794,7 +1794,7 @@ void ZebraLineGS::yzebra(
                 -operatorLC[E]*u[2+(ny-1)*(nx+1)]
                 -operatorLC[NW]*u[1+jXC[NW]+(ny-1)*(nx+1)]
                 -operatorLC[N]*u[1+(ny-1+jYC[N])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+(ny-1)*(nx+1)]-=
                                 operatorLC[i]*u[1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
@@ -1802,7 +1802,7 @@ void ZebraLineGS::yzebra(
             yLRSolver(u,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process odd inner columns
-            for(size_t sx=3; sx<nx-2; sx+=2)
+            for(Index sx=3; sx<nx-2; sx+=2)
             {
                 //set rhs                  
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
@@ -1817,7 +1817,7 @@ void ZebraLineGS::yzebra(
                     -operatorLB[E]*u[sx+jXB[E]+nx+1]
                     -operatorLB[NW]*u[sx+jXB[NW]+nx+1]
                     -operatorLB[SE]*u[sx+jXB[SE]+(nx+1)];
-                for(size_t i=7; i<operatorLB.size(); i++)
+                for(Index i=7; i<operatorLB.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorLB[i]*u[sx+jXB[i]+(1+jYB[i])*(nx+1)];
                 }
@@ -1832,11 +1832,11 @@ void ZebraLineGS::yzebra(
                     -operatorL[NW]*u[sx+jX[NW]+2*(nx+1)]
                     -operatorL[SE]*u[sx+jX[SE]+2*(nx+1)]
                     -operatorL[SW]*u[sx+(2+jY[SW])*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[sx+2*(nx+1)]-=operatorL[i]*u[sx+jX[i]+(2+jY[i])*(nx+1)];
                 }
-                for(size_t sy=3; sy<ny-2; sy++)
+                for(Index sy=3; sy<ny-2; sy++)
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     ndiagL2[sy-3]=operatorL[SW];
@@ -1849,7 +1849,7 @@ void ZebraLineGS::yzebra(
                         -operatorL[E]*u[sx+jX[E]+sy*(nx+1)]
                         -operatorL[NW]*u[sx+jX[NW]+sy*(nx+1)]
                         -operatorL[SE]*u[sx+jX[SE]+sy*(nx+1)];
-                    for(size_t i=9; i<operatorL.size(); i++)
+                    for(Index i=9; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -1866,7 +1866,7 @@ void ZebraLineGS::yzebra(
                     -operatorL[NW]*u[sx+jX[NW]+(ny-2)*(nx+1)]
                     -operatorL[SE]*u[sx+jX[SE]+(ny-2)*(nx+1)]
                     -operatorL[NE]*u[sx+(ny-2+jY[NE])*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[sx+(ny-2)*(nx+1)]-=
                                    operatorL[i]*u[sx+jX[i]+(ny-2+jY[i])*(nx+1)];
@@ -1883,7 +1883,7 @@ void ZebraLineGS::yzebra(
                     -operatorLB[E]*u[sx+jXB[E]+(ny-1)*(nx+1)]
                     -operatorLB[NW]*u[sx+jXB[NW]+(ny-1)*(nx+1)]
                     -operatorLB[SE]*u[sx+jXB[SE]+(ny-1)*(nx+1)];
-                for(size_t i=9; i<operatorLB.size(); i++)
+                for(Index i=9; i<operatorLB.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                 operatorLB[i]*u[sx+jXB[i]+(ny-1+jYB[i])*(nx+1)];
@@ -1899,7 +1899,7 @@ void ZebraLineGS::yzebra(
                 -operatorLC[W]*u[nx-2+nx+1]
                 -operatorLC[E]*u[nx+nx+1]
                 -operatorLC[NW]*u[nx-1+jXC[NW]+nx+1];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+nx+1]-=operatorLC[i]*u[nx-1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
@@ -1915,12 +1915,12 @@ void ZebraLineGS::yzebra(
                 -operatorLB[E]*u[nx+2*(nx+1)]
                 -operatorLB[NW]*u[nx-1+jXB[NW]+2*(nx+1)]
                 -operatorLB[SE]*u[nx-1+(2+jYB[SE])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-1+2*(nx+1)]-=
                                 operatorLB[i]*u[nx-1+jXB[i]+(2+jYB[i])*(nx+1)];
             }
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
                 ndiagL2[sy-3]=operatorLB[SE];
@@ -1932,7 +1932,7 @@ void ZebraLineGS::yzebra(
                     -operatorLB[W]*u[nx-1+jXB[W]+sy*(nx+1)]
                     -operatorLB[E]*u[nx-1+jXB[E]+sy*(nx+1)]
                     -operatorLB[NW]*u[nx-1+jXB[NW]+sy*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                                 operatorLB[i]*u[nx-1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -1948,7 +1948,7 @@ void ZebraLineGS::yzebra(
                 -operatorLB[E]*u[nx+(ny-2)*(nx+1)]
                 -operatorLB[NW]*u[nx-1+jXB[NW]+(ny-2)*(nx+1)]
                 -operatorLB[NE]*u[nx-1+(ny-2+jYB[NE])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-1+(ny-2)*(nx+1)]-=
                             operatorLB[i]*u[nx-1+jXB[i]+(ny-2+jYB[i])*(nx+1)];
@@ -1964,14 +1964,14 @@ void ZebraLineGS::yzebra(
                 -operatorLC[E]*u[nx+(ny-1)*(nx+1)]
                 -operatorLC[NW]*u[nx-1+jXC[NW]+(ny-1)*(nx+1)]
                 -operatorLC[N]*u[nx-1+(ny-1+jYC[N])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+(ny-1)*(nx+1)]-=
                             operatorLC[i]*u[nx-1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
             }
             yLRSolver(u,nx-1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             // process even inner columns
-            for(size_t sx=2; sx < nx-1; sx+=2)
+            for(Index sx=2; sx < nx-1; sx+=2)
             {
                 // set rhs
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
@@ -1986,7 +1986,7 @@ void ZebraLineGS::yzebra(
                     -operatorLB[E]*u[sx+jXB[E]+nx+1]
                     -operatorLB[NW]*u[sx+jXB[NW]+nx+1]
                     -operatorLB[SE]*u[sx+jXB[SE]+(nx+1)];
-                for(size_t i=7; i<operatorLB.size(); i++)
+                for(Index i=7; i<operatorLB.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorLB[i]*u[sx+jXB[i]+(1+jYB[i])*(nx+1)];
                 }
@@ -2001,11 +2001,11 @@ void ZebraLineGS::yzebra(
                     -operatorL[NW]*u[sx+jX[NW]+2*(nx+1)]
                     -operatorL[SE]*u[sx+jX[SE]+2*(nx+1)]
                     -operatorL[SW]*u[sx+(2+jY[SW])*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[sx+2*(nx+1)]-=operatorL[i]*u[sx+jX[i]+(2+jY[i])*(nx+1)];
                 }
-                for(size_t sy=3; sy<ny-2; sy++)
+                for(Index sy=3; sy<ny-2; sy++)
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     ndiagL2[sy-3]=operatorL[SW];
@@ -2018,7 +2018,7 @@ void ZebraLineGS::yzebra(
                         -operatorL[E]*u[sx+jX[E]+sy*(nx+1)]
                         -operatorL[NW]*u[sx+jX[NW]+sy*(nx+1)]
                         -operatorL[SE]*u[sx+jX[SE]+sy*(nx+1)];
-                    for(size_t i=9; i<operatorL.size(); i++)
+                    for(Index i=9; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -2035,7 +2035,7 @@ void ZebraLineGS::yzebra(
                     -operatorL[NW]*u[sx+jX[NW]+(ny-2)*(nx+1)]
                     -operatorL[SE]*u[sx+jX[SE]+(ny-2)*(nx+1)]
                     -operatorL[NE]*u[sx+(ny-2+jY[NE])*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[sx+(ny-2)*(nx+1)]-=
                                 operatorL[i]*u[sx+jX[i]+(ny-2+jY[i])*(nx+1)];
@@ -2052,7 +2052,7 @@ void ZebraLineGS::yzebra(
                     -operatorLB[E]*u[sx+jXB[E]+(ny-1)*(nx+1)]
                     -operatorLB[NW]*u[sx+jXB[NW]+(ny-1)*(nx+1)]
                     -operatorLB[SE]*u[sx+jXB[SE]+(ny-1)*(nx+1)];
-                for(size_t i=9; i<operatorLB.size(); i++)
+                for(Index i=9; i<operatorLB.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                 operatorLB[i]*u[sx+jXB[i]+(ny-1+jYB[i])*(nx+1)];

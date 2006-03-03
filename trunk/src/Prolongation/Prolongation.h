@@ -34,8 +34,8 @@ public:
     virtual NumericArray prolongate(
         const NumericArray& u,
         const Stencil& stencil,
-        const size_t nx,
-        const size_t ny) const =0;
+        const Index nx,
+        const Index ny) const =0;
 };
 
 }

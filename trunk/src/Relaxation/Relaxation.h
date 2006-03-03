@@ -82,8 +82,8 @@ public:
         NumericArray& u,
         const NumericArray& f,
         const Stencil& stencil,
-        const size_t nx,
-        const size_t ny) const=0;
+        const Index nx,
+        const Index ny) const=0;
     
     /**
      * \brief does the preSmooth() ing
@@ -99,8 +99,8 @@ public:
         NumericArray& u,
         const NumericArray& f,
         const Stencil& stencil,
-        const size_t nx,
-        const size_t ny) const
+        const Index nx,
+        const Index ny) const
     {
         for(int i=0; i<preSmoothingSteps_; ++i)
             relax(u,f,stencil,nx,ny);
@@ -120,8 +120,8 @@ public:
         NumericArray& u,
         const NumericArray& f,
         const Stencil& stencil,
-        const size_t nx,
-        const size_t ny) const
+        const Index nx,
+        const Index ny) const
     {
         for(int i=0; i<postSmoothingSteps_; ++i)
             relax(u,f,stencil,nx,ny);

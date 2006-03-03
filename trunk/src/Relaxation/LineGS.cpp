@@ -15,8 +15,8 @@ void LineGS::relax(
     NumericArray &u,
     const NumericArray &f, 
     const Stencil &stencil,
-    const size_t nx,
-    const size_t ny) const
+    const Index nx,
+    const Index ny) const
 {
     // valarrays needed for LR-decomposition of a tridiagonal matrix
     NumericArray rhs(0.0,u.size());
@@ -90,8 +90,8 @@ void LineGS::ninepointxline(
     const NumericArray &f, 
     NumericArray &rhs,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const
+    const Index nx, 
+    const Index ny) const
 { 
     //valarrays needed for saving the tridiagonal matrix A of linear system A u = rhs       
     NumericArray diagR(nx-1);
@@ -106,22 +106,22 @@ void LineGS::ninepointxline(
         // for each line: correction of the rhs given by 
         //rhs = fv - [L[n]  0  L[s]]^t * u and elimination of the 
         // boundary condition in first and last inner point
-        for(size_t sy=1; sy<ny ; sy++) 
+        for(Index sy=1; sy<ny ; sy++) 
         {
             rhs[1+sy*(nx+1)]=f[1+sy*(nx+1)]
                 -operatorL[N]*u[1+(sy+jY[N])*(nx+1)]
                 -operatorL[S]*u[1+(sy+jY[S])*(nx+1)]
                 -operatorL[W]*u[sy*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[1+sy*(nx+1)]-=operatorL[i]*u[1+jX[i]+(sy+jY[i])*(nx+1)];
             }
-            for(size_t sx=2; sx<nx-1; sx++)  
+            for(Index sx=2; sx<nx-1; sx++)  
             {
                 rhs[sx+sy*(nx+1)]=f[sx+sy*(nx+1)]
                     -operatorL[N]*u[sx+(sy+jY[N])*(nx+1)]
                     -operatorL[S]*u[sx+(sy+jY[S])*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -132,7 +132,7 @@ void LineGS::ninepointxline(
                 -operatorL[N]*u[nx-1+(sy+jY[N])*(nx+1)]
                 -operatorL[S]*u[nx-1+(sy+jY[S])*(nx+1)]
                 -operatorL[E]*u[nx+sy*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[nx-1+sy*(nx+1)]-=
                                 operatorL[i]*u[nx-1+jX[i]+(sy+jY[i])*(nx+1)];
@@ -161,11 +161,11 @@ void LineGS::ninepointxline(
                 -operatorL[N]*u[1+(1+jY[N])*(nx+1)]
                 -operatorL[S]*u[1+(1+jY[S])*(nx+1)]
                 -operatorL[W]*u[nx+1];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[1+nx+1]-=operatorL[i]*u[1+jX[i]+(1+jY[i])*(nx+1)];
             }
-            for(size_t sx=2; sx<nx-1; sx++)
+            for(Index sx=2; sx<nx-1; sx++)
             {
                 operatorL=stencil.getL(S,sx,1,nx,ny);
                 diagR[sx-1]=operatorL[C];
@@ -174,7 +174,7 @@ void LineGS::ninepointxline(
                 rhs[sx+nx+1]=f[sx+nx+1]
                     -operatorL[N]*u[sx+(1+jY[N])*(nx+1)]
                     -operatorL[S]*u[sx+(1+jY[S])*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorL[i]*u[sx+jX[i]+(1+jY[i])*(nx+1)];
                 }
@@ -186,12 +186,12 @@ void LineGS::ninepointxline(
                 -operatorL[N]*u[nx-1+(1+jY[N])*(nx+1)] 
                 -operatorL[S]*u[nx-1+(1+jY[S])*(nx+1)]
                 -operatorL[E]*u[nx+(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[nx-1+(nx+1)]-=operatorL[i]*u[nx-1+jX[i]+(1+jY[i])*(nx+1)];
             }
             xLRSolver(u,1,nx,rhs,ndiagL,diagR,ndiagR);
-            for(size_t sy=2; sy<ny-1 ; sy++)
+            for(Index sy=2; sy<ny-1 ; sy++)
             {
                 operatorL=stencil.getL(W,1,sy,nx,ny);
                 diagR[0]=operatorL[C];
@@ -200,11 +200,11 @@ void LineGS::ninepointxline(
                     -operatorL[N]*u[1+(sy+jY[N])*(nx+1)]
                     -operatorL[S]*u[1+(sy+jY[S])*(nx+1)]
                     -operatorL[W]*u[sy*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=operatorL[i]*u[1+jX[i]+(sy+jY[i])*(nx+1)];
                 }
-                for(size_t sx=2; sx<nx-1; sx++)
+                for(Index sx=2; sx<nx-1; sx++)
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sx-1]=operatorL[C];
@@ -213,7 +213,7 @@ void LineGS::ninepointxline(
                     rhs[sx+sy*(nx+1)]=f[sx+sy*(nx+1)]
                         -operatorL[N]*u[sx+(sy+jY[N])*(nx+1)]
                         -operatorL[S]*u[sx+(sy+jY[S])*(nx+1)];
-                    for(size_t i=5; i<operatorL.size(); i++)
+                    for(Index i=5; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -226,7 +226,7 @@ void LineGS::ninepointxline(
                     -operatorL[N]*u[nx-1+(sy+jY[N])*(nx+1)] 
                     -operatorL[S]*u[nx-1+(sy+jY[S])*(nx+1)]
                     -operatorL[E]*u[nx+sy*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                                 operatorL[i]*u[nx-1+jX[i]+(sy+jY[i])*(nx+1)];
@@ -240,12 +240,12 @@ void LineGS::ninepointxline(
                 -operatorL[N]*u[1+(ny-1+jY[N])*(nx+1)]
                 -operatorL[S]*u[1+(ny-1+jY[S])*(nx+1)]
                 -operatorL[W]*u[(ny-1)*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[1+(ny-1)*(nx+1)]-=
                                 operatorL[i]*u[1+jX[i]+(ny-1+jY[i])*(nx+1)];
             }
-            for(size_t sx=2; sx<nx-1; sx++)
+            for(Index sx=2; sx<nx-1; sx++)
             {
                 operatorL=stencil.getL(N,sx,ny-1,nx,ny);
                 diagR[sx-1]=operatorL[C];
@@ -254,7 +254,7 @@ void LineGS::ninepointxline(
                 rhs[sx+(ny-1)*(nx+1)]=f[sx+(ny-1)*(nx+1)]
                     -operatorL[N]*u[sx+(ny-1+jY[N])*(nx+1)]
                     -operatorL[S]*u[sx+(ny-1+jY[S])*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                 operatorL[i]*u[sx+jX[i]+(ny-1+jY[i])*(nx+1)];
@@ -267,7 +267,7 @@ void LineGS::ninepointxline(
                 -operatorL[N]*u[nx-1+(ny-1+jY[N])*(nx+1)] 
                 -operatorL[S]*u[nx-1+(ny-1+jY[S])*(nx+1)]
                 -operatorL[E]*u[nx+(ny-1)*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[nx-1+(ny-1)*(nx+1)]-=
                                 operatorL[i]*u[nx-1+jX[i]+(ny-1+jY[i])*(nx+1)];
@@ -285,8 +285,8 @@ void LineGS::ninepointyline(
     const NumericArray &f, 
     NumericArray &rhs,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const               
+    const Index nx, 
+    const Index ny) const               
 { 
     //valarrays needed for saving the tridiagonal matrix A of linear system
     //A u = rhs
@@ -302,22 +302,22 @@ void LineGS::ninepointyline(
         // for each line: correction of the rhs given by 
         // rhs = fv - [L[w]  0  L[e]] * u and elimination of the 
         // boundary condition in first and last inner point
-        for(size_t sx=1; sx<nx ; sx++) 
+        for(Index sx=1; sx<nx ; sx++) 
         {
             rhs[sx+(nx+1)]=f[sx+(nx+1)]
                 -operatorL[W]*u[sx+jX[W]+(nx+1)]
                 -operatorL[E]*u[sx+jX[E]+(nx+1)] 
                 -operatorL[S]*u[sx+(1+jY[S])*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[sx+nx+1]-=operatorL[i]*u[sx+jX[i]+(1+jY[i])*(nx+1)];
             }
-            for(size_t sy=2; sy<ny-1; sy++)  
+            for(Index sy=2; sy<ny-1; sy++)  
             {
                 rhs[sx+sy*(nx+1)]=f[sx+sy*(nx+1)]
                     -operatorL[W]*u[sx+jX[W]+sy*(nx+1)]
                     -operatorL[E]*u[sx+jX[E]+sy*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -327,7 +327,7 @@ void LineGS::ninepointyline(
                 -operatorL[W]*u[sx+jX[W]+(ny-1)*(nx+1)] 
                 -operatorL[E]*u[sx+jX[E]+(ny-1)*(nx+1)]
                 -operatorL[N]*u[sx+(ny-1+jY[N])*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[sx+(ny-1)*(nx+1)]-=
                                 operatorL[i]*u[sx+jX[i]+(ny-1+jY[i])*(nx+1)];
@@ -356,11 +356,11 @@ void LineGS::ninepointyline(
                 -operatorL[W]*u[1+jX[W]+(nx+1)]
                 -operatorL[E]*u[1+jX[E]+(nx+1)] 
                 -operatorL[S]*u[1+(1+jY[S])*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[1+nx+1]-=operatorL[i]*u[1+jX[i]+(1+jY[i])*(nx+1)];
             }
-            for(size_t sy=2; sy<ny-1; sy++) 
+            for(Index sy=2; sy<ny-1; sy++) 
             {
                 operatorL=stencil.getL(W,1,sy,nx,ny);
                 diagR[sy-1]=operatorL[C];
@@ -369,7 +369,7 @@ void LineGS::ninepointyline(
                 rhs[1+sy*(nx+1)]=f[1+sy*(nx+1)]
                     -operatorL[W]*u[1+jX[W]+sy*(nx+1)]
                     -operatorL[E]*u[1+jX[E]+sy*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=operatorL[i]*u[1+jX[i]+(sy+jY[i])*(nx+1)];
                 }
@@ -381,13 +381,13 @@ void LineGS::ninepointyline(
                 -operatorL[W]*u[1+jX[W]+(ny-1)*(nx+1)] 
                 -operatorL[E]*u[1+jX[E]+(ny-1)*(nx+1)]
                 -operatorL[N]*u[1+(ny-1+jY[N])*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[1+(ny-1)*(nx+1)]-=
                                     operatorL[i]*u[1+jX[i]+(ny-1+jY[i])*(nx+1)];
             }
             yLRSolver(u,1,nx,ny,rhs,ndiagL,diagR,ndiagR);            
-            for(size_t sx=2; sx<nx-1 ; sx++)
+            for(Index sx=2; sx<nx-1 ; sx++)
             {
                 operatorL=stencil.getL(S,sx,1,nx,ny);
                 diagR[0]=operatorL[C];
@@ -396,11 +396,11 @@ void LineGS::ninepointyline(
                     -operatorL[W]*u[sx+jX[W]+(nx+1)]
                     -operatorL[E]*u[sx+jX[E]+(nx+1)] 
                     -operatorL[S]*u[sx+(1+jY[S])*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorL[i]*u[sx+jX[i]+(1+jY[i])*(nx+1)];
                 }
-                for(size_t sy=2; sy<ny-1; sy++) 
+                for(Index sy=2; sy<ny-1; sy++) 
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sy-1]=operatorL[C];
@@ -409,7 +409,7 @@ void LineGS::ninepointyline(
                     rhs[sx+sy*(nx+1)]=f[sx+sy*(nx+1)]
                         -operatorL[W]*u[sx+jX[W]+sy*(nx+1)]
                         -operatorL[E]*u[sx+jX[E]+sy*(nx+1)];
-                    for(size_t i=5; i<operatorL.size(); i++)
+                    for(Index i=5; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -422,7 +422,7 @@ void LineGS::ninepointyline(
                     -operatorL[W]*u[sx+jX[W]+(ny-1)*(nx+1)] 
                     -operatorL[E]*u[sx+jX[E]+(ny-1)*(nx+1)]
                     -operatorL[N]*u[sx+(ny-1+jY[N])*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                 operatorL[i]*u[sx+jX[i]+(ny-1+jY[i])*(nx+1)];
@@ -436,11 +436,11 @@ void LineGS::ninepointyline(
                 -operatorL[W]*u[nx-1+jX[W]+(nx+1)]
                 -operatorL[E]*u[nx-1+jX[E]+(nx+1)] 
                 -operatorL[S]*u[nx-1+(1+jY[S])*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[nx-1+nx+1]-=operatorL[i]*u[nx-1+jX[i]+(1+jY[i])*(nx+1)];
             }
-            for(size_t sy=2; sy<ny-1; sy++) 
+            for(Index sy=2; sy<ny-1; sy++) 
             {
                 operatorL=stencil.getL(E,nx-1,sy,nx,ny);
                 diagR[sy-1]=operatorL[C];
@@ -449,7 +449,7 @@ void LineGS::ninepointyline(
                 rhs[nx-1+sy*(nx+1)]=f[nx-1+sy*(nx+1)]
                     -operatorL[W]*u[nx-1+jX[W]+sy*(nx+1)]
                     -operatorL[E]*u[nx-1+jX[E]+sy*(nx+1)];
-                for(size_t i=5; i<operatorL.size(); i++)
+                for(Index i=5; i<operatorL.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                                 operatorL[i]*u[nx-1+jX[i]+(sy+jY[i])*(nx+1)];
@@ -462,7 +462,7 @@ void LineGS::ninepointyline(
                 -operatorL[W]*u[nx-1+jX[W]+(ny-1)*(nx+1)] 
                 -operatorL[E]*u[nx-1+jX[E]+(ny-1)*(nx+1)]
                 -operatorL[N]*u[nx-1+(ny-1+jY[N])*(nx+1)];
-            for(size_t i=5; i<operatorL.size(); i++)
+            for(Index i=5; i<operatorL.size(); i++)
             {
                 rhs[nx-1+(ny-1)*(nx+1)]-=
                                 operatorL[i]*u[nx-1+jX[i]+(ny-1+jY[i])*(nx+1)];
@@ -481,8 +481,8 @@ void LineGS::xline(
     const NumericArray &f, 
     NumericArray &rhs,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const
+    const Index nx, 
+    const Index ny) const
 
 {
     if((ny > 4) && (nx > 4))
@@ -513,7 +513,7 @@ void LineGS::xline(
                 -operatorLC[S]*u[1+(1+jYC[S])*(nx+1)]
                 -operatorLC[W]*u[nx+1]
                 -operatorLC[NW]*u[1+(1+jYC[NW])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+nx+1]-=operatorLC[i]*u[1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
@@ -526,11 +526,11 @@ void LineGS::xline(
                 -operatorLB[S]*u[2+(1+jYB[S])*(nx+1)]
                 -operatorLB[NE]*u[2+(1+jYB[NE])*(nx+1)]
                 -operatorLB[NW]*u[2+jXB[NW]+nx+1];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[2+nx+1]-=operatorLB[i]*u[2+jXB[i]+(1+jYB[i])*(nx+1)];
             }
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 ndiagL2[sx-3]=operatorLB[NW];
                 ndiagL1[sx-2]=operatorLB[W];
@@ -541,7 +541,7 @@ void LineGS::xline(
                     -operatorLB[N]*u[sx+(1+jYB[N])*(nx+1)]
                     -operatorLB[S]*u[sx+(1+jYB[S])*(nx+1)]
                     -operatorLB[NE]*u[sx+(1+jYB[NE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorLB[i]*u[sx+jXB[i]+(1+jYB[i])*(nx+1)];
                 }
@@ -555,7 +555,7 @@ void LineGS::xline(
                 -operatorLB[S]*u[nx-2+(1+jYB[S])*(nx+1)]
                 -operatorLB[NE]*u[nx-2+(1+jYB[NE])*(nx+1)]
                 -operatorLB[SE]*u[nx-2+jXB[SE]+nx+1];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-2+nx+1]-=operatorLB[i]*u[nx-2+jXB[i]+(1+jYB[i])*(nx+1)];
             }
@@ -570,7 +570,7 @@ void LineGS::xline(
                 -operatorLC[S]*u[nx-1+(1+jYC[S])*(nx+1)]
                 -operatorLC[E]*u[nx+nx+1]
                 -operatorLC[NE]*u[nx-1+(1+jYC[NE])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+(nx+1)]-=
                                 operatorLC[i]*u[nx-1+jXC[i]+(1+jYC[i])*(nx+1)];
@@ -578,7 +578,7 @@ void LineGS::xline(
             xLRSolver(u,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process all inner lines
-            for(size_t sy=2; sy < ny-1; sy++)
+            for(Index sy=2; sy < ny-1; sy++)
             {
                 // set rhs
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
@@ -593,7 +593,7 @@ void LineGS::xline(
                     -operatorLB[W]*u[sy*(nx+1)]
                     -operatorLB[NW]*u[1+(sy+jYB[NW])*(nx+1)]
                     -operatorLB[SE]*u[1+(sy+jYB[SE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=
                                    operatorLB[i]*u[1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -608,11 +608,11 @@ void LineGS::xline(
                     -operatorL[NE]*u[2+(sy+jY[NE])*(nx+1)]
                     -operatorL[SW]*u[2+(sy+jY[SW])*(nx+1)]
                     -operatorL[NW]*u[2+jX[NW]+sy*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[2+sy*(nx+1)]-=operatorL[i]*u[2+jX[i]+(sy+jY[i])*(nx+1)];
                 }
-                for(size_t sx=3; sx<nx-2; sx++)  
+                for(Index sx=3; sx<nx-2; sx++)  
                 {
                     ndiagL2[sx-3]=operatorL[NW];
                     ndiagL1[sx-2]=operatorL[W];
@@ -624,7 +624,7 @@ void LineGS::xline(
                         -operatorL[S]*u[sx+(sy+jY[S])*(nx+1)]
                         -operatorL[NE]*u[sx+(sy+jY[NE])*(nx+1)]
                         -operatorL[SW]*u[sx+(sy+jY[SW])*(nx+1)];
-                    for(size_t i=9; i<operatorL.size(); i++)
+                    for(Index i=9; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -640,7 +640,7 @@ void LineGS::xline(
                     -operatorL[NE]*u[nx-2+(sy+jY[NE])*(nx+1)]
                     -operatorL[SW]*u[nx-2+(sy+jY[SW])*(nx+1)]
                     -operatorL[SE]*u[nx-2+jX[SE]+sy*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[nx-2+sy*(nx+1)]-=
                                 operatorL[i]*u[nx-2+jX[i]+(sy+jY[i])*(nx+1)];
@@ -657,7 +657,7 @@ void LineGS::xline(
                     -operatorLB[E]*u[nx+sy*(nx+1)]
                     -operatorLB[NE]*u[nx-1+(sy+jYB[NE])*(nx+1)]
                     -operatorLB[SE]*u[nx-1+(sy+jYB[SE])*(nx+1)];
-                for(size_t i=9; i<operatorLB.size(); i++)
+                for(Index i=9; i<operatorLB.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                                 operatorLB[i]*u[nx-1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -677,7 +677,7 @@ void LineGS::xline(
                 -operatorLC[S]*u[1+(ny-1+jYC[S])*(nx+1)]
                 -operatorLC[W]*u[(ny-1)*(nx+1)]
                 -operatorLC[NE]*u[1+(ny-1+jYC[NE])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+(ny-1)*(nx+1)]-=
                                 operatorLC[i]*u[1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
@@ -694,12 +694,12 @@ void LineGS::xline(
                 -operatorLB[S]*u[2+(ny-1+jYB[S])*(nx+1)]
                 -operatorLB[SE]*u[2+(ny-1+jYB[SE])*(nx+1)]
                 -operatorLB[NW]*u[2+jXB[NW]+(ny-1)*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[2+(ny-1)*(nx+1)]-=
                             operatorLB[i]*u[2+jXB[i]+(ny-1+jYB[i])*(nx+1)];
             }
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 ndiagL2[sx-3]=operatorLB[NW];
                 ndiagL1[sx-2]=operatorLB[W];
@@ -710,7 +710,7 @@ void LineGS::xline(
                     -operatorLB[N]*u[sx+(ny-1+jYB[N])*(nx+1)]
                     -operatorLB[S]*u[sx+(ny-1+jYB[S])*(nx+1)]
                     -operatorLB[SE]*u[sx+(ny-1+jYB[SE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                 operatorLB[i]*u[sx+jXB[i]+(ny-1+jYB[i])*(nx+1)];
@@ -725,7 +725,7 @@ void LineGS::xline(
                 -operatorLB[S]*u[nx-2+(ny-1+jYB[S])*(nx+1)]
                 -operatorLB[SE]*u[nx-2+(ny-1+jYB[SE])*(nx+1)]
                 -operatorLB[NE]*u[nx-2+jXB[NE]+(ny-1)*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-2+(ny-1)*(nx+1)]-=
                             operatorLB[i]*u[nx-2+jXB[i]+(ny-1+jYB[i])*(nx+1)];
@@ -741,7 +741,7 @@ void LineGS::xline(
                 -operatorLC[S]*u[nx-1+(ny-1+jYC[S])*(nx+1)]
                 -operatorLC[E]*u[nx+(ny-1)*(nx+1)]
                 -operatorLC[NE]*u[nx-1+(ny-1+jYC[NE])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+(ny-1)*(nx+1)]-=
                             operatorLC[i]*u[nx-1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
@@ -767,7 +767,7 @@ void LineGS::xline(
                 -operatorLC[S]*u[1+(1+jYC[S])*(nx+1)]
                 -operatorLC[W]*u[nx+1]
                 -operatorLC[NW]*u[1+(1+jYC[NW])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+nx+1]-=operatorLC[i]*u[1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
@@ -780,11 +780,11 @@ void LineGS::xline(
                 -operatorLB[S]*u[2+(1+jYB[S])*(nx+1)]
                 -operatorLB[NE]*u[2+(1+jYB[NE])*(nx+1)]
                 -operatorLB[NW]*u[2+jXB[NW]+nx+1];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[2+nx+1]-=operatorLB[i]*u[2+jXB[i]+(1+jYB[i])*(nx+1)];
             }
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 operatorLB=stencil.getL(S,sx,1,nx,ny);    
                 ndiagL2[sx-3]=operatorLB[NW];
@@ -796,7 +796,7 @@ void LineGS::xline(
                     -operatorLB[N]*u[sx+(1+jYB[N])*(nx+1)]
                     -operatorLB[S]*u[sx+(1+jYB[S])*(nx+1)]
                     -operatorLB[NE]*u[sx+(1+jYB[NE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorLB[i]*u[sx+jXB[i]+(1+jYB[i])*(nx+1)];
                 }
@@ -811,7 +811,7 @@ void LineGS::xline(
                 -operatorLB[S]*u[nx-2+(1+jYB[S])*(nx+1)]
                 -operatorLB[NE]*u[nx-2+(1+jYB[NE])*(nx+1)]
                 -operatorLB[SE]*u[nx-2+jXB[SE]+nx+1];
-            for(size_t sum=8; sum<operatorLB.size(); sum++)
+            for(Index sum=8; sum<operatorLB.size(); sum++)
             {
                 rhs[nx-2+nx+1]-=
                         operatorLB[sum]*u[nx-2+jXB[sum]+(1+jYB[sum])*(nx+1)];
@@ -827,7 +827,7 @@ void LineGS::xline(
                 -operatorLC[S]*u[nx-1+(1+jYC[S])*(nx+1)]
                 -operatorLC[E]*u[nx+nx+1]
                 -operatorLC[NE]*u[nx-1+(1+jYC[NE])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+(nx+1)]-=
                                 operatorLC[i]*u[nx-1+jXC[i]+(1+jYC[i])*(nx+1)];
@@ -835,7 +835,7 @@ void LineGS::xline(
             xLRSolver(u,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process all inner lines
-            for(size_t sy=2; sy<ny-1; sy++)
+            for(Index sy=2; sy<ny-1; sy++)
             {
                 // set rhs                   
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
@@ -850,7 +850,7 @@ void LineGS::xline(
                     -operatorLB[W]*u[sy*(nx+1)]
                     -operatorLB[NW]*u[1+(sy+jYB[NW])*(nx+1)]
                     -operatorLB[SE]*u[1+(sy+jYB[SE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=
                                 operatorLB[i]*u[1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -866,11 +866,11 @@ void LineGS::xline(
                     -operatorL[NE]*u[2+(sy+jY[NE])*(nx+1)]
                     -operatorL[SW]*u[2+(sy+jY[SW])*(nx+1)]
                     -operatorL[NW]*u[2+jX[NW]+sy*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[2+sy*(nx+1)]-=operatorL[i]*u[2+jX[i]+(sy+jY[i])*(nx+1)];
                 }
-                for(size_t sx=3; sx<nx-2; sx++)  
+                for(Index sx=3; sx<nx-2; sx++)  
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     ndiagL2[sx-3]=operatorL[NW];
@@ -883,7 +883,7 @@ void LineGS::xline(
                         -operatorL[S]*u[sx+(sy+jY[S])*(nx+1)]
                         -operatorL[NE]*u[sx+(sy+jY[NE])*(nx+1)]
                         -operatorL[SW]*u[sx+(sy+jY[SW])*(nx+1)];
-                    for(size_t i=9; i<operatorL.size(); i++)
+                    for(Index i=9; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -900,7 +900,7 @@ void LineGS::xline(
                     -operatorL[NE]*u[nx-2+(sy+jY[NE])*(nx+1)]
                     -operatorL[SW]*u[nx-2+(sy+jY[SW])*(nx+1)]
                     -operatorL[SE]*u[nx-2+jX[SE]+sy*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[nx-2+sy*(nx+1)]-=
                                 operatorL[i]*u[nx-2+jX[i]+(sy+jY[i])*(nx+1)];
@@ -917,7 +917,7 @@ void LineGS::xline(
                     -operatorLB[E]*u[nx+sy*(nx+1)]
                     -operatorLB[NE]*u[nx-1+(sy+jYB[NE])*(nx+1)]
                     -operatorLB[SE]*u[nx-1+(sy+jYB[SE])*(nx+1)];
-                for(size_t i=9; i<operatorLB.size(); i++)
+                for(Index i=9; i<operatorLB.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                             operatorLB[i]*u[nx-1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -937,7 +937,7 @@ void LineGS::xline(
                 -operatorLC[S]*u[1+(ny-1+jYC[S])*(nx+1)]
                 -operatorLC[W]*u[(ny-1)*(nx+1)]
                 -operatorLC[NE]*u[1+(ny-1+jYC[NE])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+(ny-1)*(nx+1)]-=
                                 operatorLC[i]*u[1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
@@ -954,12 +954,12 @@ void LineGS::xline(
                 -operatorLB[S]*u[2+(ny-1+jYB[S])*(nx+1)]
                 -operatorLB[SE]*u[2+(ny-1+jYB[SE])*(nx+1)]
                 -operatorLB[NW]*u[2+jXB[NW]+(ny-1)*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[2+(ny-1)*(nx+1)]-=
                                 operatorLB[i]*u[2+jXB[i]+(ny-1+jYB[i])*(nx+1)];
             }
-            for(size_t sx=3; sx<nx-2; sx++)  
+            for(Index sx=3; sx<nx-2; sx++)  
             {
                 operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
                 ndiagL2[sx-3]=operatorLB[NW];
@@ -971,7 +971,7 @@ void LineGS::xline(
                     -operatorLB[N]*u[sx+(ny-1+jYB[N])*(nx+1)]
                     -operatorLB[S]*u[sx+(ny-1+jYB[S])*(nx+1)]
                     -operatorLB[SE]*u[sx+(ny-1+jYB[SE])*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                 operatorLB[i]*u[sx+jXB[i]+(ny-1+jYB[i])*(nx+1)];
@@ -987,7 +987,7 @@ void LineGS::xline(
                 -operatorLB[S]*u[nx-2+(ny-1+jYB[S])*(nx+1)]
                 -operatorLB[SE]*u[nx-2+(ny-1+jYB[SE])*(nx+1)]
                 -operatorLB[NE]*u[nx-2+jXB[NE]+(ny-1)*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-2+(ny-1)*(nx+1)]-=
                             operatorLB[i]*u[nx-2+jXB[i]+(ny-1+jYB[i])*(nx+1)];
@@ -1003,7 +1003,7 @@ void LineGS::xline(
                 -operatorLC[S]*u[nx-1+(ny-1+jYC[S])*(nx+1)]
                 -operatorLC[E]*u[nx+(ny-1)*(nx+1)]
                 -operatorLC[NE]*u[nx-1+(ny-1+jYC[NE])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+(ny-1)*(nx+1)]-=
                             operatorLC[i]*u[nx-1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
@@ -1024,8 +1024,8 @@ void LineGS::yline(
     const NumericArray &f, 
     NumericArray &rhs,
     const Stencil &stencil,
-    const size_t nx, 
-    const size_t ny) const
+    const Index nx, 
+    const Index ny) const
 {
     if((ny > 4) && (nx > 4))
     {
@@ -1054,7 +1054,7 @@ void LineGS::yline(
                 -operatorLC[W]*u[nx+1]
                 -operatorLC[E]*u[2+nx+1]
                 -operatorLC[NE]*u[1+jXC[NE]+nx+1];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+nx+1]-=operatorLC[i]*u[1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
@@ -1067,11 +1067,11 @@ void LineGS::yline(
                 -operatorLB[E]*u[2+2*(nx+1)]
                 -operatorLB[NE]*u[1+jXB[NE]+2*(nx+1)]
                 -operatorLB[SE]*u[1+(2+jYB[SE])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[1+2*(nx+1)]-=operatorLB[i]*u[1+jXB[i]+(2+jYB[i])*(nx+1)];
             }
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 ndiagL2[sy-3]=operatorLB[SE];
                 ndiagL1[sy-2]=operatorLB[S];
@@ -1082,7 +1082,7 @@ void LineGS::yline(
                     -operatorLB[W]*u[1+jXB[W]+sy*(nx+1)]
                     -operatorLB[E]*u[1+jXB[E]+sy*(nx+1)]
                     -operatorLB[NE]*u[1+jXB[NE]+sy*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=
                                    operatorLB[i]*u[1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -1097,7 +1097,7 @@ void LineGS::yline(
                 -operatorLB[E]*u[2+(ny-2)*(nx+1)]
                 -operatorLB[NE]*u[1+jXB[NE]+(ny-2)*(nx+1)]
                 -operatorLB[NW]*u[1+(ny-2+jYB[NW])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[1+(ny-2)*(nx+1)]-=
                                 operatorLB[i]*u[1+jXB[i]+(ny-2+jYB[i])*(nx+1)];
@@ -1113,7 +1113,7 @@ void LineGS::yline(
                 -operatorLC[E]*u[2+(ny-1)*(nx+1)]
                 -operatorLC[NW]*u[1+jXC[NW]+(ny-1)*(nx+1)]
                 -operatorLC[N]*u[1+(ny-1+jYC[N])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+(ny-1)*(nx+1)]-=
                                 operatorLC[i]*u[1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
@@ -1121,7 +1121,7 @@ void LineGS::yline(
             yLRSolver(u,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process all inner columns
-            for(size_t sx=2; sx<nx-1; sx++)
+            for(Index sx=2; sx<nx-1; sx++)
             {
                 // set rhs
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
@@ -1136,7 +1136,7 @@ void LineGS::yline(
                     -operatorLB[E]*u[sx+jXB[E]+nx+1]
                     -operatorLB[NW]*u[sx+jXB[NW]+nx+1]
                     -operatorLB[SE]*u[sx+jXB[SE]+(nx+1)];
-                for(size_t i=7; i<operatorLB.size(); i++)
+                for(Index i=7; i<operatorLB.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorLB[i]*u[sx+jXB[i]+(1+jYB[i])*(nx+1)];
                 }
@@ -1150,11 +1150,11 @@ void LineGS::yline(
                     -operatorL[NW]*u[sx+jX[NW]+2*(nx+1)]
                     -operatorL[SE]*u[sx+jX[SE]+2*(nx+1)]
                     -operatorL[SW]*u[sx+(2+jY[SW])*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[sx+2*(nx+1)]-=operatorL[i]*u[sx+jX[i]+(2+jY[i])*(nx+1)];
                 }
-                for(size_t sy=3; sy<ny-2; sy++)
+                for(Index sy=3; sy<ny-2; sy++)
                 {
                     ndiagL2[sy-3]=operatorL[SW];
                     ndiagL1[sy-2]=operatorL[S];
@@ -1166,7 +1166,7 @@ void LineGS::yline(
                         -operatorL[E]*u[sx+jX[E]+sy*(nx+1)]
                         -operatorL[NW]*u[sx+jX[NW]+sy*(nx+1)]
                         -operatorL[SE]*u[sx+jX[SE]+sy*(nx+1)];
-                    for(size_t i=9; i<operatorL.size(); i++)
+                    for(Index i=9; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -1182,7 +1182,7 @@ void LineGS::yline(
                     -operatorL[NW]*u[sx+jX[NW]+(ny-2)*(nx+1)]
                     -operatorL[SE]*u[sx+jX[SE]+(ny-2)*(nx+1)]
                     -operatorL[NE]*u[sx+(ny-2+jY[NE])*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[sx+(ny-2)*(nx+1)]-=
                                 operatorL[i]*u[sx+jX[i]+(ny-2+jY[i])*(nx+1)];
@@ -1199,7 +1199,7 @@ void LineGS::yline(
                     -operatorLB[E]*u[sx+jXB[E]+(ny-1)*(nx+1)]
                     -operatorLB[NW]*u[sx+jXB[NW]+(ny-1)*(nx+1)]
                     -operatorLB[SE]*u[sx+jXB[SE]+(ny-1)*(nx+1)];
-                for(size_t i=9; i<operatorLB.size(); i++)
+                for(Index i=9; i<operatorLB.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                 operatorLB[i]*u[sx+jXB[i]+(ny-1+jYB[i])*(nx+1)];
@@ -1215,7 +1215,7 @@ void LineGS::yline(
                 -operatorLC[W]*u[nx-2+nx+1]
                 -operatorLC[E]*u[nx+nx+1]
                 -operatorLC[NW]*u[nx-1+jXC[NW]+nx+1];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+nx+1]-=operatorLC[i]*u[nx-1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
@@ -1231,12 +1231,12 @@ void LineGS::yline(
                 -operatorLB[E]*u[nx+2*(nx+1)]
                 -operatorLB[NW]*u[nx-1+jXB[NW]+2*(nx+1)]
                 -operatorLB[SE]*u[nx-1+(2+jYB[SE])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-1+2*(nx+1)]-=
                                 operatorLB[i]*u[nx-1+jXB[i]+(2+jYB[i])*(nx+1)];
             }
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 ndiagL2[sy-3]=operatorLB[SE];
                 ndiagL1[sy-2]=operatorLB[S];
@@ -1247,7 +1247,7 @@ void LineGS::yline(
                     -operatorLB[W]*u[nx-1+jXB[W]+sy*(nx+1)]
                     -operatorLB[E]*u[nx-1+jXB[E]+sy*(nx+1)]
                     -operatorLB[NW]*u[nx-1+jXB[NW]+sy*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                                 operatorLB[i]*u[nx-1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -1262,7 +1262,7 @@ void LineGS::yline(
                 -operatorLB[E]*u[nx+(ny-2)*(nx+1)]
                 -operatorLB[NW]*u[nx-1+jXB[NW]+(ny-2)*(nx+1)]
                 -operatorLB[NE]*u[nx-1+(ny-2+jYB[NE])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-1+(ny-2)*(nx+1)]-=
                             operatorLB[i]*u[nx-1+jXB[i]+(ny-2+jYB[i])*(nx+1)];
@@ -1278,7 +1278,7 @@ void LineGS::yline(
                 -operatorLC[E]*u[nx+(ny-1)*(nx+1)]
                 -operatorLC[NW]*u[nx-1+jXC[NW]+(ny-1)*(nx+1)]
                 -operatorLC[N]*u[nx-1+(ny-1+jYC[N])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+(ny-1)*(nx+1)]-=
                             operatorLC[i]*u[nx-1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
@@ -1304,7 +1304,7 @@ void LineGS::yline(
                 -operatorLC[W]*u[nx+1]
                 -operatorLC[E]*u[2+nx+1]
                 -operatorLC[NE]*u[1+jXC[NE]+nx+1]; 
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+nx+1]-=operatorLC[i]*u[1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
@@ -1317,11 +1317,11 @@ void LineGS::yline(
                 -operatorLB[E]*u[2+2*(nx+1)]
                 -operatorLB[NE]*u[1+jXB[NE]+2*(nx+1)]
                 -operatorLB[SE]*u[1+(2+jYB[SE])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[1+2*(nx+1)]-=operatorLB[i]*u[1+jXB[i]+(2+jYB[i])*(nx+1)];
             }
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
                 ndiagL2[sy-3]=operatorLB[SE];
@@ -1333,7 +1333,7 @@ void LineGS::yline(
                     -operatorLB[W]*u[1+jXB[W]+sy*(nx+1)]
                     -operatorLB[E]*u[1+jXB[E]+sy*(nx+1)]
                     -operatorLB[NE]*u[1+jXB[NE]+sy*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[1+sy*(nx+1)]-=
                                 operatorLB[i]*u[1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -1349,7 +1349,7 @@ void LineGS::yline(
                 -operatorLB[E]*u[2+(ny-2)*(nx+1)]
                 -operatorLB[NE]*u[1+jXB[NE]+(ny-2)*(nx+1)]
                 -operatorLB[NW]*u[1+(ny-2+jYB[NW])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[1+(ny-2)*(nx+1)]-=
                             operatorLB[i]*u[1+jXB[i]+(ny-2+jYB[i])*(nx+1)];
@@ -1365,7 +1365,7 @@ void LineGS::yline(
                 -operatorLC[E]*u[2+(ny-1)*(nx+1)]
                 -operatorLC[NW]*u[1+jXC[NW]+(ny-1)*(nx+1)]
                 -operatorLC[N]*u[1+(ny-1+jYC[N])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[1+(ny-1)*(nx+1)]-=
                                 operatorLC[i]*u[1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
@@ -1373,7 +1373,7 @@ void LineGS::yline(
             yLRSolver(u,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process all inner coulmns
-            for(size_t sx=2; sx<nx-1; sx++)
+            for(Index sx=2; sx<nx-1; sx++)
             {
                 // set rhs
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
@@ -1388,7 +1388,7 @@ void LineGS::yline(
                     -operatorLB[E]*u[sx+jXB[E]+nx+1]
                     -operatorLB[NW]*u[sx+jXB[NW]+nx+1]
                     -operatorLB[SE]*u[sx+jXB[SE]+(nx+1)];
-                for(size_t i=7; i<operatorLB.size(); i++)
+                for(Index i=7; i<operatorLB.size(); i++)
                 {
                     rhs[sx+nx+1]-=operatorLB[i]*u[sx+jXB[i]+(1+jYB[i])*(nx+1)];
                 }
@@ -1403,11 +1403,11 @@ void LineGS::yline(
                     -operatorL[NW]*u[sx+jX[NW]+2*(nx+1)]
                     -operatorL[SE]*u[sx+jX[SE]+2*(nx+1)]
                     -operatorL[SW]*u[sx+(2+jY[SW])*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[sx+2*(nx+1)]-=operatorL[i]*u[sx+jX[i]+(2+jY[i])*(nx+1)];
                 }
-                for(size_t sy=3; sy<ny-2; sy++)
+                for(Index sy=3; sy<ny-2; sy++)
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     ndiagL2[sy-3]=operatorL[SW];
@@ -1420,7 +1420,7 @@ void LineGS::yline(
                         -operatorL[E]*u[sx+jX[E]+sy*(nx+1)]
                         -operatorL[NW]*u[sx+jX[NW]+sy*(nx+1)]
                         -operatorL[SE]*u[sx+jX[SE]+sy*(nx+1)];
-                    for(size_t i=9; i<operatorL.size(); i++)
+                    for(Index i=9; i<operatorL.size(); i++)
                     {
                         rhs[sx+sy*(nx+1)]-=
                                     operatorL[i]*u[sx+jX[i]+(sy+jY[i])*(nx+1)];
@@ -1437,7 +1437,7 @@ void LineGS::yline(
                     -operatorL[NW]*u[sx+jX[NW]+(ny-2)*(nx+1)]
                     -operatorL[SE]*u[sx+jX[SE]+(ny-2)*(nx+1)]
                     -operatorL[NE]*u[sx+(ny-2+jY[NE])*(nx+1)];
-                for(size_t i=9; i<operatorL.size(); i++)
+                for(Index i=9; i<operatorL.size(); i++)
                 {
                     rhs[sx+(ny-2)*(nx+1)]-=
                                 operatorL[i]*u[sx+jX[i]+(ny-2+jY[i])*(nx+1)];
@@ -1454,7 +1454,7 @@ void LineGS::yline(
                     -operatorLB[E]*u[sx+jXB[E]+(ny-1)*(nx+1)]
                     -operatorLB[NW]*u[sx+jXB[NW]+(ny-1)*(nx+1)]
                     -operatorLB[SE]*u[sx+jXB[SE]+(ny-1)*(nx+1)];
-                for(size_t i=9; i<operatorLB.size(); i++)
+                for(Index i=9; i<operatorLB.size(); i++)
                 {
                     rhs[sx+(ny-1)*(nx+1)]-=
                                 operatorLB[i]*u[sx+jXB[i]+(ny-1+jYB[i])*(nx+1)];
@@ -1470,7 +1470,7 @@ void LineGS::yline(
                 -operatorLC[W]*u[nx-2+nx+1]
                 -operatorLC[E]*u[nx+nx+1]
                 -operatorLC[NW]*u[nx-1+jXC[NW]+nx+1];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+nx+1]-=operatorLC[i]*u[nx-1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
@@ -1486,12 +1486,12 @@ void LineGS::yline(
                 -operatorLB[E]*u[nx+2*(nx+1)]
                 -operatorLB[NW]*u[nx-1+jXB[NW]+2*(nx+1)]
                 -operatorLB[SE]*u[nx-1+(2+jYB[SE])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-1+2*(nx+1)]-=
                                 operatorLB[i]*u[nx-1+jXB[i]+(2+jYB[i])*(nx+1)];
             }
-            for(size_t sy=3; sy<ny-2; sy++)  
+            for(Index sy=3; sy<ny-2; sy++)  
             {
                 operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
                 ndiagL2[sy-3]=operatorLB[SE];
@@ -1503,7 +1503,7 @@ void LineGS::yline(
                     -operatorLB[W]*u[nx-1+jXB[W]+sy*(nx+1)]
                     -operatorLB[E]*u[nx-1+jXB[E]+sy*(nx+1)]
                     -operatorLB[NW]*u[nx-1+jXB[NW]+sy*(nx+1)];
-                for(size_t i=8; i<operatorLB.size(); i++)
+                for(Index i=8; i<operatorLB.size(); i++)
                 {
                     rhs[nx-1+sy*(nx+1)]-=
                                 operatorLB[i]*u[nx-1+jXB[i]+(sy+jYB[i])*(nx+1)];
@@ -1519,7 +1519,7 @@ void LineGS::yline(
                 -operatorLB[E]*u[nx+(ny-2)*(nx+1)]
                 -operatorLB[NW]*u[nx-1+jXB[NW]+(ny-2)*(nx+1)]
                 -operatorLB[NE]*u[nx-1+(ny-2+jYB[NE])*(nx+1)];
-            for(size_t i=8; i<operatorLB.size(); i++)
+            for(Index i=8; i<operatorLB.size(); i++)
             {
                 rhs[nx-1+(ny-2)*(nx+1)]-=
                             operatorLB[i]*u[nx-1+jXB[i]+(ny-2+jYB[i])*(nx+1)];
@@ -1535,7 +1535,7 @@ void LineGS::yline(
                 -operatorLC[E]*u[nx+(ny-1)*(nx+1)]
                 -operatorLC[NW]*u[nx-1+jXC[NW]+(ny-1)*(nx+1)]
                 -operatorLC[N]*u[nx-1+(ny-1+jYC[N])*(nx+1)];
-            for(size_t i=7; i<operatorLC.size(); i++)
+            for(Index i=7; i<operatorLC.size(); i++)
             {
                 rhs[nx-1+(ny-1)*(nx+1)]-=
                             operatorLC[i]*u[nx-1+jXC[i]+(ny-1+jYC[i])*(nx+1)];

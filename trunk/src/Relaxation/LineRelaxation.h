@@ -20,25 +20,25 @@ protected:
     const Direction direction_;
     void xLRSolver(
         NumericArray& u,
-        const size_t sy,
-        const size_t nx,
+        const Index sy,
+        const Index nx,
         NumericArray& rhs,
         NumericArray& ndiagL,
         NumericArray& diagR,
         const NumericArray& ndiagR) const;
     void yLRSolver(
         NumericArray& u,
-        const size_t sx,
-        const size_t nx,
-        const size_t ny,
+        const Index sx,
+        const Index nx,
+        const Index ny,
         NumericArray& rhs,
         NumericArray& ndiagL,
         NumericArray& diagR,
         const NumericArray& ndiagR) const;
     void xLRSolver(
         NumericArray& u,
-        const size_t sy,
-        const size_t nx,
+        const Index sy,
+        const Index nx,
         NumericArray& rhs,
         NumericArray& ndiagL1,
         NumericArray& ndiagL2,
@@ -47,9 +47,9 @@ protected:
         const NumericArray& ndiagR2) const;
     void yLRSolver(
         NumericArray& u,
-        const size_t sx,
-        const size_t nx,
-        const size_t ny,
+        const Index sx,
+        const Index nx,
+        const Index ny,
         NumericArray& rhs,
         NumericArray& ndiagL1,
         NumericArray& ndiagL2,

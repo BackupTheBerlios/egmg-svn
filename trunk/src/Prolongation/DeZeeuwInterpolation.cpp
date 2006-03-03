@@ -15,16 +15,16 @@ namespace mg
 NumericArray DeZeeuwInterpolation::prolongate(
     const NumericArray& u,
     const Stencil& stencil,
-    const size_t nx,
-    const size_t ny) const
+    const Index nx,
+    const Index ny) const
 {
-    register const size_t nxNew=2*nx;
-    register const size_t nyNew=2*ny;
+    register const Index nxNew=2*nx;
+    register const Index nyNew=2*ny;
     NumericArray result((nxNew+1)*(nyNew+1));
     PositionArray jx=stencil.getJx(C);
     PositionArray jy=stencil.getJy(C);
     NumericArray stencilL=stencil.getL(C,0,0,nx,ny);
-    std::valarray<size_t> position(9);
+    std::valarray<Index> position(9);
     NumericArray ms(9);
     NumericArray mt(9);
     // position[0]=No. of the sw-element of the stencil
@@ -37,7 +37,7 @@ NumericArray DeZeeuwInterpolation::prolongate(
     // position[7]=No. of the n-element of the stencil
     // position[8]=No. of the ne-element of the stencil
     // (see also the definitions of the constants in the .h-file)
-    for (size_t j=0; j<jx.size(); ++j)
+    for (Index j=0; j<jx.size(); ++j)
     {
         position[(jx[j]+1)+3*(jy[j]+1)]=j;
     }
@@ -61,20 +61,20 @@ NumericArray DeZeeuwInterpolation::prolongate(
     Precision w_n=0;
 
     //"interpolation" of coarse grid points
-    for (size_t sy=0; sy<=ny; ++sy)
-        for (size_t sx=0; sx<=nx; ++sx)
+    for (Index sy=0; sy<=ny; ++sy)
+        for (Index sx=0; sx<=nx; ++sx)
             result[2*sy*(nxNew+1)+2*sx]=u[sy*(nx+1)+sx];
     
     //interpolation of fine grid points on coarse grid lines
-    for (size_t sy=0; sy<=nyNew; sy+=2)
-        for (size_t sx=1; sx<=nxNew; sx+=2)
+    for (Index sy=0; sy<=nyNew; sy+=2)
+        for (Index sx=1; sx<=nxNew; sx+=2)
         {
             stencilL=stencil.getL(C,sx,sy,nx,ny);
             symsum=0;
             
             // Divide the stencil defined by stencilL und position into a
             // symmetric and an antisymmetric part.
-            for (size_t k=0; k<9; ++k)
+            for (Index k=0; k<9; ++k)
             {
                 ms[k]=0.5*(stencilL[position[k]]+stencilL[position[8-k]]);
                 symsum+=ms[k];
@@ -105,8 +105,8 @@ NumericArray DeZeeuwInterpolation::prolongate(
     
     // interpolation of fine grid points on fine grid lines and coarse grid 
     // columns
-    for (size_t sy=1; sy<=nyNew; sy+=2)
-        for (size_t sx=0; sx<=nxNew; sx+=2)
+    for (Index sy=1; sy<=nyNew; sy+=2)
+        for (Index sx=0; sx<=nxNew; sx+=2)
         {
             stencilL=stencil.getL(C,sx,sy,nx,ny);
             symsum=0;
@@ -143,8 +143,8 @@ NumericArray DeZeeuwInterpolation::prolongate(
         }
             
     //interpolation of fine grid points on fine grid lines and fine grid columns
-    for (size_t sy=1; sy<=nyNew; sy+=2)
-        for (size_t sx=1; sx<=nxNew; sx+=2)
+    for (Index sy=1; sy<=nyNew; sy+=2)
+        for (Index sx=1; sx<=nxNew; sx+=2)
         {
             stencilL=stencil.getL(C,sx,sy,nx,ny);
             erg=0;
@@ -170,17 +170,17 @@ NumericArray DeZeeuwInterpolation::prolongate(
     return result;
 }
 const NumericArray& DeZeeuwInterpolation::getI(
-    const size_t sx,
-    const size_t sy, 
-    const size_t nx,
-    const size_t ny,
+    const Index sx,
+    const Index sy, 
+    const Index nx,
+    const Index ny,
     const Stencil& stencil)
 {
     NumericArray stencilL=stencil.getL(C,0,0,nx,ny);
     PositionArray jx=stencil.getJx(C);
     PositionArray jy=stencil.getJy(C);
-    std::valarray<size_t> position(9);
-    for (size_t jj=0;jj<jx.size();jj++)
+    std::valarray<Index> position(9);
+    for (Index jj=0;jj<jx.size();jj++)
     {
         position[(jx[jj]+1)+3*(jy[jj]+1)]=jj;
     }
@@ -214,7 +214,7 @@ const NumericArray& DeZeeuwInterpolation::getI(
     
     // Divide the stencil defined by stencilL und position into a symmetric 
     // and an antisymmetric part.
-    for (size_t k=0; k<9; ++k)
+    for (Index k=0; k<9; ++k)
     {
         mS[k]=0.5*(stencilL[position[k]]+stencilL[position[8-k]]);
         symsum+=mS[k];
@@ -277,7 +277,7 @@ const NumericArray& DeZeeuwInterpolation::getI(
     
     // Divide the stencil defined by stencilL und position into a symmetric 
     // and an antisymmetric part.
-    for (size_t k=0; k<9; ++k)
+    for (Index k=0; k<9; ++k)
     {
         mS[k]=0.5*(stencilL[position[k]]+stencilL[position[8-k]]);
         symsum+=mS[k];

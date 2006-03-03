@@ -32,8 +32,8 @@ namespace mg
         const NumericArray& u,
         const NumericArray& f,
         const Stencil& stencil,
-        const size_t nx,
-        const size_t ny);
+        const Index nx,
+        const Index ny);
 }
 
 #endif /*MAXRESIDUUM_H_*/

@@ -19,8 +19,19 @@ namespace mg
 	 */
 	typedef double Precision;
     
+    /**
+     * \brief the index
+     */
+    typedef size_t Index;
+    
+    /**
+     * \brief vector holding numeric values
+     */
     typedef std::valarray<Precision> NumericArray;
     
+    /**
+     * \brief vector holding integers
+     */
     typedef std::valarray<int> PositionArray;
 		
 	/**

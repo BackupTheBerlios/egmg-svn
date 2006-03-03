@@ -43,8 +43,8 @@ void cycle(
     const Prolongation& prolongation,
     const Restriction& restriction,
     Relaxation& relaxation,
-    const size_t nx,
-    const size_t ny);
+    const Index nx,
+    const Index ny);
 }
 #include "cycle.cpp"
 #endif /*CYCLE_H_*/

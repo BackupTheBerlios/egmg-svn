@@ -205,10 +205,10 @@ public:
     inline Precision apply(
         const NumericArray& u,
         const Position pos,
-        const size_t sx,
-        const size_t sy,
-        const size_t nx,
-        const size_t ny) const
+        const Index sx,
+        const Index sy,
+        const Index nx,
+        const Index ny) const
     {
         switch(pos)
         {
@@ -332,10 +332,10 @@ public:
 
     inline Precision getCenter(
         const Position pos,
-        const size_t,
-        const size_t,
-        const size_t nx,
-        const size_t ny) const
+        const Index,
+        const Index,
+        const Index nx,
+        const Index ny) const
     {
         switch (pos)
         {
@@ -388,10 +388,10 @@ public:
      */
     inline const NumericArray& getL(
         const Position pos,
-        const size_t,
-        const size_t,
-        const size_t nx,
-        const size_t ny) const
+        const Index,
+        const Index,
+        const Index nx,
+        const Index ny) const
     {
         switch (pos)
         {
@@ -520,7 +520,7 @@ public:
      * 
      * \return  2
      */
-    inline size_t size() const
+    inline Index size() const
     {
         return 2;
     }

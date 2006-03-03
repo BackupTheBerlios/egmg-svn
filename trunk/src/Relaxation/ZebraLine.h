@@ -24,29 +24,29 @@ private:
         const NumericArray &f, 
         NumericArray resid,
         const Stencil &stencil,
-        const size_t nx, 
-        const size_t ny) const;
+        const Index nx, 
+        const Index ny) const;
     void ninepointyzebra(
         NumericArray &u,
         const NumericArray &f, 
         NumericArray resid,
         const Stencil &stencil,
-        const size_t nx, 
-        const size_t ny) const;
+        const Index nx, 
+        const Index ny) const;
     void xzebra(
         NumericArray &u,
         const NumericArray &f, 
         NumericArray resid,
         const Stencil &stencil,
-        const size_t nx, 
-        const size_t ny) const;
+        const Index nx, 
+        const Index ny) const;
     void yzebra(
         NumericArray &u,
         const NumericArray &f, 
         NumericArray resid,
         const Stencil &stencil,
-        const size_t nx, 
-        const size_t ny) const;
+        const Index nx, 
+        const Index ny) const;
 public:
     /**
      * \brief The constructor of a ZebraLine object
@@ -85,8 +85,8 @@ public:
         NumericArray &u,
         const NumericArray &f, 
         const Stencil &stencil,
-        const size_t nx,
-        const size_t ny) const;
+        const Index nx,
+        const Index ny) const;
 };
 }
 #endif /* ZEBRALINE_H_ */

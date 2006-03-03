@@ -77,14 +77,14 @@ public:
     NumericArray prolongate(
         const NumericArray& u,
         const Stencil& stencil,
-        const size_t nx,
-        const size_t ny) const;
+        const Index nx,
+        const Index ny) const;
 
     const NumericArray& getI(
-        const size_t,
-        const size_t,
-        const size_t,
-        const size_t,
+        const Index,
+        const Index,
+        const Index,
+        const Index,
         const Stencil&) const
     {
         return i_;  

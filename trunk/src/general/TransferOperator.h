@@ -59,10 +59,10 @@ public:
 	 * \return				the coefficients of the TransferOperator
 	 */
 	virtual const NumericArray& getI(
-		const size_t sx,
-		const size_t sy,
-		const size_t nx,
-		const size_t ny, 
+		const Index sx,
+		const Index sy,
+		const Index nx,
+		const Index ny, 
 		const Stencil& stencil) const =0;
 		
 	/**

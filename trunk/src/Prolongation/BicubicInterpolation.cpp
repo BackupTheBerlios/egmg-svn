@@ -11,29 +11,29 @@ namespace mg
 NumericArray BicubicInterpolation::prolongate(
     const NumericArray& u,
     const Stencil&,
-    const size_t nx,
-    const size_t ny) const
+    const Index nx,
+    const Index ny) const
 {
-    const size_t nxNew=2*nx;
-    const size_t nyNew=2*ny;
+    const Index nxNew=2*nx;
+    const Index nyNew=2*ny;
     NumericArray result((nxNew+1)*(nyNew+1));
     
     //"interpolation" of coarse grid points
-    for (size_t sy=0; sy<=ny; ++sy)
-        for (size_t sx=0; sx<=nx; ++sx)
+    for (Index sy=0; sy<=ny; ++sy)
+        for (Index sx=0; sx<=nx; ++sx)
             result[2*sy*(nxNew+1)+2*sx]=u[sy*(nx+1)+sx];
         
     if (nxNew>3 && nyNew>3)
     {
         //interpolation of fine grid points on coarse grid lines
-        for (size_t sy=0; sy<=nyNew; sy+=2)
+        for (Index sy=0; sy<=nyNew; sy+=2)
         {
             result[sy*(nxNew+1)+1]=
                 1./8*(3*result[sy*(nxNew+1)]
                      +6*result[sy*(nxNew+1)+2]
                      -1*result[sy*(nxNew+1)+4]);
 
-            for (size_t sx=3; sx<=nxNew-2; sx+=2)
+            for (Index sx=3; sx<=nxNew-2; sx+=2)
                 result[sy*(nxNew+1)+sx]=
                     1./16*(-1*result[sy*(nxNew+1)+sx-3]
                            +9*result[sy*(nxNew+1)+sx-1]
@@ -47,14 +47,14 @@ NumericArray BicubicInterpolation::prolongate(
         }
         
         //interpolation of fine grid points on fine grid lines
-        for (size_t sx=0; sx<=nxNew; ++sx)
+        for (Index sx=0; sx<=nxNew; ++sx)
         {
             result[nxNew+1+sx]=
                 1./8*(3*result[sx]+
                       6*result[2*(nxNew+1)+sx]
                      -1*result[4*(nxNew+1)+sx]); 
 
-            for (size_t j=3; j<=nyNew-2; j+=2)
+            for (Index j=3; j<=nyNew-2; j+=2)
                 result[j*(nxNew+1)+sx]=
                     1./16*(-1*result[(j-3)*(nxNew+1)+sx]
                            +9*result[(j-1)*(nxNew+1)+sx]
@@ -73,15 +73,15 @@ NumericArray BicubicInterpolation::prolongate(
         //each direction
 
         //interpolation of fine grid points on coarse grid lines
-        for (size_t sy=0; sy<=nyNew; sy+=2)
-            for (size_t sx=1; sx<=nxNew; sx+=2)
+        for (Index sy=0; sy<=nyNew; sy+=2)
+            for (Index sx=1; sx<=nxNew; sx+=2)
                 result[sy*(nxNew+1)+sx]=
                     1./2*(result[sy*(nxNew+1)+sx-1]
                          +result[sy*(nxNew+1)+sx+1]);
         
         //interpolation of fine grid points on fine grid lines
-        for (size_t sy=1; sy<=nyNew; sy+=2)
-            for (size_t sx=0; sx<=nxNew; ++sx)
+        for (Index sy=1; sy<=nyNew; sy+=2)
+            for (Index sx=0; sx<=nxNew; ++sx)
                 result[sy*(nxNew+1)+sx]=
                     1./2*(result[(sy-1)*(nxNew+1)+sx]
                          +result[(sy+1)*(nxNew+1)+sx]);
