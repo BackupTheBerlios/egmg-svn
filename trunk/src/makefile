@@ -7,6 +7,9 @@ Objects = main.o
 Obj = ./functions/*.o ./Prolongation/*.o ./Relaxation/*.o ./Restriction/*.o #./Stencil/*.o
 Exe = ./main.exe
 
+.PHONY: CycleType
+CycleType:
+	$(MAKE) -C CycleType $(TARGET)
 .PHONY: functions
 functions:
 	$(MAKE) -C functions $(TARGET)
