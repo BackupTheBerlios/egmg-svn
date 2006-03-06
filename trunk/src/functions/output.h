@@ -21,10 +21,20 @@ namespace mg
  * CRI = ( ||x{i}||/||x{0}||)^(1/i)
  * CR5 = ( ||x{i}||/||x{5}||)^(1/(i-5)) for i>5
  * CR  = ( ||x{i}||/||x{i-1}||
- * \param vec    a vector containing a history of residues messured 
- *               in the same norm
+ * \param[in] vec    a vector containing a history of residues messured 
+ *                   in the same norm
  */
-void convergenceRates(std::vector<Precision>& vec);
+void convergenceRates(const std::vector<Precision>& vec, std::ostream& out);
+
+/**
+ * 
+ */
+void gnuPlotDiscreteFunction(
+    const NumericArray& u,
+    const Index nx,
+    const Index ny,
+    std::ostream& out);
+
 }
 
 #endif /*OUTPUT_H_*/

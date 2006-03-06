@@ -23,7 +23,7 @@ void cycle(
     const Index nx,
     const Index ny)
 {
-    if (cycleType.solve())
+    if (cycleType.solve() || std::min(nx,ny)<=6)
     {
         /**
          * \todo implement a direct solver

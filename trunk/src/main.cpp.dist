@@ -81,8 +81,10 @@ int main()
 		}
 		iterations++;
 	}
-	//print out the defects history
-    convergenceRates(residues);
+    //print out the defects history
+    convergenceRates(residues,std::cout);
 	std::cout<<"Fehler = "<<error(u,nx,ny,g)<<" It = "<<iterations<<std::endl;
+    std::ofstream plotData("data.dat");
+	gnuPlotDiscreteFunction(residuum(u,fv,lap,nx,ny),nx,ny,plotData);
 	return 0;
 }
