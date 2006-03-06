@@ -47,7 +47,8 @@ public:
     FCycle(const FCycle& rhs)
         : maximumDepth_(rhs.maximumDepth_),
           currentDepth_(rhs.currentDepth_+1),
-          currentState_(rhs.lastState_)
+          currentState_(rhs.lastState_),
+          lastState_(rhs.lastState_)
     {}
     
     /**
