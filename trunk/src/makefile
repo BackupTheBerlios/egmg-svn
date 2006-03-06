@@ -1,6 +1,6 @@
 CXX = LANG=en g++
 LD = LANG=en g++
-export CXXFLAGS = -O3 -W -Wall -pedantic
+export CXXFLAGS = -O3 -W -Wall -ansi -pedantic
 LDFLAGS = $(CXXFLAGS)
 
 Objects = main.o
@@ -39,10 +39,10 @@ clean: TARGET = clean
 clean: CycleType functions Prolongation Relaxation Restriction Stencil
 	$(RM) $(Exe) $(Objects) doxygen.log
 	
-debug: CXXFLAGS = -O0 -g -W -Wall -pedantic
+debug: CXXFLAGS = -O0 -g -W -Wall -ansi -pedantic
 debug: all
 	
-profile: CXXFLAGS = -O3 -pg -W -Wall -pedantic
+profile: CXXFLAGS = -O3 -pg -W -Wall -ansi -pedantic
 profile: all
 	$(Exe)
 	gprof $(Exe) > gprof.out.txt
