@@ -1,7 +1,9 @@
-#include<valarray>
-#include<vector>
-#include<cmath>
-#include<iostream>
+#include <valarray>
+#include <vector>
+#include <cmath>
+#include <iostream>
+#include <ostream>
+#include <fstream>
 #include "./Stencil/StencilIncludes.h"
 #include "./Restriction/RestrictionIncludes.h"
 #include "./Relaxation/RelaxationIncludes.h"
