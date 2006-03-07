@@ -15,6 +15,7 @@
 
 namespace mg
 {
+
 /**
  * \brief cycle() does one iterative multigridcycle
  * 
@@ -22,6 +23,7 @@ namespace mg
  * equation (pde) on a discrete rectangular grid. The discretization of the
  * pde is given by stencil.\n
  * CycleType controlls the CylceType \see CycleType.
+ * 
  * \param[in] cycleType         the cycle type
  * \param[in,out] u             the vector represantation of the unknown
  *                              function to solve on a rectangular grid.

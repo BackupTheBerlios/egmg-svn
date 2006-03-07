@@ -1,3 +1,7 @@
+/** \file functionsIncludes.h
+ * \author <a href="mailto:mail@jirikraus.de">Jiri Kraus</a>,
+ * \brief convenient header for includes
+ */
 #ifndef FUNCTIONSINCLUDES_H_
 #define FUNCTIONSINCLUDES_H_
 

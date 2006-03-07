@@ -1,7 +1,7 @@
 Objects =
-	
-FCycle.h, WCycle.h: Stencil.h
-FCycle.h, WCycle.h: ../general/parameters.h
+
+CycleType.h: Stencil.h ../general/parameters.h
+FCycle.h, WCycle.h: CycleType.h
 VCycle.h: WCycle.h
 
 %.o: %.h %.cpp

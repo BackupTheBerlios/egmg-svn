@@ -7,6 +7,30 @@ Objects = main.o
 Obj = ./functions/*.o ./Prolongation/*.o ./Relaxation/*.o ./Restriction/*.o
 Exe = ./main.exe
 
+all: TARGET = all
+all: CycleType functions Prolongation Relaxation Restriction Stencil $(Objects)
+	$(LD) $(LDFLAGS) $(Objects) $(Obj) -o $(Exe)
+	
+clean: TARGET = clean
+clean: CycleType functions Prolongation Relaxation Restriction Stencil
+	$(RM) $(Exe) $(Objects) doxygen.log
+
+run: all
+	$(Exe)
+	
+debug: CXXFLAGS = -O0 -g -W -Wall -ansi -pedantic
+debug: all
+	
+profile: CXXFLAGS = -O3 -pg -W -Wall -ansi -pedantic
+profile: all
+	$(Exe)
+	gprof $(Exe) > gprof.out.txt
+	$(RM) gmon.out
+
+#do always a rebuild of the documentation if doc is called
+doc:
+	doxygen Multigrid.Doxyfile
+
 .PHONY: CycleType
 CycleType:
 	$(MAKE) -C CycleType $(TARGET)
@@ -29,28 +53,3 @@ Stencil:
 #always build main to keep dependency simple while testing
 main.o: main.cpp CycleType functions Prolongation Relaxation Restriction Stencil
 	$(CXX) $(CXXFLAGS) -c main.cpp
-
-
-all: TARGET = all
-all: CycleType functions Prolongation Relaxation Restriction Stencil $(Objects)
-	$(LD) $(LDFLAGS) $(Objects) $(Obj) -o $(Exe)
-
-clean: TARGET = clean
-clean: CycleType functions Prolongation Relaxation Restriction Stencil
-	$(RM) $(Exe) $(Objects) doxygen.log
-	
-debug: CXXFLAGS = -O0 -g -W -Wall -ansi -pedantic
-debug: all
-	
-profile: CXXFLAGS = -O3 -pg -W -Wall -ansi -pedantic
-profile: all
-	$(Exe)
-	gprof $(Exe) > gprof.out.txt
-	$(RM) gmon.out
-
-#do always a rebuild of the documentation if doc is called
-doc:
-	doxygen Multigrid.Doxyfile
-
-run: all
-	$(Exe)

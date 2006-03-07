@@ -35,8 +35,8 @@ namespace mg
     typedef std::valarray<int> PositionArray;
 		
 	/**
-	 * \enum mg::Postion
-	 * \brief Postion describes relative positions
+	 * \enum mg::Position
+	 * \brief Position describes relative positions
 	 * 
 	 * The meaning of the constants are:
 	 * <table border="0">
@@ -58,6 +58,7 @@ namespace mg
 	 * <td>S</td><td>south</td>
 	 * </tr><tr>
 	 * <td>SW</td><td>south west</td>
+     * </tr>
 	 * </table>
 	 */
 	enum Position{C=0,W=1,N=2,E=3,S=4,NW=5,NE=6,SE=7,SW=8};

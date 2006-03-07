@@ -23,11 +23,20 @@ namespace mg
  * CR  = ( ||x{i}||/||x{i-1}||
  * \param[in] vec    a vector containing a history of residues messured 
  *                   in the same norm
+ * \param[out] out  the ostream to write the output to
  */
 void convergenceRates(const std::vector<Precision>& vec, std::ostream& out);
 
 /**
+ * \brief writes x y value tripels to the ostream out
  * 
+ * gnuPlotDiscreteFunction write x y value triples to the ostream out, these
+ * data can be visualized with gnuplot: splot "datafile"
+ * 
+ * \param[in] u     the discrete function to visualize
+ * \param[in] nx    number of steps in x direction
+ * \param[in] ny    number of steps in y direction
+ * \param[out] out  the ostream to write the output to
  */
 void gnuPlotDiscreteFunction(
     const NumericArray& u,

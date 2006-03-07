@@ -9,8 +9,6 @@
 
 #include <vector>
 #include "CycleType.h"
-#include "../general/parameters.h"
-#include "../Stencil/Stencil.h"
 
 namespace mg
 {

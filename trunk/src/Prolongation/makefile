@@ -2,12 +2,10 @@ Objects = BicubicInterpolation.o BilinearInterpolation.o SevenPointInterpolation
 
 %.o: %.h %.cpp
 	$(CXX) $(CXXFLAGS) -c $*.cpp
-	
-BilinearInterpolation.h: Prolongation.h
-SevenPointInterpolation.h: Prolongation.h
-BicubicInterpolation.h: Prolongation.h
 
-Prolongation.h: ../general/parameters.h
+BicubicInterpolation.h BilinearInterpolation.h SevenPointInterpolation.h: Prolongation.h
+
+Prolongation.h: ../general/parameters.h ../general/TransferOperator.h ../Stencil/Stencil.h
 
 all: $(Objects)
 

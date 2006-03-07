@@ -1,3 +1,7 @@
+/** \file CycleTypeIncludes.h
+ * \author <a href="mailto:mail@jirikraus.de">Jiri Kraus</a>,
+ * \brief convenient header for includes
+ */
 #ifndef CYCLETYPEINCLUDES_H_
 #define CYCLETYPEINCLUDES_H_
 

@@ -9,12 +9,13 @@
 
 #include <vector>
 #include "CycleType.h"
-#include "../general/parameters.h"
-#include "../Stencil/Stencil.h"
 
 namespace mg
 {
-    
+
+/**
+ * \brief FCycle is a F Cylce
+ */    
 class FCycle : public mg::CycleType
 {
 private:
