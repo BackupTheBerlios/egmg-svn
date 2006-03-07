@@ -18,7 +18,16 @@ namespace mg
  */
 class CycleType
 {
+private:
+    /**
+     * \brief The copy constructor of a CycleType object
+     * 
+     * The copy constructor of a CycleType object should not be used.
+     * \param[in] rhs   the CycleType to copy
+     */
+    CycleType(const CycleType& rhs);
 public:
+    CycleType() {}
     /**
      * \brief The constructor of a CycleType object
      * 
@@ -27,18 +36,7 @@ public:
      */
     CycleType(const Index maximalDepth);
     
-    /**
-     * \brief The copy constructor of a CycleType object
-     * 
-     * The copy constructor of a CycleType object has to take care that the
-     * copy constructed CycleType object knows everything to do the next
-     * coarser grid
-     * 
-     * \param[in] rhs   the WCycle to copy
-     */
-    CycleType(const CycleType& rhs);
-    
-    ~CycleType();
+    virtual ~CycleType() {}
     
     /**
      * \brief solve() on this grid level directly?
@@ -47,14 +45,24 @@ public:
      * 
      * \return  true if we are on the coarsest grid
      */
-    bool solve() const;
+    virtual bool solve() const =0;
     
     /**
      * \brief repeat() the iteration on this level?
      * 
      * \return  true if a another iteration should be done on this grid level
      */
-    bool repeat();
+    virtual bool repeat() =0;
+    
+    /**
+     * \brief tells a CycleType Object that the next grid level will be entered
+     */
+    virtual void incrementGridLevel() =0;
+    
+    /**
+     * \brief tells a CycleType Object that a grid level will be left
+     */
+    virtual void decrementGridLevel() =0;
     
     /**
      * \brief accelerate() the current solution
@@ -67,12 +75,12 @@ public:
      * \param[in] nx        number of steps in x direction
      * \param[in] ny        number of steps in y direction
      */
-    void accelerate(
+    virtual void accelerate(
         NumericArray& u,
         const NumericArray& f,
         const Stencil& stencil,
         const Index nx,
-        const Index ny);
+        const Index ny) =0;
 };
 
 }

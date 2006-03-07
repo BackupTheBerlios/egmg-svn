@@ -7,20 +7,21 @@
 #ifndef FCYCLE_H_
 #define FCYCLE_H_
 
+#include <vector>
+#include "CycleType.h"
 #include "../general/parameters.h"
 #include "../Stencil/Stencil.h"
 
 namespace mg
 {
     
-class FCycle //: interface mg::CycleType
+class FCycle : public mg::CycleType
 {
 private:
     const Index maximumDepth_;
-    const Index currentDepth_;
+    Index currentDepth_;
     enum State_{INIT,FCYCLE,VCYCLE};
-    State_ currentState_;
-    State_ lastState_;
+    std::vector<State_ > currentState_;
 
 public:
     /**
@@ -32,23 +33,18 @@ public:
     FCycle(Index maximumDepth)
         : maximumDepth_(maximumDepth),
           currentDepth_(0),
-          currentState_(INIT),
-          lastState_(INIT)
+          currentState_(maximumDepth+1,INIT)
     {}
     
-    /**
-     * \brief The copy constructor of a FCycle object
-     * 
-     * FCycle constructs a FCycle object with the same parameters than rhs,
-     * but a current level counter is increased by one.
-     * \param[in] rhs   the FCycle to copy
-     */
-    FCycle(const FCycle& rhs)
-        : maximumDepth_(rhs.maximumDepth_),
-          currentDepth_(rhs.currentDepth_+1),
-          currentState_(rhs.lastState_),
-          lastState_(rhs.lastState_)
-    {}
+    virtual void incrementGridLevel()
+    {
+        ++currentDepth_;
+    }
+    
+    virtual void decrementGridLevel()
+    {
+        --currentDepth_;
+    }
     
     /**
      * \brief solve() on this grid level directly?
@@ -57,7 +53,7 @@ public:
      * 
      * \return  true if we are on the coarsest grid
      */
-    bool solve() const
+    virtual bool solve() const
     {
         return maximumDepth_==currentDepth_;
     }
@@ -67,14 +63,19 @@ public:
      * 
      * \return  true if a another iteration should be done on this grid level
      */
-    bool repeat()
+    virtual bool repeat()
     {
-        lastState_=currentState_;
-        if (currentState_==INIT)
-            currentState_=FCYCLE;
-        else if (currentState_==FCYCLE)
-            currentState_=VCYCLE;
-        return lastState_!=VCYCLE;
+        if (currentState_[currentDepth_]==INIT)
+            currentState_[currentDepth_]=FCYCLE;
+        else if (currentState_[currentDepth_]==FCYCLE)
+            currentState_[currentDepth_]=VCYCLE;
+        else if (currentState_[currentDepth_]==VCYCLE)
+        {
+            //reinitilize for next cycle
+            currentState_[currentDepth_]=INIT;
+            return false;
+        }
+        return true;
     }
     
     /**
@@ -82,7 +83,7 @@ public:
      * 
      * does nothing for FCycle
      */
-    void accelerate(
+    virtual void accelerate(
         NumericArray&,
         const NumericArray&,
         const Stencil&,

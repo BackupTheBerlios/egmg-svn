@@ -10,6 +10,7 @@
 #include "../Prolongation/Prolongation.h"
 #include "../Relaxation/Relaxation.h"
 #include "../Restriction/Restriction.h"
+#include "../CycleType/CycleType.h"
 #include "../Stencil/Stencil.h"
 
 namespace mg
@@ -34,9 +35,8 @@ namespace mg
  * \param[in] ny                number of steps in y direction
  * \throw std::domain_error     if nx or ny is not divedable by 2
  */
-template<typename CycleType>
 void cycle(
-    CycleType cycleType,
+    CycleType& cycleType,
     NumericArray& u,
     const NumericArray& f,
     Stencil& stencil,
@@ -46,5 +46,5 @@ void cycle(
     const Index nx,
     const Index ny);
 }
-#include "cycle.cpp"
+
 #endif /*CYCLE_H_*/

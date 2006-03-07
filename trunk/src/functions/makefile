@@ -1,4 +1,4 @@
-Objects = error.o putbval.o putrhs.o residuum.o maxResiduum.o twonormResiduum.o output.o directSolver.o
+Objects = cycle.o error.o putbval.o putrhs.o residuum.o maxResiduum.o twonormResiduum.o output.o directSolver.o
 
 %.o: %.h %.cpp
 	$(CXX) $(CXXFLAGS) -c $*.cpp

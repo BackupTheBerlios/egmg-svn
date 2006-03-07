@@ -46,47 +46,47 @@ void testInit()
 int main()
 {
     testInit();
-	const int k = 8;
-	const size_t nx =static_cast<size_t>(std::pow(2.,k));
-	const size_t ny = nx;
-	NumericArray u(0.0,(nx+1)*(ny+1));
-	NumericArray fv(0.0,(nx+1)*(ny+1));
-	putbval(u,nx,ny,g);
-	putrhs(fv,nx,ny,f);
-	const size_t itmax = 100;
-	size_t iterations = 0;
-	const Precision eps = 1e-30;
-	std::cout<<"Genauigkeit : "<<eps<<std::endl;
-	Laplacian2D2 lap;
-	GSLexicographic relaxation(2,1);
-	Precision resnull = twonormResiduum(u,fv,lap,nx,ny);
-	Precision resnew = resnull;
-	Precision resold = resnull;
-	FullWeighting restriction;
-	BilinearInterpolation prolongation;
+    const int k = 8;
+    const size_t nx =static_cast<size_t>(std::pow(2.,k));
+    const size_t ny = nx;
+    NumericArray u(0.0,(nx+1)*(ny+1));
+    NumericArray fv(0.0,(nx+1)*(ny+1));
+    putbval(u,nx,ny,g);
+    putrhs(fv,nx,ny,f);
+    const size_t itmax = 25;
+    size_t iterations = 0;
+    const Precision eps = 1e-30;
+    std::cout<<"Genauigkeit : "<<eps<<std::endl;
+    Laplacian2D2 lap;
+    GSRedBlack relaxation(2,1);
+    Precision resnull = twonormResiduum(u,fv,lap,nx,ny);
+    Precision resnew = resnull;
+    Precision resold = resnull;
+    FullWeighting restriction;
+    BilinearInterpolation prolongation;
     VCycle vCycle(k-1);
-	//residues is used to store the intermediate residues, there are printed
-	//after the cycle iterations because writing to std out takes a long time
-	std::vector<Precision> residues;
-	residues.push_back(resnull);
-	while (iterations<itmax && resnew/resnull>eps)
-	{
-		resold=resnew;
-		cycle(vCycle,u,fv,lap,prolongation,restriction,relaxation,nx,ny);
-		resnew=twonormResiduum(u,fv,lap,nx,ny);
-		residues.push_back(resnew);
-		std::cout<<resnew<<std::endl;
-		if (resnew>resold && iterations>3)
-		{
-			std::cout<<"No convergence"<<std::endl;
-			break;	
-		}
-		iterations++;
-	}
+    //residues is used to store the intermediate residues, there are printed
+    //after the cycle iterations because writing to std out takes a long time
+    std::vector<Precision> residues;
+    residues.push_back(resnull);
+    while (iterations<itmax && resnew/resnull>eps)
+    {
+        resold=resnew;
+        cycle(vCycle,u,fv,lap,prolongation,restriction,relaxation,nx,ny);
+        resnew=twonormResiduum(u,fv,lap,nx,ny);
+        residues.push_back(resnew);
+        std::cout<<resnew<<std::endl;
+        if (resnew>resold && iterations>3)
+        {
+            std::cout<<"No convergence"<<std::endl;
+            break;  
+        }
+        iterations++;
+    }
     //print out the defects history
     convergenceRates(residues,std::cout);
-	std::cout<<"Fehler = "<<error(u,nx,ny,g)<<" It = "<<iterations<<std::endl;
-    std::ofstream plotData("data.dat");
-	gnuPlotDiscreteFunction(residuum(u,fv,lap,nx,ny),nx,ny,plotData);
-	return 0;
+    std::cout<<"Fehler = "<<error(u,nx,ny,g)<<" It = "<<iterations<<std::endl;
+//    std::ofstream plotData("data.dat");
+//    gnuPlotDiscreteFunction(residuum(u,fv,lap,nx,ny),nx,ny,plotData);
+    return 0;
 }

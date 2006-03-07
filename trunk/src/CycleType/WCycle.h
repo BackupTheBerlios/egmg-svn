@@ -7,6 +7,8 @@
 #ifndef WCYCLE_H_
 #define WCYCLE_H_
 
+#include <vector>
+#include "CycleType.h"
 #include "../general/parameters.h"
 #include "../Stencil/Stencil.h"
 
@@ -14,15 +16,15 @@ namespace mg
 {
 
 /**
- * \brief VCycle is a W Cylce
+ * \brief WCycle is a W Cylce
  */
-class WCycle //: interface mg::CycleType
+class WCycle : public mg::CycleType
 {
 private:
     const Index gamma_;
-    Index repeats_;
+    std::vector<Index> repeats_;
     const Index maximalDepth_;
-    const Index currentDepth_;
+    Index currentDepth_;
 public:
     /**
      * \brief The constructor of a WCycle object
@@ -33,26 +35,22 @@ public:
      */
     WCycle(const Index maximalDepth,const Index gamma)
         : gamma_(gamma),
-          repeats_(0),
+          repeats_(maximalDepth+1,0),
           maximalDepth_(maximalDepth),
           currentDepth_(0)
     {}
     
-    /**
-     * \brief The copy constructor of a WCycle object
-     * 
-     * WCycle constructs a WCycle object with the same parameters than rhs,
-     * but a current level counter is increased by one.
-     * \param[in] rhs   the WCycle to copy
-     */
-    WCycle(const WCycle& rhs)
-        : gamma_(rhs.gamma_),
-          repeats_(0),
-          maximalDepth_(rhs.maximalDepth_),
-          currentDepth_(rhs.currentDepth_+1)
-    {}
-
     virtual ~WCycle() {}
+    
+    virtual void incrementGridLevel()
+    {
+        repeats_[++currentDepth_]=0;
+    }
+    
+    virtual void decrementGridLevel()
+    {
+        --currentDepth_;
+    }
     
     /**
      * \brief solve() on this grid level directly?
@@ -75,8 +73,8 @@ public:
      */
     virtual bool repeat()
     {
-        ++repeats_;
-        return repeats_<=gamma_;
+        ++repeats_[currentDepth_];
+        return repeats_[currentDepth_]<=gamma_;
     }
     
     /**

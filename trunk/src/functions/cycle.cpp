@@ -12,9 +12,9 @@
 
 namespace mg
 {
-template<typename CycleType>
+
 void cycle(
-    CycleType cycleType,
+    CycleType& cycleType,
     NumericArray& u,
     const NumericArray& f,
     Stencil& stencil,
@@ -24,6 +24,7 @@ void cycle(
     const Index nx,
     const Index ny)
 {
+    cycleType.incrementGridLevel();
     if (cycleType.solve() || std::min(nx,ny)<=6)
     {
         directSolver(u,f,stencil,nx,ny);
@@ -69,5 +70,6 @@ void cycle(
             cycleType.accelerate(u,f,stencil,nx,ny);
         }
     }
+    cycleType.decrementGridLevel();
 }
 }
