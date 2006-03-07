@@ -1,7 +1,7 @@
 /** \file output.h
- * \author Matthias Rettenmeier
+ * \author Matthias Rettenmeier,
+ *         <a href="mailto:mail@jirikraus.de">Jiri Kraus</a>
  * \brief contains the interface of the functions onvergenceRates
- * \todo implement a gnuplot output function
  */
 #ifndef OUTPUT_H_
 #define OUTPUT_H_

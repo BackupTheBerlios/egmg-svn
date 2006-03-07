@@ -5,7 +5,6 @@
  * This file contains the interface of DendyInterpolation. The
  * implementation is in DendyInterpolation.cpp
  * \todo This file needs cleanup
- * \todo make this work with all type of stencils
  */
  
 #ifndef DENDY_INTERPOLATION_H_

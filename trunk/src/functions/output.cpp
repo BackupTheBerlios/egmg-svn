@@ -1,5 +1,6 @@
 /** \file output.cpp
- * \author Matthias Rettenmeier
+ * \author Matthias Rettenmeier,
+ *         <a href="mailto:mail@jirikraus.de">Jiri Kraus</a>
  * \brief contains the implementation of the functions output and outputvalue
  */
 #include <iomanip>

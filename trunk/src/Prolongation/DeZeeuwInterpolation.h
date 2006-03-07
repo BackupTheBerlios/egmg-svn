@@ -5,7 +5,6 @@
  * This file contains the interface of DeZeeuwInterpolation. The
  * implementation is in DeZeeuwInterpolation.cpp
  * \todo This file needs cleanup
- * \todo make this work with all type of stencils
  */
 #ifndef DEZEEUWINTERPOLATION_H_
 #define DEZEEUWINTERPOLATION_H_
