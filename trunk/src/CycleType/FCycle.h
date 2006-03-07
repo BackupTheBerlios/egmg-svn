@@ -1,7 +1,6 @@
-/** \file FCycle.cpp
+/** \file FCycle.h
  * \author <a href="mailto:mail@jirikraus.de">Jiri Kraus</a>,
  *  <a href="mailto:kai.lists.berlios.de@tragetaschen.dyndns.org">Kai Ruhnau</a>
- * 
  * \brief Contains the class FCycle.
  * \see cycle.h
  */

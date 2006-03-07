@@ -58,8 +58,8 @@ void gnuPlotDiscreteFunction(
        <<std::setw(10)<<std::left<<"value"<<std::endl;
     Precision hx=1.0/nx;
     Precision hy=1.0/ny;
-    for (Index sy=0; sy<ny; ++sy)
-        for (Index sx=0; sx<nx; ++sx)
+    for (Index sy=0; sy<=ny; ++sy)
+        for (Index sx=0; sx<=nx; ++sx)
             out<<std::setw(10)<<std::left<<sx*hx<<" "
                <<std::setw(10)<<std::left<<sy*hy<<" "
                <<std::setw(10)<<std::left<<u[sy*(nx+1)+sx]<<std::endl;

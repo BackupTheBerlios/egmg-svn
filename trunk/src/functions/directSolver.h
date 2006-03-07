@@ -1,9 +1,10 @@
-/** \file directLUSolver.h
+/** \file directSolver.h
  * \author <a href="mailto:mail@jirikraus.de">Jiri Kraus</a>
- * \brief directLUSolver.h contains the declaration of the func. directLUSolver.
+ *  <a href="mailto:kai.lists.berlios.de@tragetaschen.dyndns.org">Kai Ruhnau</a>
+ * \brief directSolver.h contains the declaration of the func. directSolver.
  */
-#ifndef DIRECTLUSOLVER_H_
-#define DIRECTLUSOLVER_H_
+#ifndef DIRECTSOLVER_H_
+#define DIRECTSOLVER_H_
 
 #include "../general/parameters.h"
 #include "../Stencil/Stencil.h"
@@ -12,9 +13,9 @@ namespace mg
 {
 
 /**
- * \brief directLUSolver() solves the discrete pde given by stencil
+ * \brief directSolver() solves the discrete pde given by stencil
  * 
- * directLUSolver() solves the discrete linear pde given by stencil with
+ * directSolver() solves the discrete linear pde given by stencil with
  * LU decomposition.
  * 
  * \param[in,out] u     the solution of the discrete pde
@@ -23,11 +24,11 @@ namespace mg
  * \param[in] nx        number of steps in x direction
  * \param[in] ny        number of steps in y direction
  */
-void directLUSolver(
+void directSolver(
     NumericArray& u,
     const NumericArray& f,
     const Stencil& stencil,
     const Index nx,
     const Index ny);
 }
-#endif /*DIRECTLUSOLVER_H_*/
+#endif /*DIRECTSOLVER_H_*/

@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include "cycle.h"
 #include "residuum.h"
+#include "directSolver.h"
 
 namespace mg
 {
@@ -25,11 +26,7 @@ void cycle(
 {
     if (cycleType.solve() || std::min(nx,ny)<=6)
     {
-        /**
-         * \todo implement a direct solver
-         */
-        for (int i=0; i<10; i++)
-            relaxation.relax(u,f,stencil,nx,ny);
+        directSolver(u,f,stencil,nx,ny);
     }
     else
     {
