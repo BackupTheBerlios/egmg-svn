@@ -11,86 +11,79 @@ namespace mg
 namespace
 {
     
-void fillBoarderValues(
-    NumericArray& matrixA,
-    const Index dimA,
+void fillBorderValues(
+    NumericArray& matrix,
+    const Index dimension,
     const NumericArray& u,
     NumericArray& rightSide,
     const Index nx,
-    const Index ny
-    )
+    const Index ny)
 {
-    //boarder values XDIR
+    //border values XDIR
     for (Index sx=0; sx<=nx; ++sx)
     {
-        //lower boarder
-        matrixA[sx*dimA+sx]=1;
+        //lower border
+        matrix[sx*dimension+sx]=1;
         rightSide[sx]=u[sx];
-        //upper boarder
-        matrixA[(dimA-1-sx)*dimA+(dimA-1-sx)]=1;
-        rightSide[dimA-1-sx]=u[dimA-sx];
+        //upper border
+        matrix[(dimension-1-sx)*dimension+(dimension-1-sx)]=1;
+        rightSide[dimension-1-sx]=u[dimension-sx];
     }
-    //boarder values YDIR
+    //border values YDIR
     //corners have been process in XDIR (y=1..ny-1 instead of y=0..ny)
     for (Index sy=1; sy<ny; ++sy)
     {
-        //left boarder
-        matrixA[sy*(nx+1)*dimA+sy*(nx+1)]=1;
+        //left border
+        matrix[sy*(nx+1)*dimension+sy*(nx+1)]=1;
         rightSide[sy*(nx+1)]=u[sy*(nx+1)];
-        //right boarder
-        matrixA[(sy*(nx+1)+nx)*dimA+(sy*(nx+1)+nx)]=1;
+        //right border
+        matrix[(sy*(nx+1)+nx)*dimension+(sy*(nx+1)+nx)]=1;
         rightSide[(sy*(nx+1)+nx)]=u[(sy*(nx+1)+nx)];
     }
 }
 
-void pointFillMatrixA(
-    NumericArray& matrixA,
-    const Index dimA,
+void pointFillMatrix(
+    NumericArray& matrix,
+    const Index dimension,
     const Stencil& stencil,
     const Position postion,
     const Index sx,
     const Index sy,
     const Index nx,
-    const Index ny
-    )
+    const Index ny)
 {
     PositionArray jX=stencil.getJx(postion);
     PositionArray jY=stencil.getJy(postion);
     NumericArray operatorL=stencil.getL(postion,sx,sy,nx,ny);
     for (Index i=0; i<operatorL.size(); ++i)
-        matrixA[(sy*(nx+1)+sx)*dimA+((sy+jY[i])*(nx+1)+sx+jX[i])]=operatorL[i];
+        matrix[(sy*(nx+1)+sx)*dimension+((sy+jY[i])*(nx+1)+sx+jX[i])]=operatorL[i];
 }
 
-void fillMatrixA(
-    NumericArray& matrixA,
-    const Index dimA,
+void fillMatrix(
+    NumericArray& matrix,
+    const Index dimension,
     const Stencil& stencil,
     const Index nx,
-    const Index ny
-)
+    const Index ny)
 {
     //corner points
-    pointFillMatrixA(matrixA,dimA,stencil,NW,1,ny-1,nx,ny);
-    pointFillMatrixA(matrixA,dimA,stencil,NE,nx-1,ny-1,nx,ny);
-    pointFillMatrixA(matrixA,dimA,stencil,SE,nx-1,1,nx,ny);
-    pointFillMatrixA(matrixA,dimA,stencil,SW,1,1,nx,ny);
-    //boarder points
+    pointFillMatrix(matrix,dimension,stencil,NW,1,ny-1,nx,ny);
+    pointFillMatrix(matrix,dimension,stencil,NE,nx-1,ny-1,nx,ny);
+    pointFillMatrix(matrix,dimension,stencil,SE,nx-1,1,nx,ny);
+    pointFillMatrix(matrix,dimension,stencil,SW,1,1,nx,ny);
+    //border points
     for (Index sy=2; sy<(ny-1); ++sy)
-        pointFillMatrixA(matrixA,dimA,stencil,W,1,sy,nx,ny);
+        pointFillMatrix(matrix,dimension,stencil,W,1,sy,nx,ny);
     for (Index sy=2; sy<(ny-1); ++sy)
-        pointFillMatrixA(matrixA,dimA,stencil,E,nx-1,sy,nx,ny);
+        pointFillMatrix(matrix,dimension,stencil,E,nx-1,sy,nx,ny);
     for (Index sx=2; sx<(nx-1); ++sx)
-        pointFillMatrixA(matrixA,dimA,stencil,N,sx,ny-1,nx,ny);
+        pointFillMatrix(matrix,dimension,stencil,N,sx,ny-1,nx,ny);
     for (Index sx=2; sx<(nx-1); ++sx)
-        pointFillMatrixA(matrixA,dimA,stencil,S,sx,1,nx,ny);
+        pointFillMatrix(matrix,dimension,stencil,S,sx,1,nx,ny);
     //center Points
     for (Index sy=2; sy<(ny-1); ++sy)
-    {
         for (Index sx=2; sx<(nx-1); ++sx)
-        {
-            pointFillMatrixA(matrixA,dimA,stencil,C,sx,sy,nx,ny);
-        }
-    }
+            pointFillMatrix(matrix,dimension,stencil,C,sx,sy,nx,ny);
 }
 
 PositionArray pivotLU(
@@ -128,12 +121,11 @@ PositionArray pivotLU(
 }
 
 NumericArray solve(
-    const NumericArray& matrix,
+    NumericArray& matrix,
     const NumericArray& b,
     const Index dimension)
 {
-    NumericArray lu=matrix;
-    PositionArray permutation=pivotLU(lu,dimension);
+    PositionArray permutation=pivotLU(matrix,dimension);
 
     NumericArray result(dimension);
     //solve Ly=b
@@ -141,17 +133,17 @@ NumericArray solve(
     {
         result[sx]=b[permutation[sx]];
         for (Index sy=0; sy<sx; ++sy)
-            result[sx]-=lu[permutation[sx]*dimension+sy]*result[sy];
+            result[sx]-=matrix[permutation[sx]*dimension+sy]*result[sy];
     }
     //solve Rx=y
     for (Index sx=0; sx<dimension; ++sx)
     {
         for (Index sy=0; sy<sx; ++sy)
             result[dimension-1-sx]-=
-                 lu[permutation[dimension-1-sx]*dimension+dimension-1-sy]
+                 matrix[permutation[dimension-1-sx]*dimension+dimension-1-sy]
                 *result[dimension-1-sy];
         result[dimension-1-sx]/=
-            lu[(permutation[dimension-1-sx]+1)*dimension-1-sx];
+            matrix[(permutation[dimension-1-sx]+1)*dimension-1-sx];
     }
     return result;
 }
@@ -165,14 +157,14 @@ void directSolver(
     const Index nx,
     const Index ny)
 {
-    const Index dimA=u.size();
-    NumericArray matrixA(0.0,dimA*dimA);
+    const Index dimension=u.size();
+    NumericArray matrix(0.0,dimension*dimension);
     NumericArray rightSide=f;
     
-    fillBoarderValues(matrixA,dimA,u,rightSide,nx,ny);
+    fillBorderValues(matrix,dimension,u,rightSide,nx,ny);
 
-    fillMatrixA(matrixA,dimA,stencil,nx,ny);
+    fillMatrix(matrix,dimension,stencil,nx,ny);
     
-    u=solve(matrixA,rightSide,u.size());
+    u=solve(matrix,rightSide,u.size());
 }  
 }
