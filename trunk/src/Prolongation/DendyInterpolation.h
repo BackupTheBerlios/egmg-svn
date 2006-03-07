@@ -55,13 +55,15 @@ public:
     virtual ~DendyInterpolation() {}
 
     /**
-     * \brief prolongate does a matrix-dependent interpolation on the input vector
+     * \brief prolongate does a matrix-dependent interpolation on the input
+     *        vector
      * 
-     * \param u     the vector representing a rectangle to prolongate
-     * \param nx    Number of steps in x direction
-     * \param ny    Number of steps in y direction
-     * \return      a vector representing the prolongated rectangle of 
-     *              size 2*(nx+1)*2*(ny+1)
+     * \param[in] u         the vector representing a rectangel to prolongate
+     * \param[in] stencil   the stencil rep. of the pde
+     * \param[in] nx        Number of steps in x direction
+     * \param[in] ny        Number of steps in y direction
+     * \return              a vector representing the prolongated rectangle of 
+     *                      size 2*(nx+1)*2*(ny+1)
      */
     NumericArray prolongate(
         const NumericArray& u,

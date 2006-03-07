@@ -75,11 +75,12 @@ public:
      * input vector on a rectangular 2D gird with lexicographic ordering and the
      * discretazation Stencil for a pde
      * 
-     * \param u     the vector representation of the 2D grid to perform the
-     *              relaxation on this vector will be changed
-     * \param f     the right hand side of the pde
-     * \param nx    number of steps in x direction
-     * \param ny    number of steps in y direction
+     * \param[in,out] u     the vector representation of the 2D grid to perform
+     *                      the relaxation on
+     * \param[in] f         the right hand side of the pde
+     * \param[in] stencil   the stencil rep. of the pde
+     * \param[in] nx        number of steps in x direction
+     * \param[in] ny        number of steps in y direction
      */
     void relax(
         NumericArray &u,

@@ -74,11 +74,13 @@ public:
     /**
      * \brief prolongate does a bicubic interpolation on the input vector
      * 
-     * \param u     the vector representing a rectangel to prolongate
-     * \param nx    Number of steps in x direction
-     * \param ny    Number of steps in y direction
-     * \return      a vector representing the prolongated rectangel of 
-     *              size 2*(nx+1)*2*(ny+1)
+     * \param[in] u         the vector representing a rectangel to prolongate
+     * \param[in] stencil   the stencil rep. of the pde needed for matrix dep.
+     *                      Prolongations (not used).
+     * \param[in] nx        Number of steps in x direction
+     * \param[in] ny        Number of steps in y direction
+     * \return              a vector representing the prolongated rectangel of 
+     *                      size 2*(nx+1)*2*(ny+1)
      */
     NumericArray prolongate(
         const NumericArray& u,

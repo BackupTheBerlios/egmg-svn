@@ -53,8 +53,8 @@ public:
      * 
      * MSV2D4 constructs a MSV2D4 where \f$a_x\f$ and \f$a_y\f$
      * are given by:
-     * \param[in] a_x   coefficient of the diff. operator (default 1.0)
-     * \param[in] a_y   coefficient of the diff. operator (default 1.0)
+     * \param[in] ax   coefficient of the diff. operator (default 1.0)
+     * \param[in] ay   coefficient of the diff. operator (default 1.0)
      */
     explicit MSV2D4(Precision ax =1.0,Precision ay =1.0) 
         : l_(9), jx_(initJx_()), jy_(initJy_()), ax_(ax), ay_(ay)

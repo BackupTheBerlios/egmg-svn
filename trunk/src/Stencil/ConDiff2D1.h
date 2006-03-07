@@ -54,11 +54,16 @@ public:
     /**
      * \brief The constructor of a ConDiff2D1 object
      * 
-     * ConDiff2D1 constructs a ConDiff2D1 where \f$\epsilon\f$, \f$a_1\f$ and \f$a_2\f$
-     * are given by:
-     * \param[in] \epsilon coefficient of the diffusion part (default 1.0)
-     * \param[in] a_1 = cos(\beta)  coefficient of the convection part (default \pi/4)
-     * \param[in] a_2 = sin(\beta)  coefficient of the convection part (default \pi/4)
+     * ConDiff2D1 constructs a ConDiff2D1 where \f$\epsilon\f$, \f$a_1\f$ and
+     * \f$a_2\f$ are given by:\n
+     * \f[
+     * a_1 = cos(\beta)
+     * \f]
+     * \f[
+     * a_2 = sin(\beta)
+     * \f]
+     * \param[in] epsilon coefficient of the diffusion part (default 1.0)
+     * \param[in] beta    coefficient of the convection part (default pi/4)
      */
     explicit ConDiff2D1(
         Precision epsilon=1.0,
@@ -70,6 +75,7 @@ public:
     {}
 
     virtual ~ConDiff2D1() {}
+    
     inline Precision apply(
         const NumericArray& u,
         const Position,

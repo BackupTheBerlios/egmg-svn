@@ -191,11 +191,6 @@ private:
 public:
     /**
      * \brief The constructor of a Biharmonic2D2 object
-     * 
-     * Biharmonic2D2 constructs a Biharmonic2D2 where \f$a_x\f$ and \f$a_y\f$
-     * are given by:
-     * \param[in] a_x   coefficient of the diff. operator (default 1.0)
-     * \param[in] a_y   coefficient of the diff. operator (default 1.0)
      */
     explicit Biharmonic2D2()
             : lCenter_(13), lBorder_(12), lCorner_(11),
@@ -380,6 +375,8 @@ public:
      * J_x ={ 0,-1,0,1,0,-2,0,2,0,-1,1,1,-1}\n
      * J_y ={ 0,0,1,0,-1,0,2,0,-2,1,1,-1,-1}\n
      * 
+     * \param[in] pos   relative position in the domain according to the
+     *                  enum Postion 
      * \param[in]       the x coordinate of the center element (not used)
      * \param[in]       the y coordinate of the center element (not used)
      * \param[in] nx    the step size in x direction

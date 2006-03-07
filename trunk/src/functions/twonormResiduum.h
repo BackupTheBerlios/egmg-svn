@@ -15,11 +15,12 @@ namespace mg
 /**
  * \brief twonormResiduum() calculates the two norm of the residuum
  *
- * \param u     the acctual approximation of the solution
- * \param f     the right hand side of the pde
- * \param nx    number of steps in x direction
- * \param ny    number of steps in y direction
- * \return      the two norm of the resduum
+ * \param[in] u         the acctual approximation of the solution
+ * \param[in] f         the right hand side of the pde
+ * \param[in] stencil   the stencil rep. of the pde
+ * \param[in] nx        number of steps in x direction
+ * \param[in] ny        number of steps in y direction
+ * \return              the two norm of the resduum
  */
     Precision twonormResiduum(
         const NumericArray& u,

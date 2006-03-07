@@ -80,11 +80,11 @@ public:
     /**
      * \brief The constructor of a ConvectionDiffusion2D1 object
      * 
-     * ConvectionDiffusion2D1 constructs a ConvectionDiffusion2D1 where \f$\epsilon\f$, \f$a_1\f$ and \f$a_2\f$
-     * are given by:
-     * \param[in] \epsilon coefficient of the diffusion part (default 1.0)
-     * \param[in] a=(2 x_2 - 1)(1 - x�_1) coefficient of the convection part (default \pi/4)
-     * \param[in] b=2 x_1 x_2 (x_2 - 1)   coefficient of the convection part (default \pi/4)
+     * ConvectionDiffusion2D1 constructs a ConvectionDiffusion2D1 where
+     * \f$\epsilon\f$ is given by:
+     * 
+     * \param[in] epsilon   coefficient of the diffusion part (default 1)
+     * \param[in] mode      (default 0)
      */
     explicit ConvectionDiffusion2D1(Precision epsilon =1.0, int mode=0) 
         : l_(5), jx_(initJx_()), jy_(initJy_()), epsilon_(epsilon), mode_(mode)

@@ -153,10 +153,11 @@ public:
     /**
      * \brief The constructor of a ConDiff2Dkap object
      * 
-     * ConDiff2Dkap constructs a ConDiff2Dkap where \f$a_x\f$ and \f$a_y\f$
-     * are given by:
-     * \param[in] a_x   coefficient of the diff. operator (default 1.0)
-     * \param[in] a_y   coefficient of the diff. operator (default 1.0)
+     * ConDiff2Dkap constructs a ConDiff2Dkap with:
+     * 
+     * \param[in] epsilon   (default 1)
+     * \param[in] beta      (default pi/4)
+     * \param[in] kappa     (default 1/3)
      */
     explicit ConDiff2Dkap(
         Precision epsilon=1.0,

@@ -19,7 +19,7 @@ namespace mg
 class FCycle : public mg::CycleType
 {
 private:
-    const Index maximumDepth_;
+    const Index maximalDepth_;
     Index currentDepth_;
     enum State_{INIT,FCYCLE,VCYCLE};
     std::vector<State_ > currentState_;
@@ -31,10 +31,10 @@ public:
      * FCycle constructs a FCycle object with:
      * \param[in] maximalDepth  Number of Grid Levels
      */
-    FCycle(Index maximumDepth)
-        : maximumDepth_(maximumDepth),
+    FCycle(Index maximalDepth)
+        : maximalDepth_(maximalDepth),
           currentDepth_(0),
-          currentState_(maximumDepth+1,INIT)
+          currentState_(maximalDepth+1,INIT)
     {}
     
     virtual void incrementGridLevel()
@@ -56,7 +56,7 @@ public:
      */
     virtual bool solve() const
     {
-        return maximumDepth_==currentDepth_;
+        return maximalDepth_==currentDepth_;
     }
     
     /**
