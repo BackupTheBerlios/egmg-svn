@@ -1,3 +1,7 @@
+/** \file Galerkin.h
+ * \author <a href="mailto:mail@jirikraus.de">Jiri Kraus</a>
+ * \brief Contains the interface the class Galerkin.
+ */
 #ifndef GALERKIN_H_
 #define GALERKIN_H_
 
@@ -12,22 +16,25 @@
 namespace mg
 {
 
-class Galerkin : public Stencil
+namespace
+{
+
+class GalerkinImpl
 {
 private:
-    class Quadruple
+	class Quadruple
     {
     private:
-        const Index i_, j_, k_, l_;
+        const Index v1_, v2_, v3_, v4_;
     public:
-        Quadruple(const Index i,const Index j,const Index k,const Index l)
-            :i_(i),j_(j),k_(k),l_(l) {}
+        Quadruple(const Index v1,const Index v2,const Index v3,const Index v4)
+            :v1_(v1),v2_(v2),v3_(v3),v4_(v4) {}
 
         bool operator==(const Quadruple& rhs) const
         {
             if (this == &rhs)
                 return true;
-            return i_==rhs.i_ && j_==rhs.j_ && k_== rhs.k_ && l_==rhs.l_;
+            return v1_==rhs.v1_ && v2_==rhs.v2_ && v3_== rhs.v3_ && v4_==rhs.v4_;
         }
 
         bool operator!=(const Quadruple& rhs) const
@@ -36,98 +43,163 @@ private:
                 return false;
             return !(*this==rhs);
         }
-
-        bool operator>(const Quadruple& rhs) const
+        bool operator<(const Quadruple& rhs) const
+        {
+            return 
+                   v1_<rhs.v1_ 
+                || v1_==rhs.v1_ && v2_<rhs.v2_
+                || v1_==rhs.v1_ && v2_==rhs.v2_ && v3_<rhs.v3_
+                || v1_==rhs.v1_ && v2_==rhs.v2_ && v3_==rhs.v3_ && v4_<rhs.v4_;
+        }
+		bool operator>(const Quadruple& rhs) const
+		{
+			return (*this!=rhs) && !(*this<rhs);
+		}
+		bool operator>=(const Quadruple& rhs) const
         {
             return !(*this<rhs);
         }
-        bool operator<(const Quadruple& rhs) const
-
-        {
-            return 
-                   i_<rhs.i_ 
-                || i_==rhs.i_ && j_<rhs.j_
-                || i_==rhs.i_ && j_==rhs.j_ && k_<rhs.k_
-                || i_==rhs.i_ && j_==rhs.j_ && k_==rhs.k_ && l_<rhs.l_;
-        }
-
+		bool operator<=(const Quadruple& rhs) const
+		{
+			return !(*this>rhs);
+		}
     };
+	std::map<Quadruple,NumericArray > operatorValues_;
+	const std::vector<PositionArray > jX_;
+	const std::vector<PositionArray > jY_;
+	const Restriction* const restriction_;
+	const Stencil* const stencil_;
+	const Prolongation* const prolongation_;
+	const Index size_;
+	initJX_(
+		const Restriction* const restriction,
+		const Stencil* const stencil,
+		const Prolongation* const prolongation);
+	initJY_(
+		const Restriction* const restriction,
+		const Stencil* const stencil,
+		const Prolongation* const prolongation);
+	initJX_(const Stencil* const stencil);
+	initJy_(const Stencil* const stencil);
+public:
+	GalerkinImpl(
+		const Restriction* const restriction,
+		const Stencil* const stencil,
+		const Prolongation* const prolongation)
+		: jX_(initJX_(restriction,stencil,prolongation)),
+		  jY_(initJY_((restriction,stencil,prolongation)),
+		  restriction_(restriction),
+		  stencil_(stencil),
+		  prolongation_(prolongation),
+		  size_(initSize_(restriction,stencil,prolongation))
+	{}
+	GalerkinImpl(const Stencil* const stencil)
+		: jX_(initJX_(stencil)),jY_(initJY_(stencil)),
+		  restriction_(0),
+		  stencil_(stencil),
+		  prolongation_(0),
+		  size_(stencil.size())
+	{}
+}
 
-    std::vector<std::map<Quadruple,NumericArray > > data_;
-    std::vector<PositionArray > jx_;
-    std::vector<PositionArray > jy_;
+}
+
+class Galerkin : public Stencil
+{
+private:
+    
+
+    std::vector< > data_;
+	std::vector<std::vector<PositionArray > > jX_;
+	std::vector<std::vector<PositionArray > > jY_;
     const Stencil& stencil_;
     Index size_;
-    std::vector<const Prolongation*> prolongations_;
-    std::vector<const Restriction*> restrictions_;
-    std::vector<PositionArray > initJx_(const Stencil&);
-    std::vector<PositionArray > initJy_(const Stencil&);
+    std::vector<const Prolongation&> prolongations_;
+    std::vector<const Restriction&> restrictions_;
+	Index currentDepth_;
+    std::vector<std::vector<PositionArray > > initJx_(const Stencil&);
+    std::vector<std::vector<PositionArray > > initJy_(const Stencil&);
     void updateSize_();
     void updateJxJy_();
+	NumericArray computeL(
+        const Position position,
+        const Index sx,
+        const Index sy,
+        const Index nx,
+        const Index ny) const;
 public:
     Galerkin(const Stencil& fineGridOperator)
-        : jx_(initJx_(fineGridOperator)), jy_(initJy_(fineGridOperator)),
-          stencil_(fineGridOperator), size_(fineGridOperator.size()) {}
+        : data_(9),
+		  jX_(initJx_(fineGridOperator)),jY_(initJy_(fineGridOperator)),
+          stencil_(fineGridOperator),
+		  size_(fineGridOperator.size()),
+		  prolongations_(0),
+		  restrictions_(0),
+		  currentDepth_(prolongations_.size()){}
     virtual ~Galerkin() {}
 
     virtual Precision apply(
-        const NumericArray&,
-        const Position,
-        const Index,
-        const Index,
-        const Index,
-        const Index) const;
+        const NumericArray& u,
+        const Position position,
+        const Index sx,
+        const Index sy,
+        const Index nx,
+        const Index ny) const;
 
     virtual Precision getCenter(
-        const Position,
-        const Index,
-        const Index,
-        const Index,
-        const Index) const;
+		const Position position,
+        const Index sx,
+        const Index sy,
+        const Index nx,
+        const Index ny) const;
 
     virtual const NumericArray& getL(
-        const Position,
-        const Index,
-        const Index,
-        const Index,
-        const Index) const;
+        const Position position,
+        const Index sx,
+        const Index sy,
+        const Index nx,
+        const Index ny) const;
 
     inline const PositionArray& getJx(const Position p) const
     {
-        return jx_[p];
+		return jX_[currentDepth_][p];
     }
 
     inline const PositionArray& getJy(const Position p) const
     {
-        return jy_[p];
+        return jY_[currentDepth_][p];
     }
 
     void pushProlongation(const Prolongation& prolongation)
     {
-        prolongations_.push_back(&prolongation);
-        updateSize_();
+        prolongations_.push_back(prolongation);
+		currentDepth_=prolongations_.size();
         updateJxJy_();
+		updateSize_();
     }
 
     void popProlongation()
     {
         prolongations_.pop_back();
-        updateSize_();
+		currentDepth_=prolongations_.size();
         updateJxJy_();
+		updateSize_();
     }
 
     void pushRestriction(const Restriction& restriction)
     {
-        restrictions_.push_back(&restriction);
-        updateSize_();
+        restrictions_.push_back(restriction);
+		currentDepth_=restrictions_.size();
         updateJxJy_();
+		updateSize_();
     }
 
     void popRestriction()
     {
         restrictions_.pop_back();
-        updateSize_();
+		currentDepth_=restrictions_.size();
         updateJxJy_();
+		updateSize_();
     }
 
     inline Index size() const
