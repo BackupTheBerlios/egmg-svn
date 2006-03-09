@@ -4,7 +4,7 @@
  */
 
 #include <cmath>
-#include <utility>
+#include <algorithm>
 #include "error.h"
 
 namespace mg

@@ -4,7 +4,7 @@
  * \see maxResiduum.h
  */
 
-#include <utility>
+#include <algorithm>
 #include "maxResiduum.h"
 
 namespace mg

@@ -3,6 +3,8 @@
  *  <a href="mailto:kai.lists.berlios.de@tragetaschen.dyndns.org">Kai Ruhnau</a>
  * \brief directSolver.cpp contains the impl. of the func. directSolver.
  */
+
+#include <algorithm>
 #include "directSolver.h"
 
 namespace mg
