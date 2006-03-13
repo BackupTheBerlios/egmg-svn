@@ -183,6 +183,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\functions\directSolver.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\functions\directSolver.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\functions\error.cpp"
 					>
 				</File>
@@ -195,15 +203,19 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\functions\functionsIncludes.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\functions\g.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\functions\max_residuum.cpp"
+					RelativePath=".\src\functions\maxResiduum.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\functions\max_residuum.h"
+					RelativePath=".\src\functions\maxResiduum.h"
 					>
 				</File>
 				<File
@@ -239,11 +251,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\functions\twonorm_residuum.cpp"
+					RelativePath=".\src\functions\twonormResiduum.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\functions\twonorm_residuum.h"
+					RelativePath=".\src\functions\twonormResiduum.h"
 					>
 				</File>
 				<File
@@ -255,35 +267,67 @@
 				Name="Prolongation"
 				>
 				<File
-					RelativePath=".\src\Prolongation\Bicubic_interpolation.cpp"
+					RelativePath=".\src\Prolongation\BicubicInterpolation.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Prolongation\Bicubic_interpolation.h"
+					RelativePath=".\src\Prolongation\BicubicInterpolation.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Prolongation\Bilinear_interpolation.cpp"
+					RelativePath=".\src\Prolongation\BilinearInterpolation.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Prolongation\Bilinear_interpolation.h"
+					RelativePath=".\src\Prolongation\BilinearInterpolation.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Prolongation\Dendy_interpolation.cpp"
+					RelativePath=".\src\Prolongation\DendyInterpolation.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\src\Prolongation\DendyInterpolation.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Prolongation\Dendy_interpolation.h"
+					RelativePath=".\src\Prolongation\DeZeeuwInterpolation.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\src\Prolongation\DeZeeuw_interpolation.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Prolongation\DeZeeuw_interpolation.h"
+					RelativePath=".\src\Prolongation\DeZeeuwInterpolation.h"
 					>
 				</File>
 				<File
@@ -291,11 +335,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\Prolongation\SevenPoint_interpolation.cpp"
+					RelativePath=".\src\Prolongation\ProlongationIncludes.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Prolongation\SevenPoint_interpolation.h"
+					RelativePath=".\src\Prolongation\SevenPointInterpolation.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Prolongation\SevenPointInterpolation.h"
 					>
 				</File>
 			</Filter>
@@ -315,19 +363,19 @@
 				Name="Restriction"
 				>
 				<File
-					RelativePath=".\src\Restriction\Full_Weighting.cpp"
+					RelativePath=".\src\Restriction\FullWeighting.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Restriction\Full_Weighting.h"
+					RelativePath=".\src\Restriction\FullWeighting.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Restriction\Half_Weighting.cpp"
+					RelativePath=".\src\Restriction\HalfWeighting.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Restriction\Half_Weighting.h"
+					RelativePath=".\src\Restriction\HalfWeighting.h"
 					>
 				</File>
 				<File
@@ -343,11 +391,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\Restriction\seven_point_restr.cpp"
+					RelativePath=".\src\Restriction\RestrictionIncludes.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Restriction\seven_point_restr.h"
+					RelativePath=".\src\Restriction\SevenPointRestriction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Restriction\SevenPointRestriction.h"
 					>
 				</File>
 			</Filter>
@@ -355,137 +407,77 @@
 				Name="Relaxation"
 				>
 				<File
-					RelativePath=".\src\Relaxation\GS_Lex.cpp"
+					RelativePath=".\src\Relaxation\GSLexicographic.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Relaxation\GS_Lex.h"
+					RelativePath=".\src\Relaxation\GSLexicographic.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Relaxation\GS_RB.cpp"
+					RelativePath=".\src\Relaxation\GSRedBlack.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Relaxation\GS_RB.h"
+					RelativePath=".\src\Relaxation\GSRedBlack.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Relaxation\lineGS.cpp"
+					RelativePath=".\src\Relaxation\Jacobi.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Relaxation\lineGS.h"
+					RelativePath=".\src\Relaxation\Jacobi.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Relaxation\lineJAC.cpp"
+					RelativePath=".\src\Relaxation\LineGS.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Relaxation\lineJAC.h"
+					RelativePath=".\src\Relaxation\LineGS.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Relaxation\LineJAC.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Relaxation\LineJAC.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Relaxation\LineRelaxation.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Relaxation\LineRelaxation.h"
 					>
 				</File>
 				<File
 					RelativePath=".\src\Relaxation\Relaxation.h"
 					>
 				</File>
-				<Filter
-					Name="lineJAC"
+				<File
+					RelativePath=".\src\Relaxation\RelaxationIncludes.h"
 					>
-					<Filter
-						Name="9point"
-						>
-						<File
-							RelativePath=".\src\Relaxation\lineJAC\9point\x.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineJAC\9point\xzebra.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineJAC\9point\y.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineJAC\9point\yzebra.h"
-							>
-						</File>
-					</Filter>
-					<Filter
-						Name="25point"
-						>
-						<File
-							RelativePath=".\src\Relaxation\lineJAC\25point\x.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineJAC\25point\xzebra.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineJAC\25point\y.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineJAC\25point\yzebra.h"
-							>
-						</File>
-					</Filter>
-				</Filter>
-				<Filter
-					Name="lineGS"
+				</File>
+				<File
+					RelativePath=".\src\Relaxation\ZebraLine.cpp"
 					>
-					<Filter
-						Name="9point"
-						>
-						<File
-							RelativePath=".\src\Relaxation\lineGS\9point\alternatingzebra.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineGS\9point\x.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineGS\9point\xzebra.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineGS\9point\y.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineGS\9point\yzebra.h"
-							>
-						</File>
-					</Filter>
-					<Filter
-						Name="25point"
-						>
-						<File
-							RelativePath=".\src\Relaxation\lineGS\25point\alternatingzebra.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineGS\25point\x.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineGS\25point\xzebra.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineGS\25point\y.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\Relaxation\lineGS\25point\yzebra.h"
-							>
-						</File>
-					</Filter>
-				</Filter>
+				</File>
+				<File
+					RelativePath=".\src\Relaxation\ZebraLine.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Relaxation\ZebraLineGS.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Relaxation\ZebraLineGS.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Stencil"
@@ -509,6 +501,22 @@
 				<File
 					RelativePath=".\src\Stencil\Galerkin.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\src\Stencil\Galerkin.h"
@@ -532,6 +540,34 @@
 				</File>
 				<File
 					RelativePath=".\src\Stencil\Stencil.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Stencil\StencilIncludes.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="CycleType"
+				>
+				<File
+					RelativePath=".\src\CycleType\CycleType.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\CycleType\CycleTypeIncludes.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\CycleType\FCycle.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\CycleType\VCycle.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\CycleType\WCycle.h"
 					>
 				</File>
 			</Filter>
