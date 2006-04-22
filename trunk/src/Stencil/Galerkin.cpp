@@ -4,42 +4,278 @@
  */
 
 #include <cstdlib>
-#include "Galerkin.h"
+//#include "Galerkin.h"
+#include "Stencil.h"
+#include "../general/parameters.h"
+#include "../Prolongation/Prolongation.h"
+#include "../Restriction/Restriction.h"
+#include <stack>
 
 namespace mg
 {
 
 namespace
 {
-
-PositionArray computeJ(
-	const Position pos,
-	const PositionArray& restriction,
-	const PositionArray& stencil,
-	const PositionArray& prolongation)
+    
+void GeneratePositionArrays(
+    PositionArray& jX,
+    PositionArray& jY,
+    const Index size,
+    const Position pos)
 {
-	std::vector<PositionArray> result;
-	for (Index i=0; i<restriction.size() ; ++i)
-	{
-		PositionArray temp(stencil);
-		temp+=restriction[i];
-		for (Index j=0; j<temp.size(); ++j)
-		{
-			if (temp[j]%2!=0)
-			{
-				PositionArray temp2(prolongation);
-				temp2+=temp[j];
-				result.push_back(temp2);
-				temp[j]=0;
-			}
-		}
-		result.push_back(temp);
-	}
-
-	return result;
+    //ASSERT( pos == c )
+    //ASSERT( (2*size+1)*(2*size+1) == jX.size() && jX.size() == jY.size() );
+    std::stack<Integer> xPositions;
+    std::stack<Integer> yPositions;
+    
+    Integer intSize = size;
+    for ( Integer k=intSize; k>=1; --k)
+    {
+        xPositions.push(k);
+        xPositions.push(k);
+        yPositions.push(k);
+        yPositions.push(k);
+    }
+    jX[0]=0;
+    jY[0]=0;
+    for ( Index i=1; i<4*size+1; ++i )
+    {
+        if ( i%4 == 0 )
+        {
+            jX[i] = 0;
+            jY[i] = -1*yPositions.top();
+            yPositions.pop();
+        }
+        else if ( i%4 == 1 )
+        {
+            jX[i] = -1*xPositions.top();
+            xPositions.pop();
+            jY[i] = 0;
+        }
+        else if ( i%4 == 2 )
+        {
+            jX[i] = 0;
+            jY[i] = yPositions.top();
+            yPositions.pop();
+        }
+        else if ( i%4 == 3 )
+        {
+            jX[i] = xPositions.top();
+            xPositions.pop();
+            jY[i] = 0;
+        }
+    }
+    //ASSERT( xPositions.empty() && yPositions.empty() );
+    for ( Integer k=-intSize; k<=-1; ++k )
+    {
+        xPositions.push(k);
+        yPositions.push(k);
+    }
+    for ( Integer k=1; k<=intSize; ++k )
+    {
+        xPositions.push(k);
+        yPositions.push(k);
+    }
+    Index i=4*size+1;
+    while( i<jX.size() )
+    {
+        std::stack<Integer> xP = xPositions;
+        Integer yPosition = yPositions.top();
+        yPositions.pop();
+        while( !xP.empty() )
+        {
+            jX[i] = xP.top();
+            xP.pop();
+            jY[i] = yPosition;
+            ++i;
+            if ( i>=jX.size() )
+                break;
+        }
+        //ASSERT( !yPositions.empty() );    
+    }
 }
 
-std::vector<PositionArray > TwoGridGalerkin::initJX_(
+Index ComputeSize(
+    const Restriction& restriction,
+    const Stencil& stencil)
+{
+    PositionArray restrictionJx = restriction.getJx();
+    PositionArray restrictionJy = restriction.getJy();
+    Index restSize = std::max( restrictionJx.expansion(),
+                               restrictionJy.expansion() );
+    return restSize + stencil.size();
+}
+
+Index ComputeSize(
+    const PositionArray& jX,
+    const PositionArray& jY,
+    const Prolongation& prolong)
+{
+    PositionArray prolongJx = prolong.getJx();
+    PositionArray prolongJy = prolong.getJy();
+    const Index prolongSize = std::max( prolongJx.expansion(),
+                                        prolongJy.expansion() );
+    const Index result = std::max( jX.expansion(), jY.expansion() );
+    if ( result%2 == 0 )
+    {
+        return result/2 + prolongSize - 1;
+    }
+    return ( result - 1 )/2 + prolongSize;
+}
+
+void RestritionTimesStencil(
+    NumericArray& resultL,
+    PositionArray& jX,
+    PositionArray& jY,
+    const Position pos,
+    const Index sx,
+    const Index sy,
+    const Index nx,
+    const Index ny,
+    const Restriction& restriction,
+    const Stencil& stencil)
+{
+    //ASSERT( pos == C )
+    const PositionArray restrictionJx = restriction.getJx();
+    const PositionArray restriciionJy = restriction.getJy();
+    const NumericArray restrictionI = restriction.getI(sx,sy,nx,ny,stencil);
+
+    const Index size = ComputeSize(restriction,stencil);
+    
+    jX.resize((2*size+1)*(2*size+1));
+    jY.resize((2*size+1)*(2*size+1));
+    jX=0;
+    jY=0;
+    GeneratePositionArrays(jX,jY,size,C);
+    resultL.resize((2*size+1)*(2*size+1));
+    resultL = 0.0;
+
+    for ( Index i=0; i<restrictionI.size(); ++i )
+    {
+        PositionArray stencilJx = stencil.getJx( pos );
+        PositionArray stencilJy = stencil.getJy( pos );
+        NumericArray stencilL = stencil.getL(
+            pos,
+            sx+restrictionJx[i],
+            sy+restriciionJy[i],
+            nx, ny);
+        stencilJx+=restrictionJx[i];
+        stencilJy+=restriciionJy[i];
+        stencilL*=restrictionI[i];
+        for ( Index j=0; j<resultL.size(); ++j )
+        {
+            for ( Index k=0; k<stencilL.size(); ++k)
+            {
+                if ( stencilJx[k] == jX[j] && stencilJy[k] == jY[j] )
+                {
+                    resultL[j] += stencilL[k];
+                }
+            }
+        }
+    }
+}
+
+void ProlongateStencil(
+    NumericArray& resultL,
+    PositionArray& resultJx,
+    PositionArray& resultJy,
+    const NumericArray& opL,
+    const PositionArray& jX,
+    const PositionArray& jY,
+    const Position pos,
+    const Index sx,
+    const Index sy,
+    const Index nx,
+    const Index ny,
+    const Prolongation& prolongation,
+    const Stencil& stencil)
+{
+    const PositionArray prolongJx = prolongation.getJx();
+    const PositionArray prolongJy = prolongation.getJy();
+    const NumericArray prolongI = prolongation.getI(sx,sy,nx,ny,stencil);
+    const Index size = ComputeSize(jX,jY,prolongation);
+    
+    resultJx.resize((2*size+1)*(2*size+1));
+    resultJy.resize((2*size+1)*(2*size+1));
+    resultJx=0;
+    resultJy=0;
+    GeneratePositionArrays(resultJx,resultJy,size,C);
+    resultL.resize((2*size+1)*(2*size+1));
+    resultL = 0.0;
+    
+    for (Index i=0; i<opL.size(); ++i)
+    {
+        if (jX[i]%2 == 0 && jY[i]%2 == 0) //coars grid point
+        {
+            for (Index j=0; j<resultL.size(); ++j)
+            {
+                if (resultJx[j] == jX[i]/2 && resultJy[j] == jY[i]/2)
+                {
+                    resultL[j]+=opL[i];
+                    break;
+                }
+            }
+        }
+        else if (jX[i]%2 == 0) //fine grid point on x-coars grid line
+        {
+            for ( Index j=0; j<prolongI.size(); ++j )
+            {
+                if ( prolongJy[j] == 0 )
+                {
+                    for ( Index k=0; k<resultL.size(); ++k )
+                    {
+                        if ( resultJx[k] == jX[i] + prolongJx[j] &&
+                             resultJy[k] == jY[i] + prolongJy[j] )
+                        {
+                            resultL[k]+=opL[i]*prolongI[j];
+                        }
+                    }
+                }
+            }
+        }
+        else if (jY[i]%2 == 0) //fine grid point on y-coars grid line
+        {
+            for ( Index j=0; j<prolongI.size(); ++j )
+            {
+                if ( prolongJx[j] == 0 )
+                {
+                    for ( Index k=0; k<resultL.size(); ++k )
+                    {
+                        if ( resultJx[k] == jX[i] + prolongJx[j] &&
+                             resultJy[k] == jY[i] + prolongJy[j] )
+                        {
+                            resultL[k]+=opL[i]*prolongI[j];
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            for ( Index j=0; j<prolongI.size(); ++j )
+            {
+                if ( prolongJx[j] != 0 && prolongJy[j] != 0 )
+                {
+                    for ( Index k=0; k<resultL.size(); ++k )
+                    {
+                        if ( resultJx[k] == jX[i] + prolongJx[j] &&
+                             resultJy[k] == jY[i] + prolongJy[j] )
+                        {
+                            resultL[k]+=opL[i]*prolongI[j];
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+}
+}
+
+
+
+/*std::vector<PositionArray > TwoGridGalerkin::initJX_(
 	const Restriction& restriction,
 	const Stencil& stencil,
 	const Prolongation& prolongation)
@@ -180,4 +416,4 @@ Index TwoGridGalerkin::initSize_(
 //    return data_[position][Quadruple(sx,sy,nx,ny)];
 //}
 
-}
+}*/
