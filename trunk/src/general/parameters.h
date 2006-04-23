@@ -14,16 +14,16 @@
  */
 namespace mg
 {
-	/**
-	 * \brief the Precision to do the calculations with
-	 */
-	typedef double Precision;
+    /**
+     * \brief the Precision to do the calculations with
+     */
+    typedef double Precision;
     
     /**
      * \brief the index
      */
     typedef size_t Index;
-    
+
     /**
      * \brief vector holding numeric values
      */
@@ -33,35 +33,35 @@ namespace mg
      * \brief vector holding integers
      */
     typedef std::valarray<int> PositionArray;
-		
-	/**
-	 * \enum mg::Position
-	 * \brief Position describes relative positions
-	 * 
-	 * The meaning of the constants are:
-	 * <table border="0">
-	 * <tr>
-	 * <td>C</td><td>center</td>
-	 * </tr><tr>
-	 * <td>W</td><td>west</td>
-	 * </tr><tr>
-	 * <td>NW</td><td>north west</td>
-	 * </tr><tr>
-	 * <td>N</td><td>north</td>
-	 * </tr><tr>
-	 * <td>NE</td><td>north east</td>
-	 * </tr><tr>
-	 * <td>E</td><td>east</td>
-	 * </tr><tr>
-	 * <td>SE</td><td>south east</td>
-	 * </tr><tr>
-	 * <td>S</td><td>south</td>
-	 * </tr><tr>
-	 * <td>SW</td><td>south west</td>
+        
+    /**
+     * \enum mg::Position
+     * \brief Position describes relative positions
+     * 
+     * The meaning of the constants are:
+     * <table border="0">
+     * <tr>
+     * <td>C</td><td>center</td>
+     * </tr><tr>
+     * <td>W</td><td>west</td>
+     * </tr><tr>
+     * <td>NW</td><td>north west</td>
+     * </tr><tr>
+     * <td>N</td><td>north</td>
+     * </tr><tr>
+     * <td>NE</td><td>north east</td>
+     * </tr><tr>
+     * <td>E</td><td>east</td>
+     * </tr><tr>
+     * <td>SE</td><td>south east</td>
+     * </tr><tr>
+     * <td>S</td><td>south</td>
+     * </tr><tr>
+     * <td>SW</td><td>south west</td>
      * </tr>
-	 * </table>
-	 */
-	enum Position{C=0,W=1,N=2,E=3,S=4,NW=5,NE=6,SE=7,SW=8};
+     * </table>
+     */
+    enum Position{C=0,W=1,N=2,E=3,S=4,NW=5,NE=6,SE=7,SW=8};
     
     /**
      * \enum mg::Direction
@@ -79,13 +79,13 @@ namespace mg
      * </table>
      */
     enum Direction{ALTDIR=0,XDIR=1,YDIR=2};
-	
-	/**
-	 * \brief a function pointer to a function \f$ f: K^2 \rightarrow K \f$
-	 */
-	typedef Precision (*function2D) (
-		const Precision x,
-		const Precision y);
-	
+    
+    /**
+     * \brief a function pointer to a function \f$ f: K^2 \rightarrow K \f$
+     */
+    typedef Precision (*function2D) (
+        const Precision x,
+        const Precision y);
+    
 }
 #endif /*PARAMETERS_H_*/

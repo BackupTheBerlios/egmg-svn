@@ -19,54 +19,54 @@ namespace mg
 class Relaxation
 {
 private:
-	int preSmoothingSteps_;
-	int postSmoothingSteps_;
-	
+    int preSmoothingSteps_;
+    int postSmoothingSteps_;
+    
 public:
-	/**
-	 * \brief The constructor of a Relaxation object
-	 * 
-	 * Relaxation constructs a Relaxation object with:
-	 * \param[in] preSmoothingSteps		number of pre smoothing steps  (def. 1)
-	 * \param[in] postSmoothingSteps	number of post smoothing steps (def. 1)
-	 */
-	Relaxation(
-		const int preSmoothingSteps =1,
-		const int postSmoothingSteps =1):
-		preSmoothingSteps_(preSmoothingSteps),
-		postSmoothingSteps_(postSmoothingSteps){}
+    /**
+     * \brief The constructor of a Relaxation object
+     * 
+     * Relaxation constructs a Relaxation object with:
+     * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
+     * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
+     */
+    Relaxation(
+        const int preSmoothingSteps =1,
+        const int postSmoothingSteps =1):
+        preSmoothingSteps_(preSmoothingSteps),
+        postSmoothingSteps_(postSmoothingSteps){}
 
     virtual ~Relaxation() {}
     
     /**
-	 * \brief getPreSmoothingSteps() returns the number of pre smothing steps
-	 * \return the number of pre somthing steps
-	 */
-	int getPreSmoothingSteps() const {return preSmoothingSteps_;};
-	
-	/**
-	 * \brief setPreSmoothingSteps() sets the number of pre smothing steps
-	 * \param[in] preSmoothingSteps		the number of pre somthing steps
-	 */
-	void setPreSmoothingSteps(int preSmoothingSteps)
-	{
-		preSmoothingSteps_=preSmoothingSteps;
-	}
-	
-	/**
-	 * \brief getPostSmoothingSteps() returns the number of post somthing steps
-	 * \return the number of post somthing steps
-	 */
-	int getPostSmoothingSteps()	const {return postSmoothingSteps_;};
-	
-	/**
-	 * \brief setPostSmoothingSteps() sets the number of post smothing steps
-	 * \param[in] postSmoothingSteps		the number of post somthing steps
-	 */
-	void setPostSmoothingSteps(int postSmoothingSteps)
-	{
-		postSmoothingSteps_=postSmoothingSteps;
-	}
+     * \brief getPreSmoothingSteps() returns the number of pre smothing steps
+     * \return the number of pre somthing steps
+     */
+    int getPreSmoothingSteps() const {return preSmoothingSteps_;};
+    
+    /**
+     * \brief setPreSmoothingSteps() sets the number of pre smothing steps
+     * \param[in] preSmoothingSteps     the number of pre somthing steps
+     */
+    void setPreSmoothingSteps(int preSmoothingSteps)
+    {
+        preSmoothingSteps_=preSmoothingSteps;
+    }
+    
+    /**
+     * \brief getPostSmoothingSteps() returns the number of post somthing steps
+     * \return the number of post somthing steps
+     */
+    int getPostSmoothingSteps() const {return postSmoothingSteps_;};
+    
+    /**
+     * \brief setPostSmoothingSteps() sets the number of post smothing steps
+     * \param[in] postSmoothingSteps        the number of post somthing steps
+     */
+    void setPostSmoothingSteps(int postSmoothingSteps)
+    {
+        postSmoothingSteps_=postSmoothingSteps;
+    }
     
     /**
      * \brief relax() executes one relaxation step on the input vector

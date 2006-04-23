@@ -24,7 +24,7 @@ public:
      * VCycle constructs a VCycle object with:
      * \param[in] maximalDepth  Number of Grid Levels
      */
-	explicit VCycle(const Index maximalDepth)
+    explicit VCycle(const Index maximalDepth)
         : WCycle(maximalDepth,1)
     {}    
 };

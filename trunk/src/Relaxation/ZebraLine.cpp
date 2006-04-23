@@ -12,7 +12,7 @@
 
 
 namespace mg
-{			
+{           
 void ZebraLine::relax(
     NumericArray &u,
     const NumericArray &f, 
@@ -20,14 +20,14 @@ void ZebraLine::relax(
     const Index nx,
     const Index ny) const
 {
-	// valarray needed for LR-decomposition of a tridiagonal matrix
-	NumericArray resid=residuum(u,f,stencil,nx,ny);
-	switch (stencil.size())
-	{
-    	case 1:  // stencil of size 1
+    // valarray needed for LR-decomposition of a tridiagonal matrix
+    NumericArray resid=residuum(u,f,stencil,nx,ny);
+    switch (stencil.size())
+    {
+        case 1:  // stencil of size 1
         {
             switch (direction_)
-    		{
+            {
                 case ALTDIR:
                 { 
                     ninepointxzebra(u,f,resid,stencil,nx,ny);
@@ -35,7 +35,7 @@ void ZebraLine::relax(
                     ninepointyzebra(u,f,resid,stencil,nx,ny);
                     break;
                 }
-    		    case XDIR:
+                case XDIR:
                 {
                     ninepointxzebra(u,f,resid,stencil,nx,ny);
                     break;
@@ -51,7 +51,7 @@ void ZebraLine::relax(
                     break;
                 }
             }
-            break;			
+            break;          
         }
         case 2:  // stencil of size 2
         {

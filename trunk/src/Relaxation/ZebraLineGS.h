@@ -84,9 +84,9 @@ public:
     void relax(
         NumericArray &u,
         const NumericArray &f, 
-		const Stencil &stencil,
+        const Stencil &stencil,
         const Index nx,
-        const Index ny) const;	
+        const Index ny) const;  
 };
 }
 #endif /*ZEBRALINEGS_H_*/

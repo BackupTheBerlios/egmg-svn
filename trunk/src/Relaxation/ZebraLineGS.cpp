@@ -9,7 +9,7 @@
 #include "ZebraLineGS.h"
 
 namespace mg
-{		
+{       
 void ZebraLineGS::relax(
     NumericArray &u,
     const NumericArray &f, 
@@ -47,9 +47,9 @@ void ZebraLineGS::relax(
                     break;
                 }
             }
-            break;			
+            break;          
         }
-	    case 2:  //stencil of size 2
+        case 2:  //stencil of size 2
         {
             switch (direction_)
             {
@@ -63,7 +63,7 @@ void ZebraLineGS::relax(
                 {
                     xzebra(u, f, rhs, stencil, nx, ny);
                     break;
-                }	
+                }   
                 case YDIR:
                 {
                     yzebra(u, f, rhs, stencil, nx, ny);
@@ -77,7 +77,7 @@ void ZebraLineGS::relax(
             }
             break;
         }
-	    default:
+        default:
         {
             std::cerr << "Stencil is too big (size>2)!" << std::endl;
             break;

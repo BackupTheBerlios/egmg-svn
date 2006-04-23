@@ -68,11 +68,11 @@ public:
           omega_(omega),gsRedBlack_() {}
     virtual ~ZebraLine() {}
     
-	/**
+    /**
       * \brief relax() executes one relaxation step on the input vector
       * 
       * relax() exectues one zebra line relaxation step on the input
-	  * vector on a rectangular 2D gird with lexicographic ordering and the
+      * vector on a rectangular 2D gird with lexicographic ordering and the
       * discretazation Stencil for a pde
       * 
      * \param u     the vector representation of the 2D grid to perform the

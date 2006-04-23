@@ -21,27 +21,27 @@ namespace mg
 class GSLexicographic : public mg::Relaxation
 {
 public:
-	/**
-	 * \brief The constructor of a GSLexicographic object
-	 * 
-	 * GSLexicographic constructs a GSLexicographic object with:
-	 * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
+    /**
+     * \brief The constructor of a GSLexicographic object
+     * 
+     * GSLexicographic constructs a GSLexicographic object with:
+     * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
      * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
-	 */
-	GSLexicographic(
+     */
+    GSLexicographic(
         const int preSmoothingSteps =1,
         const int postSmoothingSteps =1)
         : Relaxation(preSmoothingSteps,postSmoothingSteps) {}
-	virtual ~GSLexicographic() {}
+    virtual ~GSLexicographic() {}
     
-	/**
-	 * \brief relax() executes one relaxation step on the input vector
-	 * 
-	 * relax() exectues one Gaus seidel relaxation step on the input vector
-	 * one a rectangular 2D grid with lexicographic ordering and the
-	 * discretazation given by stencil for a pde.
-	 * 
-	 * \param[in,out] u     the vector representation of the 2D grid to perform
+    /**
+     * \brief relax() executes one relaxation step on the input vector
+     * 
+     * relax() exectues one Gaus seidel relaxation step on the input vector
+     * one a rectangular 2D grid with lexicographic ordering and the
+     * discretazation given by stencil for a pde.
+     * 
+     * \param[in,out] u     the vector representation of the 2D grid to perform
      *                      the relaxation on
      * \param[in] f         the right hand side of the pde
      * \param[in] stencil   the stencil rep. of the pde

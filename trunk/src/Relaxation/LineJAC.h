@@ -66,7 +66,7 @@ public:
         const Precision omega =1.0)
         : LineRelaxation(preSmoothingSteps,postSmoothingSteps,direction),
           omega_(omega), jacobi_(preSmoothingSteps,postSmoothingSteps,omega) {}
-	virtual ~LineJAC() {}
+    virtual ~LineJAC() {}
     
     /**
      * \brief relax() executes one relaxation step on the input vector
