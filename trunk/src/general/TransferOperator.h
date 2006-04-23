@@ -80,6 +80,8 @@ public:
 	 * \return			the coordinates vector in y direction
 	 */
 	virtual const PositionArray& getJy() const =0;
+
+	virtual ~TransferOperator() =0;
 };
 
 }

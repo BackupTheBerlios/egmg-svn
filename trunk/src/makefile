@@ -4,15 +4,15 @@ export CXXFLAGS = -O3 -W -Wall -ansi -pedantic
 LDFLAGS = $(CXXFLAGS)
 
 Objects = main.o
-Obj = ./functions/*.o ./Prolongation/*.o ./Relaxation/*.o ./Restriction/*.o
+Obj = ./functions/*.o ./Prolongation/*.o ./Relaxation/*.o ./Restriction/*.o ./general/*.o
 Exe = ./main.exe
 
 all: TARGET = all
-all: CycleType functions Prolongation Relaxation Restriction Stencil $(Objects)
+all: CycleType functions Prolongation Relaxation Restriction Stencil general $(Objects)
 	$(LD) $(LDFLAGS) $(Objects) $(Obj) -o $(Exe)
 	
 clean: TARGET = clean
-clean: CycleType functions Prolongation Relaxation Restriction Stencil
+clean: CycleType functions Prolongation Relaxation Restriction Stencil general
 	$(RM) $(Exe) $(Objects) doxygen.log
 
 run: all
@@ -49,7 +49,10 @@ Restriction:
 .PHONY: Stencil
 Stencil:
 	$(MAKE) -C Stencil $(TARGET)
+.PHONY: general
+general:
+	$(MAKE) -C general $(TARGET)
 
 #always build main to keep dependency simple while testing
-main.o: main.cpp CycleType functions Prolongation Relaxation Restriction Stencil
+main.o: main.cpp CycleType functions Prolongation Relaxation Restriction Stencil general
 	$(CXX) $(CXXFLAGS) -c main.cpp
