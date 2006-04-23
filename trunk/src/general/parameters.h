@@ -6,6 +6,7 @@
 #define PARAMETERS_H_
 
 #include <valarray>
+#include <algorithm>
 
 /**
  * \brief the namespace mg is for everything in this library
@@ -25,6 +26,11 @@ namespace mg
     typedef size_t Index;
 
     /**
+     * \brief Integer Values
+     */
+    typedef int Integer;
+    
+    /**
      * \brief vector holding numeric values
      */
     typedef std::valarray<Precision> NumericArray;
@@ -32,7 +38,7 @@ namespace mg
     /**
      * \brief vector holding integers
      */
-    typedef std::valarray<int> PositionArray;
+    typedef std::valarray<Integer> PositionArray;
         
     /**
      * \enum mg::Position
