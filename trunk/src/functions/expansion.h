@@ -6,6 +6,7 @@
 #define EXPANSION_H_
 
 #include "../general/parameters.h"
+#include <algorithm>
 
 namespace mg
 {
@@ -24,9 +25,9 @@ inline Index expansion(
     const PositionArray& jX,
     const PositionArray& jY)
 {
-    const Index expansionJx1 = static_cast<Index>(jX.max());
+    const Index expansionJx1 = static_cast<Index>(std::abs(jX.max()));
     const Index expansionJx2 = static_cast<Index>(std::abs(jX.min()));
-    const Index expansionJy1 = static_cast<Index>(jY.max());
+    const Index expansionJy1 = static_cast<Index>(std::abs(jY.max()));
     const Index expansionJy2 = static_cast<Index>(std::abs(jY.min()));
     const Index expansionJx = std::max(expansionJx1,expansionJx2);
     const Index expansionJy = std::max(expansionJy1,expansionJy2);
