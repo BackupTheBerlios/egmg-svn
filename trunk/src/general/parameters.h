@@ -80,7 +80,7 @@ namespace mg
      * <td>XDIR</td><td>x direction</td>
      * </tr><tr>
      * <td>YDIR</td><td>y direction</td>
-     * </tr><tr>
+     * </tr>
      * </table>
      */
     enum Direction{ALTDIR=0,XDIR=1,YDIR=2};
