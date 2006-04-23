@@ -6,7 +6,6 @@
 #define PARAMETERS_H_
 
 #include <valarray>
-#include <algorithm>
 
 /**
  * \brief the namespace mg is for everything in this library
