@@ -26,7 +26,7 @@ private:
     //initilize i_, makes it possible to make i_ const
     NumericArray initI_(Precision weight) const
     {
-        const Precision t[]={weight/4,weight/8,weight/8,weight/8,weight/8,
+        const Precision t[]={weight/2,weight/8,weight/8,weight/8,weight/8,
                              0,0,0,0};
         return NumericArray(t,9);
     }
