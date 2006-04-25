@@ -89,85 +89,80 @@ public:
         const Index ny) const;
 
     const NumericArray& getI(
-        const Index sx,
-        const Index sy,
-        const Index nx,
-        const Index ny,
+        const Position pos,
+        const Index,
+        const Index,
+        const Index,
+        const Index,
         const Stencil&) const
     {
-        if (sy==1)        // unterer Rand
+        if ( SW == pos )
         {
-            if (sx==1)   // untere linke Ecke
-            {
-                const Precision t[] = {
-                    1.0,     3.0/8,   3.0/4,   3.0/4,  3.0/8,
-                    9.0/32,  9.0/16,  9.0/32,  9.0/64, 0.0,
-                    0.0,     0.0,    -3.0/64, -1.0/8, -3.0/32,
-                    1.0/64, -3.0/32, -1.0/8,  -3.0/64, 0.0,
-                    0.0,     0.0,     0.0,     0.0,    0.0};
-                iBorder_ = NumericArray(t,25);
-                return iBorder_;                
-            }
-            else if (sx==nx-1)   // untere rechte Ecke
-            {
-                const Precision t[] = {
-                     1.0,    3.0/4,   3.0/4,   3.0/8,   3.0/8,
-                     9.0/16, 9.0/32,  9.0/64,  9.0/32, -1.0/8,
-                    -3.0/32, 1.0/64, -3.0/32, -1.0/8,  -3.0/64,
-                     0.0,    0.0,     0.0,     0.0,     0.0,
-                     0.0,    0.0,     0.0,     0.0,    -3.0/64};
-                iBorder_ = NumericArray(t,25);
-                return iBorder_;                
-            }
-            else
-            {
-                const Precision t[] = {
-                     1.0,      9.0/16,   3.0/4,    9.0/16,    3.0/8,
-                     27.0/64,  27.0/64,  27.0/128, 27.0/128, -1.0/16,
-                    -3.0/64,   1.0/128, -9.0/128, -1.0/8,    -9.0/128,
-                     1.0/128, -3.0/64,  -1.0/16,  -3.0/128,   0.0,
-                     0.0,      0.0,      0.0,      0.0,      -3.0/128};
-                iBorder_ = NumericArray(t,25);
-                return iBorder_;                
-            }
+            const Precision t[] = {
+                1.0,     3.0/8,   3.0/4,   3.0/4,  3.0/8,
+                9.0/32,  9.0/16,  9.0/32,  9.0/64, 0.0,
+                0.0,     0.0,    -3.0/64, -1.0/8, -3.0/32,
+                1.0/64, -3.0/32, -1.0/8,  -3.0/64, 0.0,
+                0.0,     0.0,     0.0,     0.0,    0.0};
+            iBorder_ = NumericArray(t,25);
+            return iBorder_;                
         }
-        else if (sy==ny-1)  // oberer Rand
+        else if ( SE == pos )
         {
-            if (sx==1)   // obere linke Ecke
-            {
-                const Precision t[] = {
-                     1.0,     3.0/8,   3.0/8,  3.0/4,  3.0/4,
-                     9.0/64,  9.0/32,  9.0/16, 9.0/32, 0.0,
-                     0.0,     0.0,     0.0,    0.0,    0.0,
-                     0.0,    -3.0/64, -1.0/8, -3.0/32, 1.0/64,
-                    -3.0/32, -1.0/8,  -3.0/64, 0.0,    0.0};
-                iBorder_ = NumericArray(t,25);
-                return iBorder_;                
-            }
-            else if (sx==nx-1)   // obere rechte Ecke
-            {
-                const Precision t[] = {
-                     1.0,     3.0/4,  3.0/8,  3.0/8,   3.0/4,
-                     9.0/32,  9.0/64, 9.0/32, 9.0/16, -1.0/8,
-                    -3.0/64,  0.0,    0.0,    0.0,     0.0,
-                     0.0,     0.0,    0.0,    0.0,     0.0,
-                    -3.0/64, -1.0/8, -3.0/32, 1.0/64, -3.0/32};
-                iBorder_ = NumericArray(t,25);
-                return iBorder_;                
-            }
-            else
-            {
-                const Precision t[] = {
-                     1.0,      9.0/16,   3.0/8,   9.0/16,   3.0/4,
-                     27.0/128, 27.0/128, 27.0/64, 27.0/64, -1.0/16,
-                    -3.0/128,  0.0,      0.0,     0.0,      0.0,
-                     0.0,     -3.0/128, -1.0/16, -3.0/64,   1.0/128,
-                    -9.0/128, -1.0/8,   -9.0/128, 1.0/128, -3.0/64};
-                iBorder_ = NumericArray(t,25);
-                return iBorder_;                
-            }
+            const Precision t[] = {
+                 1.0,    3.0/4,   3.0/4,   3.0/8,   3.0/8,
+                 9.0/16, 9.0/32,  9.0/64,  9.0/32, -1.0/8,
+                -3.0/32, 1.0/64, -3.0/32, -1.0/8,  -3.0/64,
+                 0.0,    0.0,     0.0,     0.0,     0.0,
+                 0.0,    0.0,     0.0,     0.0,    -3.0/64};
+            iBorder_ = NumericArray(t,25);
+            return iBorder_;                
         }
-        else if (sx==1)   // linker Rand
+        else if ( S == pos )
+        {
+            const Precision t[] = {
+                 1.0,      9.0/16,   3.0/4,    9.0/16,    3.0/8,
+                 27.0/64,  27.0/64,  27.0/128, 27.0/128, -1.0/16,
+                -3.0/64,   1.0/128, -9.0/128, -1.0/8,    -9.0/128,
+                 1.0/128, -3.0/64,  -1.0/16,  -3.0/128,   0.0,
+                 0.0,      0.0,      0.0,      0.0,      -3.0/128};
+            iBorder_ = NumericArray(t,25);
+            return iBorder_;                
+        }
+        else if ( NW == pos )
+        {
+            const Precision t[] = {
+                 1.0,     3.0/8,   3.0/8,  3.0/4,  3.0/4,
+                 9.0/64,  9.0/32,  9.0/16, 9.0/32, 0.0,
+                 0.0,     0.0,     0.0,    0.0,    0.0,
+                 0.0,    -3.0/64, -1.0/8, -3.0/32, 1.0/64,
+                -3.0/32, -1.0/8,  -3.0/64, 0.0,    0.0};
+            iBorder_ = NumericArray(t,25);
+            return iBorder_;                
+        }
+        else if ( NE == pos )
+        {
+            const Precision t[] = {
+                 1.0,     3.0/4,  3.0/8,  3.0/8,   3.0/4,
+                 9.0/32,  9.0/64, 9.0/32, 9.0/16, -1.0/8,
+                -3.0/64,  0.0,    0.0,    0.0,     0.0,
+                 0.0,     0.0,    0.0,    0.0,     0.0,
+                -3.0/64, -1.0/8, -3.0/32, 1.0/64, -3.0/32};
+            iBorder_ = NumericArray(t,25);
+            return iBorder_;                
+        }
+        else if ( N == pos )
+        {
+            const Precision t[] = {
+                 1.0,      9.0/16,   3.0/8,   9.0/16,   3.0/4,
+                 27.0/128, 27.0/128, 27.0/64, 27.0/64, -1.0/16,
+                -3.0/128,  0.0,      0.0,     0.0,      0.0,
+                 0.0,     -3.0/128, -1.0/16, -3.0/64,   1.0/128,
+                -9.0/128, -1.0/8,   -9.0/128, 1.0/128, -3.0/64};
+            iBorder_ = NumericArray(t,25);
+            return iBorder_;                
+        }
+        else if ( W == pos )
         {
             const Precision t[] = {
                 1.0,      3.0/8,    9.0/16,   3.0/4,    9.0/16,
@@ -178,7 +173,7 @@ public:
             iBorder_ = NumericArray(t,25);
             return iBorder_;                
         }
-        else if (sx==nx-1)  // rechter Rand
+        else if ( E == pos )
         {
             const Precision t[] = {
                  1.0,      3.0/4,    9.0/16,   3.0/8,    9.0/16,
@@ -189,16 +184,18 @@ public:
             iBorder_ = NumericArray(t,25);
             return iBorder_;                
         }
-        else
+        else if ( C == pos )
+        {
             return i_;
+        }
     }
 
-    const PositionArray& getJx() const
+    const PositionArray& getJx( const Position ) const
     {
         return jx_; 
     }
 
-    const PositionArray& getJy() const
+    const PositionArray& getJy( const Position ) const
     {
         return jy_;
     }

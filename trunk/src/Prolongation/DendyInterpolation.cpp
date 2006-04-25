@@ -126,6 +126,7 @@ NumericArray DendyInterpolation::prolongate(
     return result;
 }
 const NumericArray& DendyInterpolation::getI(
+    const Position,
     const Index sx,
     const Index sy, 
     const Index nx,

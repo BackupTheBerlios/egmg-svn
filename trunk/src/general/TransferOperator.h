@@ -50,6 +50,8 @@ public:
      * \see Position
      * \see Stencil.getL
      * 
+     * \param[in] pos       relative position in the domain according to the
+     *                      enum Postion
      * \param[in] sx        the x position
      * \param[in] sy        the y position
      * \param[in] nx        number of points in x direction
@@ -59,6 +61,7 @@ public:
      * \return              the coefficients of the TransferOperator
      */
     virtual const NumericArray& getI(
+        const Position pos,
         const Index sx,
         const Index sy,
         const Index nx,
@@ -68,18 +71,22 @@ public:
     /**
      * \brief returns the coordinate vector in x dir. for the coefficient vec. I
      * \see getI
-     * 
-     * \return          the coordinates vector in y direction
+     *
+     * \param[in] pos       relative position in the domain according to the
+     *                      enum Postion 
+     * \return              the coordinates vector in y direction
      */
-    virtual const PositionArray& getJx() const =0;
+    virtual const PositionArray& getJx( const Position pos ) const =0;
     
     /**
      * \brief returns the coordinate vector in y dir. for the coefficient vec. I
      * \see getI
-     * 
-     * \return          the coordinates vector in y direction
+     *
+     * \param[in] pos       relative position in the domain according to the
+     *                      enum Postion
+     * \return              the coordinates vector in y direction
      */
-    virtual const PositionArray& getJy() const =0;
+    virtual const PositionArray& getJy( const Position pos ) const =0;
 
 	virtual ~TransferOperator() =0;
 };

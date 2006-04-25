@@ -347,7 +347,6 @@ void generatePositionArrays(
         }
         //ASSERT( !yPositions.empty() );    
     }
-    
 }
 
 }

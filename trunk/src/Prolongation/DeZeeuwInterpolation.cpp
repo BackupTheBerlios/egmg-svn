@@ -170,6 +170,7 @@ NumericArray DeZeeuwInterpolation::prolongate(
     return result;
 }
 const NumericArray& DeZeeuwInterpolation::getI(
+    const Position,
     const Index sx,
     const Index sy, 
     const Index nx,
