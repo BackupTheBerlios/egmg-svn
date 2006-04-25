@@ -16,5 +16,7 @@
 #include "twonormResiduum.h"
 #include "zero.h"
 #include "output.h"
+#include "expansion.h"
+#include "generatePositionArrays.h"
 
 #endif /*FUNCTIONSINCLUDES_H_*/
