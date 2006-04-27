@@ -4,7 +4,7 @@ export CXXFLAGS = -O3 -W -Wall -ansi -pedantic
 LDFLAGS = $(CXXFLAGS)
 
 Objects = main.o
-Obj = ./functions/*.o ./Prolongation/*.o ./Relaxation/*.o ./Restriction/*.o ./general/*.o
+Obj = ./functions/*.o ./Prolongation/*.o ./Relaxation/*.o ./Restriction/*.o ./general/*.o ./Stencil/*.o
 Exe = ./main.exe
 
 all: TARGET = all

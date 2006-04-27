@@ -10,364 +10,24 @@
 #include "../functions/expansion.h"
 #include "../Prolongation/Prolongation.h"
 #include "../Restriction/Restriction.h"
+#include "../functions/generatePositionArrays.h"
+#include "../functions/printStencil.h"
 #include <stack>
 #include <iostream>
 #include <iomanip>
+
 namespace mg
 {
 
 namespace
 {
-    
-void GeneratePositionArrays(
-    PositionArray& jX,
-    PositionArray& jY,
-    const Position pos,
-    const Index size,
-    const Index sizeToBorder)
-{
-    //ASSERT( sizeToBorder > 1 )
-    if ( C == pos )
-    {
-        jX.resize((2*size+1)*(2*size+1));
-        jY.resize((2*size+1)*(2*size+1));
-        jX=0;
-        jY=0;
-    }
-    else if ( W == pos || N == pos || E == pos || S == pos )
-    {
-        jX.resize((size+sizeToBorder+1)*(2*size+1));
-        jY.resize((size+sizeToBorder+1)*(2*size+1));
-        jX=0;
-        jY=0;
-    }
-    else
-    {
-        jX.resize((size+sizeToBorder+1)*(size+sizeToBorder+1));
-        jY.resize((size+sizeToBorder+1)*(size+sizeToBorder+1));
-        jX=0;
-        jY=0;
-    }
-    std::stack<Integer> xPositions;
-    std::stack<Integer> yPositions;
-    
-    Integer intSize = size;
-    Integer intSizeToBorder = sizeToBorder;
-    for ( Integer k=intSize; k>=1; --k)
-    {
-        xPositions.push(k);
-        if ( k > intSizeToBorder && ( W == pos || SW == pos || NW == pos ||
-                                      E == pos || NE == pos || SE == pos ) )
-        {
-            continue;
-        }
-        xPositions.push(k);
-    }
-    for ( Integer k=intSize; k>=1; --k)
-    {
-        yPositions.push(k);
-        if ( k > intSizeToBorder && ( S == pos || SW == pos || SE == pos ||
-                                      N == pos || NE == pos || NW == pos ) )
-        {
-            continue;
-        }
-        yPositions.push(k);
-    }
-    jX[0]=0;
-    jY[0]=0;
-    for ( Index i=1; i<=4; ++i )
-    {
-        if ( i%4 == 0 )
-        {
-            jX[i] = 0;
-            jY[i] = -1*yPositions.top();
-            yPositions.pop();
-        }
-        else if ( i%4 == 1 )
-        {
-            jX[i] = -1*xPositions.top();
-            xPositions.pop();
-            jY[i] = 0;
-        }
-        else if ( i%4 == 2 )
-        {
-            jX[i] = 0;
-            jY[i] = yPositions.top();
-            yPositions.pop();
-        }
-        else if ( i%4 == 3 )
-        {
-            jX[i] = xPositions.top();
-            xPositions.pop();
-            jY[i] = 0;
-        }
-    }
-    if ( pos == C )
-    {
-        for ( Index i=5; i<4*size+1; ++i )
-        {
-            if ( i%4 == 0 )
-            {
-                jX[i] = 0;
-                jY[i] = -1*yPositions.top();
-                yPositions.pop();
-            }
-            else if ( i%4 == 1 )
-            {
-                jX[i] = -1*xPositions.top();
-                xPositions.pop();
-                jY[i] = 0;
-            }
-            else if ( i%4 == 2 )
-            {
-                jX[i] = 0;
-                jY[i] = yPositions.top();
-                yPositions.pop();
-            }
-            else if ( i%4 == 3 )
-            {
-                jX[i] = xPositions.top();
-                xPositions.pop();
-                jY[i] = 0;
-            }
-        }
-    }
-    else if ( pos == W )
-    {
-        for ( Index i=5; i<=3*size+sizeToBorder; ++i )
-        {
-            if ( i%3 == 2 )
-            {
-                jY[i] = yPositions.top();
-                yPositions.pop();
-                jX[i] = 0;
-            }
-            else if ( i%3 == 0 )
-            {
-                jX[i] = xPositions.top();
-                xPositions.pop();
-                jY[i] = 0;
-            }
-            else if ( i%3 == 1 )
-            {
-                jX[i] = 0;
-                jY[i] = -1*yPositions.top();
-                yPositions.pop();
-            }
-        }
-    }
-    else if ( pos == N )
-    {
-        for ( Index i=5; i<=3*size+sizeToBorder; ++i )
-        {
-            if ( i%3 == 2 )
-            {
-                jX[i] = -1*xPositions.top();
-                xPositions.pop();
-                jY[i] = 0;
-            }
-            else if ( i%3 == 0 )
-            {
-                jX[i] = xPositions.top();
-                xPositions.pop();
-                jY[i] = 0;
-            }
-            else if ( i%3 == 1 )
-            {
-                jX[i] = 0;
-                jY[i] = -1*yPositions.top();
-                yPositions.pop();
-            }
-        }
-    }
-    else if ( pos == E )
-    {
-        for ( Index i=5; i<=3*size+sizeToBorder; ++i )
-        {
-            if ( i%3 == 2 )
-            {
-                jX[i] = -1*xPositions.top();
-                xPositions.pop();
-                jY[i] = 0;
-            }
-            else if ( i%3 == 0 )
-            {
-                jY[i] = yPositions.top();
-                yPositions.pop();
-                jX[i] = 0;
-            }
-            else if ( i%3 == 1 )
-            {
-                jX[i] = 0;
-                jY[i] = -1*yPositions.top();
-                yPositions.pop();
-            }
-        }
-    }
-    else if ( pos == S )
-    {
-        for ( Index i=5; i<=3*size+sizeToBorder; ++i )
-        {
-            if ( i%3 == 2 )
-            {
-                jX[i] = -1*xPositions.top();
-                xPositions.pop();
-                jY[i] = 0;
-            }
-            else if ( i%3 == 0 )
-            {
-                jX[i] = 0;
-                jY[i] = yPositions.top();
-                yPositions.pop();
-            }
-            else if ( i%3 == 1 )
-            {
-                jX[i] = xPositions.top();
-                xPositions.pop();
-                jY[i] = 0;
-            }
-        }
-    }
-    else if ( pos == NW )
-    {
-        for ( Index i=5; i<=2*size+2*sizeToBorder; ++i )
-        {
-            if ( i%2 == 1 )
-            {
-                jX[i] = xPositions.top();
-                xPositions.pop();
-                jY[i] = 0;
-            }
-            else if ( i%2 == 0 )
-            {
-                jX[i] = 0;
-                jY[i] = -1*yPositions.top();
-                yPositions.pop();
-            }
-        }
-    }
-    else if ( pos == NE )
-    {
-        for ( Index i=5; i<=2*size+2*sizeToBorder; ++i )
-        {
-            if ( i%2 == 1 )
-            {
-                jX[i] = -1*xPositions.top();
-                xPositions.pop();
-                jY[i] = 0;
-            }
-            else if ( i%2 == 0 )
-            {
-                jX[i] = 0;
-                jY[i] = -1*yPositions.top();
-                yPositions.pop();
-            }
-        }
-    }
-    else if ( pos == SE )
-    {
-        for ( Index i=5; i<=2*size+2*sizeToBorder; ++i )
-        {
-            if ( i%2 == 1 )
-            {
-                jX[i] = -1*xPositions.top();
-                xPositions.pop();
-                jY[i] = 0;
-            }
-            else if ( i%2 == 0 )
-            {
-                jX[i] = 0;
-                jY[i] = yPositions.top();
-                yPositions.pop();
-            }
-        }
-    }
-    else if ( pos == SW )
-    {
-        for ( Index i=5; i<=2*size+2*sizeToBorder; ++i )
-        {
-            if ( i%2 == 1 )
-            {
-                jX[i] = 0;
-                jY[i] = yPositions.top();
-                yPositions.pop();
-            }
-            else if ( i%2 == 0 )
-            {
-                jX[i] = xPositions.top();
-                xPositions.pop();
-                jY[i] = 0;
-            }
-        }
-    }
-
-    //ASSERT( xPositions.empty() && yPositions.empty() );
-    for ( Integer k=-intSize; k<=-1; ++k )
-    {
-        if ( k < -1*intSizeToBorder && ( W == pos || SW == pos || NW == pos ) )
-        {
-            continue;
-        }
-        xPositions.push(k);
-    }
-    for ( Integer k=-intSize; k<=-1; ++k )
-    {
-        if ( k < -1*intSizeToBorder && ( S == pos || SW == pos || SE == pos ) )
-        {
-            continue;
-        }
-        yPositions.push(k);
-    }
-    for ( Integer k=1; k<=intSize; ++k )
-    {
-        if ( k > intSizeToBorder && ( N == pos || NW == pos || NE == pos ) )
-        {
-            continue;
-        }
-        yPositions.push(k);   
-    }
-    for ( Integer k=1; k<=intSize; ++k )
-    {
-        if ( k > intSizeToBorder && ( E == pos || NE == pos || SE == pos ) )
-        {
-            continue;
-        }
-        xPositions.push(k);
-    }
-    Index i=2*size+2*sizeToBorder+1;
-    if ( C == pos )
-    {
-        i=4*size+1;
-    }
-    else if ( W == pos || N == pos || E == pos || S == pos )
-    {
-        i=3*size+sizeToBorder+1;
-    }
-    while( i<jX.size() )
-    {
-        std::stack<Integer> xP = xPositions;
-        Integer yPosition = yPositions.top();
-        yPositions.pop();
-        while( !xP.empty() )
-        {
-            jX[i] = xP.top();
-            xP.pop();
-            jY[i] = yPosition;
-            ++i;
-            if ( i>=jX.size() )
-                break;
-        }
-        //ASSERT( !yPositions.empty() );    
-    }
-    
-}
 
 Index ComputeSize(
     const Restriction& restriction,
     const Stencil& stencil)
 {
-    PositionArray restrictionJx = restriction.getJx();
-    PositionArray restrictionJy = restriction.getJy();
+    PositionArray restrictionJx = restriction.getJx( C );
+    PositionArray restrictionJy = restriction.getJy( C );
     const Index restSize = expansion(restrictionJx,restrictionJy);
     return restSize + stencil.size();
 }
@@ -377,8 +37,8 @@ Index ComputeSize(
     const PositionArray& jY,
     const Prolongation& prolong)
 {
-    PositionArray prolongJx = prolong.getJx();
-    PositionArray prolongJy = prolong.getJy();
+    PositionArray prolongJx = prolong.getJx( C );
+    PositionArray prolongJy = prolong.getJy( C );
     const Index prolongSize = expansion(prolongJx, prolongJy);
     const Index result = expansion(jX, jY);
     if ( result%2 == 0 )
@@ -386,6 +46,68 @@ Index ComputeSize(
         return result/2 + prolongSize - 1;
     }
     return ( result - 1 )/2 + prolongSize;
+}
+
+inline Position getNewPos(
+    const Position pos,
+    const Integer jX,
+    const Integer jY)
+{
+    Position newPos = C;
+    switch ( pos )
+    {
+        case W:
+            if ( jY < 0 )
+            {
+                newPos = W;
+            }
+            break;
+        case N:
+            if ( jX > 0 )
+            {
+                newPos = N;
+            }
+            break;
+        case E:
+            if ( jY > 0 )
+            {
+                newPos = E;
+            }
+            break;
+        case S:
+            if ( jX < 0 )
+            {
+                newPos = S;
+            }
+            break;
+        case NW:
+            if ( jX < 0 && jY > 0 )
+            {
+                newPos = NW;
+            }
+            break;
+        case NE:
+            if ( jX > 0 && jY > 0 )
+            {
+                newPos = NW;
+            }
+            break;
+        case SE:
+            if ( jX > 0 && jY < 0 )
+            {
+                newPos = NW;
+            }
+            break;
+        case SW:
+            if ( jX > 0 && jY < 0 )
+            {
+                newPos = NW;
+            }
+            break;
+        default:        // case C:
+            newPos = C;
+    }
+    return newPos;
 }
 
 void RestritionTimesStencil(
@@ -401,26 +123,24 @@ void RestritionTimesStencil(
     const Stencil& stencil)
 {
     //ASSERT( pos == C )
-    const PositionArray restrictionJx = restriction.getJx();
-    const PositionArray restriciionJy = restriction.getJy();
-    const NumericArray restrictionI = restriction.getI(sx,sy,nx,ny,stencil);
+    const PositionArray restrictionJx = restriction.getJx( C );
+    const PositionArray restriciionJy = restriction.getJy( C );
+    const NumericArray restrictionI = restriction.getI( C,sx,sy,nx,ny,stencil );
 
     const Index size = ComputeSize(restriction,stencil);
-    
-    jX.resize((2*size+1)*(2*size+1));
-    jY.resize((2*size+1)*(2*size+1));
-    jX=0;
-    jY=0;
-    GeneratePositionArrays(jX,jY,C,size,2);
-    resultL.resize((2*size+1)*(2*size+1));
+
+    generatePositionArrays(jX,jY,pos,size,2);
+    resultL.resize(jX.size());
     resultL = 0.0;
 
     for ( Index i=0; i<restrictionI.size(); ++i )
     {
-        PositionArray stencilJx = stencil.getJx( pos );
-        PositionArray stencilJy = stencil.getJy( pos );
+        const Position newPos = getNewPos(
+            pos, restrictionJx[i], restriciionJy[i] );
+        PositionArray stencilJx = stencil.getJx( newPos );
+        PositionArray stencilJy = stencil.getJy( newPos );
         NumericArray stencilL = stencil.getL(
-            pos,
+            newPos,
             2*sx+restrictionJx[i],
             2*sy+restriciionJy[i],
             2*nx, 2*ny);
@@ -456,21 +176,18 @@ void ProlongateStencil(
     const Prolongation& prolongation,
     const Stencil& stencil)
 {
-    const PositionArray prolongJx = prolongation.getJx();
-    const PositionArray prolongJy = prolongation.getJy();
-    const NumericArray prolongI = prolongation.getI(sx,sy,nx,ny,stencil);
     const Index size = ComputeSize(jX,jY,prolongation);
-    
-    resultJx.resize((2*size+1)*(2*size+1));
-    resultJy.resize((2*size+1)*(2*size+1));
-    resultJx=0;
-    resultJy=0;
-    GeneratePositionArrays(resultJx,resultJy,C,size,2);
-    resultL.resize((2*size+1)*(2*size+1));
+    generatePositionArrays( resultJx,resultJy,pos,size,1 );
+    resultL.resize( resultJx.size() );
     resultL = 0.0;
-    
     for (Index i=0; i<opL.size(); ++i)
     {
+        const Position newPos = getNewPos(
+            pos, jX[i], jY[i] );
+        const PositionArray prolongJx = prolongation.getJx( newPos );
+        const PositionArray prolongJy = prolongation.getJy( newPos );
+        const NumericArray prolongI = prolongation.getI( 
+            newPos,sx+jX[i],sy+jY[i],2*nx,2*ny,stencil );
         if (jX[i]%2 == 0 && jY[i]%2 == 0) //coars grid point
         {
             for (Index j=0; j<resultL.size(); ++j)
@@ -540,7 +257,6 @@ void ProlongateStencil(
             }
         }
     }
-    //resultL*=4.0;
 }
 
 }
@@ -566,6 +282,7 @@ void computeGalerkin(
         pos,sx,sy,nx,ny,
         restriction,
         stencil);
+    printStencil(interResultL,interJx,interJy,std::cout);
     ProlongateStencil(
         resultL,resultJx,resultJy,
         interResultL,interJx,interJy,
@@ -574,7 +291,8 @@ void computeGalerkin(
         stencil);
     
 }
-
+}
+/*
 void testGenPosArray(const Index size, const Index size2)
 {
     PositionArray jX;
@@ -772,7 +490,7 @@ void testGenPosArray(const Index size, const Index size2)
     
 }
 
-}
+}*/
 
 
 
