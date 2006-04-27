@@ -18,5 +18,6 @@
 #include "output.h"
 #include "expansion.h"
 #include "generatePositionArrays.h"
+#include "printStencil.h"
 
 #endif /*FUNCTIONSINCLUDES_H_*/
