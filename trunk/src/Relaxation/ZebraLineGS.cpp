@@ -21,67 +21,45 @@ void ZebraLineGS::relax(
     NumericArray rhs(0.0,u.size());
     switch (stencil.size())
     {
-        case 1:  // stencil of size 1
+    case 1:  // stencil of size 1
+        switch (direction_)
         {
-            switch (direction_)
-            {
-                case ALTDIR:
-                { 
-                    ninepointxzebra(u, f, rhs, stencil, nx, ny);
-                    ninepointyzebra(u, f, rhs, stencil, nx, ny);
-                    break;
-                }
-                case XDIR:
-                {
-                    ninepointxzebra(u, f, rhs, stencil, nx, ny);
-                    break;
-                }
-                case YDIR:
-                {
-                    ninepointyzebra(u, f, rhs, stencil, nx, ny);
-                    break;
-                }
-                default:
-                {
-                    std::cerr << "Error in direction of the line relaxation!\n";
-                    break;
-                }
-            }
-            break;          
-        }
-        case 2:  //stencil of size 2
-        {
-            switch (direction_)
-            {
-                case ALTDIR:
-                { 
-                    xzebra(u, f, rhs, stencil, nx, ny);
-                    yzebra(u, f, rhs, stencil, nx, ny);
-                    break;
-                }
-                case XDIR:
-                {
-                    xzebra(u, f, rhs, stencil, nx, ny);
-                    break;
-                }   
-                case YDIR:
-                {
-                    yzebra(u, f, rhs, stencil, nx, ny);
-                    break;
-                }
-                default:
-                {
-                    std::cerr << "Error in direction of the line relaxation!\n";
-                    break;
-                }
-            }
+        case ALTDIR:
+            ninepointxzebra(u, f, rhs, stencil, nx, ny);
+            ninepointyzebra(u, f, rhs, stencil, nx, ny);
             break;
-        }
+        case XDIR:
+            ninepointxzebra(u, f, rhs, stencil, nx, ny);
+            break;
+        case YDIR:
+            ninepointyzebra(u, f, rhs, stencil, nx, ny);
+            break;
         default:
-        {
-            std::cerr << "Stencil is too big (size>2)!" << std::endl;
+            std::cerr << "Error in direction of the line relaxation!\n";
             break;
         }
+        break;          
+    case 2:  //stencil of size 2
+        switch (direction_)
+        {
+        case ALTDIR:
+            xzebra(u, f, rhs, stencil, nx, ny);
+            yzebra(u, f, rhs, stencil, nx, ny);
+            break;
+        case XDIR:
+            xzebra(u, f, rhs, stencil, nx, ny);
+            break;
+        case YDIR:
+            yzebra(u, f, rhs, stencil, nx, ny);
+            break;
+        default:
+            std::cerr << "Error in direction of the line relaxation!\n";
+            break;
+        }
+        break;
+    default:
+        std::cerr << "Stencil is too big (size>2)!" << std::endl;
+        break;
     }
 }
 void ZebraLineGS::ninepointxzebra(
