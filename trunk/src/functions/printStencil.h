@@ -14,7 +14,8 @@ namespace mg
  * \brief prints the given stencil to out
  * 
  * printStencil prints a stencil given by a coeficient array and two positon
- * arrays according to the discription of Stencil. /see Stencil
+ * arrays according to the discription of Stencil. The center element is
+ * printed in parantis. /see Stencil
  * 
  * \param[in] L     the coeficients of the stencil
  * \param[in] jX    the position array of the stencil in x dir
