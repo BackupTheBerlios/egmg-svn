@@ -28,11 +28,18 @@ public:
      * \brief The constructor of a WCycle object
      * 
      * WCycle constructs a WCycle object with:
+     * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
+     * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      * \param[in] maximalDepth  Number of Grid Levels
      * \param[in] gamma         Number of repeats on each grid level
      */
-    WCycle(const Index maximalDepth,const Index gamma)
-        : gamma_(gamma),
+    WCycle(
+        const int preSmoothingSteps,
+        const int postSmoothingSteps,
+        const Index maximalDepth,
+        const Index gamma)
+        : CycleType(preSmoothingSteps, postSmoothingSteps),
+          gamma_(gamma),
           repeats_(maximalDepth+1,0),
           maximalDepth_(maximalDepth),
           currentDepth_(0)

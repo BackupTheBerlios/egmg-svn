@@ -21,17 +21,6 @@ namespace mg
 class GSLexicographic : public mg::Relaxation
 {
 public:
-    /**
-     * \brief The constructor of a GSLexicographic object
-     * 
-     * GSLexicographic constructs a GSLexicographic object with:
-     * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
-     * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
-     */
-    GSLexicographic(
-        const int preSmoothingSteps =1,
-        const int postSmoothingSteps =1)
-        : Relaxation(preSmoothingSteps,postSmoothingSteps) {}
     virtual ~GSLexicographic() {}
     
     /**

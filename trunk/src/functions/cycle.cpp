@@ -20,7 +20,7 @@ void cycle(
     Stencil& stencil,
     const Prolongation& prolongation,
     const Restriction& restriction,
-    Relaxation& relaxation,
+    const Relaxation& relaxation,
     const Index nx,
     const Index ny)
 {
@@ -31,12 +31,13 @@ void cycle(
     }
     else
     {
-        //if it is not possible to do standart coarsening throw an exeption
+        //if it is not possible to do standard coarsening throw an exeption
         if (nx%2!=0 || ny%2!=0)
             throw std::domain_error("u");
         while(cycleType.repeat())
         {
-            relaxation.preSmooth(u,f,stencil,nx,ny);
+            for(int i=0; i<cycleType.getPreSmoothingSteps(); ++i)
+                relaxation.relax(u,f,stencil,nx,ny);
             //calculate the residuum
             NumericArray residv=residuum(u,f,stencil,nx,ny);
             //restrict the residuum to the coars grid
@@ -66,7 +67,10 @@ void cycle(
             //we are going to a smaler grid so remove transfer operators
             stencil.popRestriction();
             stencil.popProlongation();
-            relaxation.postSmooth(u,f,stencil,nx,ny);
+
+            for(int i=0; i<cycleType.getPostSmoothingSteps(); ++i)
+                relaxation.relax(u,f,stencil,nx,ny);
+
             cycleType.accelerate(u,f,stencil,nx,ny);
         }
     }

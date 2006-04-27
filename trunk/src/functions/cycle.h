@@ -44,7 +44,7 @@ void cycle(
     Stencil& stencil,
     const Prolongation& prolongation,
     const Restriction& restriction,
-    Relaxation& relaxation,
+    const Relaxation& relaxation,
     const Index nx,
     const Index ny);
 }

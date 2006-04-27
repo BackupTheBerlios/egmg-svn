@@ -61,18 +61,11 @@ public:
      * \brief The constructor of a LineRelaxation object
      * 
      * LineRelaxation constructs a LineRelaxation object with:
-     * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
-     * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      * \param[in] direction             direction of the line relaxation
      *                                  (def. alternating directions)
      * \see Direction
      */ 
-    LineRelaxation(
-        const int preSmoothingSteps=1,
-        const int postSmoothingSteps=1,
-        const Direction direction=ALTDIR)
-        : Relaxation(preSmoothingSteps,postSmoothingSteps),
-          direction_(direction) {}
+    LineRelaxation(const Direction direction=ALTDIR):direction_(direction) {}
 };
 
 }

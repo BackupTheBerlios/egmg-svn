@@ -19,6 +19,9 @@ namespace mg
 class CycleType
 {
 private:
+    int preSmoothingSteps_;
+    int postSmoothingSteps_;
+
     /**
      * \brief The copy constructor of a CycleType object
      * 
@@ -27,15 +30,19 @@ private:
      */
     CycleType(const CycleType& rhs);
 public:
-    CycleType() {}
     /**
      * \brief The constructor of a CycleType object
      * 
-     * A CylcleType object needs a constructor with at least these parameters:
-     * \param[in] maximalDepth  Number of Grid Levels
+     * CycleType constructs a CycleType object with:
+     * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
+     * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      */
-    CycleType(const Index maximalDepth);
-    
+    CycleType(
+        const int preSmoothingSteps,
+        const int postSmoothingSteps):
+        preSmoothingSteps_(preSmoothingSteps),
+        postSmoothingSteps_(postSmoothingSteps) {}
+
     virtual ~CycleType() {}
     
     /**
@@ -63,6 +70,36 @@ public:
      * \brief tells a CycleType Object that a grid level will be left
      */
     virtual void decrementGridLevel() =0;
+    
+    /**
+     * \brief getPreSmoothingSteps() returns the number of pre smothing steps
+     * \return the number of pre somthing steps
+     */
+    int getPreSmoothingSteps() const {return preSmoothingSteps_;};
+    
+    /**
+     * \brief setPreSmoothingSteps() sets the number of pre smothing steps
+     * \param[in] preSmoothingSteps     the number of pre somthing steps
+     */
+    void setPreSmoothingSteps(int preSmoothingSteps)
+    {
+        preSmoothingSteps_=preSmoothingSteps;
+    }
+    
+    /**
+     * \brief getPostSmoothingSteps() returns the number of post somthing steps
+     * \return the number of post somthing steps
+     */
+    int getPostSmoothingSteps() const {return postSmoothingSteps_;};
+    
+    /**
+     * \brief setPostSmoothingSteps() sets the number of post smothing steps
+     * \param[in] postSmoothingSteps        the number of post somthing steps
+     */
+    void setPostSmoothingSteps(int postSmoothingSteps)
+    {
+        postSmoothingSteps_=postSmoothingSteps;
+    }
     
     /**
      * \brief accelerate() the current solution

@@ -26,16 +26,9 @@ public:
      * \brief The constructor of a Jacobi object
      * 
      * Jacobi constructs a Jacobi object with:
-     * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
-     * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      * \param[in] omega                 relaxation parameter (def. 1.0)
      */
-    Jacobi(
-        const int preSmoothingSteps =1,
-        const int postSmoothingSteps =1,
-        const Precision omega =1.0)
-        : Relaxation(preSmoothingSteps,postSmoothingSteps),
-          omega_(omega) {}
+    Jacobi(const Precision omega =1.0): omega_(omega) {}
     virtual ~Jacobi() {}
     
     /**

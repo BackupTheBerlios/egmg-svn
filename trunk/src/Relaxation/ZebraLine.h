@@ -52,19 +52,15 @@ public:
      * \brief The constructor of a ZebraLine object
      * 
      * ZebraLine constructs a ZebraLine object with:
-     * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
-     * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      * \param[in] direction             direction of the line relaxation
      *                                  (def. alternating directions)
      * \param[in] omega                 relaxation parameter (def. 1.0)
      * \see Direction
      */ 
     ZebraLine(
-        const int preSmoothingSteps =1,
-        const int postSmoothingSteps =1,
         const Direction direction =ALTDIR,
         const Precision omega =1.0)
-        : LineRelaxation(preSmoothingSteps,postSmoothingSteps,direction),
+        : LineRelaxation(direction),
           omega_(omega),gsRedBlack_() {}
     virtual ~ZebraLine() {}
     

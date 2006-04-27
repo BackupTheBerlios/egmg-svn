@@ -52,17 +52,12 @@ public:
      * \brief The constructor of a LineGS object
      * 
      * LineGS constructs a LineGS object with:
-     * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
-     * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      * \param[in] direction             direction of the line relaxation
      *                                  (def. alternating directions)
      * \see Direction
      */ 
-    LineGS(
-        const int preSmoothingSteps =1,
-        const int postSmoothingSteps =1,
-        const Direction direction =ALTDIR)
-        : LineRelaxation(preSmoothingSteps,postSmoothingSteps,direction),
+    LineGS(const Direction direction =ALTDIR)
+        : LineRelaxation(direction),
           gsLexicographic_() {}
     virtual ~LineGS() {}
 

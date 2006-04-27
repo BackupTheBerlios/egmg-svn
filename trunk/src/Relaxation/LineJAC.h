@@ -52,20 +52,16 @@ public:
      * \brief The constructor of a LineJAC object
      * 
      * LineJAC constructs a LineJAC object with:
-     * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
-     * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      * \param[in] direction             direction of the line relaxation
      *                                  (def. alternating directions)
      * \param[in] omega                 relaxation parameter (def. 1.0)
      * \see Direction
      */ 
     LineJAC(
-        const int preSmoothingSteps =1,
-        const int postSmoothingSteps =1,
         const Direction direction =ALTDIR,
         const Precision omega =1.0)
-        : LineRelaxation(preSmoothingSteps,postSmoothingSteps,direction),
-          omega_(omega), jacobi_(preSmoothingSteps,postSmoothingSteps,omega) {}
+        : LineRelaxation(direction),
+          omega_(omega), jacobi_(omega) {}
     virtual ~LineJAC() {}
     
     /**

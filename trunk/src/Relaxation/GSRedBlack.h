@@ -20,16 +20,7 @@ namespace mg
 class GSRedBlack : public mg::Relaxation
 {
 public:
-    /**
-     * \brief The constructor of a GSRedBlack object
-     * 
-     * GSRedBlack constructs a GSRedBlack object with:
-     * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
-     * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
-     */
-    GSRedBlack(const int preSmoothingSteps =1,const int postSmoothingSteps =1)
-        : Relaxation(preSmoothingSteps,postSmoothingSteps) {}
-        
+
     virtual ~GSRedBlack() {}
     
     /**

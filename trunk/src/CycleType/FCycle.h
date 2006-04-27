@@ -29,10 +29,16 @@ public:
      * \brief The constructor of a FCycle object
      * 
      * FCycle constructs a FCycle object with:
+     * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
+     * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      * \param[in] maximalDepth  Number of Grid Levels
      */
-    FCycle(Index maximalDepth)
-        : maximalDepth_(maximalDepth),
+    FCycle(
+        const int preSmoothingSteps,
+        const int postSmoothingSteps,
+        Index maximalDepth)
+        : CycleType(preSmoothingSteps, postSmoothingSteps),
+          maximalDepth_(maximalDepth),
           currentDepth_(0),
           currentState_(maximalDepth+1,INIT)
     {}

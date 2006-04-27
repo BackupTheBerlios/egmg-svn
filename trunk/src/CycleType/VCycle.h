@@ -22,10 +22,15 @@ public:
      * \brief The constructor of a VCycle object
      * 
      * VCycle constructs a VCycle object with:
+     * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
+     * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      * \param[in] maximalDepth  Number of Grid Levels
      */
-    explicit VCycle(const Index maximalDepth)
-        : WCycle(maximalDepth,1)
+    VCycle(
+        const int preSmoothingSteps,
+        const int postSmoothingSteps,
+        const Index maximalDepth)
+        : WCycle(preSmoothingSteps, postSmoothingSteps,maximalDepth,1)
     {}    
 };
 
