@@ -42,7 +42,7 @@ void cycle(
             NumericArray residv=residuum(u,f,stencil,nx,ny);
             //restrict the residuum to the coars grid
             NumericArray coarsResiduum=restriction.restriction
-                    (residv,stencil,prolongation,nx,ny);
+                    (residv,stencil,nx,ny);
             //we going to a coarser grid so Galerkin Operator needs to know
             //the transfer operators
             stencil.pushProlongation(prolongation);
