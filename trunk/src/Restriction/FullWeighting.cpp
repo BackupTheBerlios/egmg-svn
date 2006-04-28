@@ -11,7 +11,6 @@ namespace mg
 NumericArray FullWeighting::restriction(
     const NumericArray& u,
     const Stencil&,
-    const Prolongation&,
     const Index nx,const Index ny) const
 {
     //if it is not possible to do standart coarsening throw an exeption

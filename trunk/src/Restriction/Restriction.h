@@ -40,7 +40,6 @@ public:
     virtual NumericArray restriction(
         const NumericArray& u,
         const Stencil& stencil,
-        const Prolongation& prolongation, 
         const Index nx,
         const Index ny) const =0;
 };

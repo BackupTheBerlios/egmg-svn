@@ -10,7 +10,6 @@ namespace mg
 NumericArray HalfWeighting::restriction(
     const NumericArray& u,
     const Stencil&,
-    const Prolongation&,
     const Index nx,
     const Index ny) const
 {
