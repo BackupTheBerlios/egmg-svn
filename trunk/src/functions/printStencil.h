@@ -6,6 +6,7 @@
 #define PRINTSTENCIL_H_
 
 #include "../general/parameters.h"
+#include <ostream>
 
 namespace mg
 {
