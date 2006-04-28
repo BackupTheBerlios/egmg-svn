@@ -211,6 +211,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\functions\generatePositionArrays.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\functions\generatePositionArrays.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\functions\maxResiduum.cpp"
 					>
 				</File>
@@ -224,6 +232,14 @@
 				</File>
 				<File
 					RelativePath=".\src\functions\output.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\functions\printStencil.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\functions\printStencil.h"
 					>
 				</File>
 				<File
@@ -287,7 +303,6 @@
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -311,7 +326,6 @@
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -400,6 +414,14 @@
 				</File>
 				<File
 					RelativePath=".\src\Restriction\SevenPointRestriction.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Restriction\TranspProlong.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Restriction\TranspProlong.h"
 					>
 				</File>
 			</Filter>
@@ -503,7 +525,6 @@
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
