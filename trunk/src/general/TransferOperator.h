@@ -88,7 +88,7 @@ public:
      */
     virtual const PositionArray& getJy( const Position pos ) const =0;
 
-	virtual ~TransferOperator() =0;
+	virtual ~TransferOperator() {};
 };
 
 }
