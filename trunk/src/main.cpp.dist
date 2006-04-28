@@ -19,6 +19,8 @@ void testInit()
     FCycle fCycle(1,1,3);
     VCycle vCycle(1,1,3);
     WCycle wCycle(1,1,3,2);
+    std::vector<Index> gammas(3,2); //Equivalent to a WCycle
+    LevelCycle levelCycle(1,1,gammas);
     BicubicInterpolation bicubicInterpolation;
     BilinearInterpolation bilinearInterpolation;
     SevenPointInterpolation sevenPointInterpolation;

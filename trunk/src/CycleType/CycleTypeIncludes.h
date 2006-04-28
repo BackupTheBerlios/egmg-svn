@@ -8,5 +8,6 @@
 #include "FCycle.h"
 #include "VCycle.h"
 #include "WCycle.h"
+#include "LevelCycle.h"
 
 #endif /*CYCLETYPEINCLUDES_H_*/
