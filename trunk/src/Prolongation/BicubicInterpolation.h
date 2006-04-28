@@ -9,6 +9,7 @@
 #define BICUBICINTERPOLATION_H_
 
 #include "Prolongation.h"
+#include <stdexcept>
 
 namespace mg
 {
@@ -188,6 +189,8 @@ public:
         {
             return i_;
         }
+        else
+            throw std::logic_error("Wrong position");
     }
 
     const PositionArray& getJx( const Position ) const
