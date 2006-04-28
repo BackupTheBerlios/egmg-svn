@@ -26,7 +26,7 @@ namespace mg
 class DendyInterpolation : public mg::Prolongation
 {
 private:
-    NumericArray t_;
+    mutable NumericArray t_;
     const PositionArray jx_;
     const PositionArray jy_;
 
@@ -71,12 +71,12 @@ public:
         const Index ny) const;
                                     
     const NumericArray& getI(
-        const Position pos,
+		const Position,
         const Index sx,
         const Index sy, 
         const Index nx,
         const Index ny,
-        const Stencil& stencil);
+        const Stencil& stencil) const;
 
     const PositionArray& getJx( const Position ) const
     {

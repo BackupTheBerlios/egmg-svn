@@ -8,5 +8,7 @@
 #include "BicubicInterpolation.h"
 #include "BilinearInterpolation.h"
 #include "SevenPointInterpolation.h"
+#include "DendyInterpolation.h"
+#include "DeZeeuwInterpolation.h"
 
 #endif /*PROLONGATIONINCLUDES_H_*/

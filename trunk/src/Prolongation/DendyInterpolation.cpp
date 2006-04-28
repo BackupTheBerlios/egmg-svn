@@ -1,6 +1,7 @@
 /** \file DendyInterpolation.cpp
  * \author Benedikt Engbroks
- * \brief Contains the implementation of the class DendyInterpolation
+ * \brief
+ Contains the implementation of the class DendyInterpolation
  * \see DendyInterpolation.h
  */
 #include "DendyInterpolation.h"
@@ -20,19 +21,38 @@ NumericArray DendyInterpolation::prolongate(
     PositionArray jx=stencil.getJx(C);
     PositionArray jy=stencil.getJy(C);
     NumericArray stencilL=NumericArray();
-    std::valarray<Index> position(9);
-    // position[0]=No. of the sw-element of the stencil
-    // position[1]=No. of the s-element of the stencil
-    // position[2]=No. of the se-element of the stencil
-    // position[3]=No. of the w-element of the stencil
-    // position[4]=No. of the c-element of the stencil (i.e. 0)
-    // position[5]=No. of the e-element of the stencil
-    // position[6]=No. of the nw-element of the stencil
-    // position[7]=No. of the n-element of the stencil
-    // position[8]=No. of the ne-element of the stencil
-    // (see also the definitions of the constants in the .h-file)
-    for (Index j=0; j<jx.size(); ++j)
-        position[(jx[j]+1)+3*(jy[j]+1)]=j;
+    std::valarray<Index> position((Index)0, 9);
+
+	for (Index j=0; j<jx.size(); ++j)
+	{
+		if (jy[j] == 1)		// north
+		{
+			if (jx[j] == -1)
+				position[NW] = j;
+			else if (jx[j] == 0)
+				position[N] = j;
+			else if (jx[j] == 1)
+				position[NE] = j;
+		}
+		if (jy[j] == 0)		// center
+		{
+			if (jx[j] == -1)
+				position[W] = j;
+			else if (jx[j] == 0)
+				position[C] = j;
+			else if (jx[j] == 1)
+				position[E] = j;
+		}
+		if (jy[j] == -1)	// south
+		{
+			if (jx[j] == -1)
+				position[SW] = j;
+			else if (jx[j] == 0)
+				position[S] = j;
+			else if (jx[j] == 1)
+				position[SE] = j;
+		}
+	}
 
     Precision scale=0;
     Precision weight1=0;
@@ -126,19 +146,47 @@ NumericArray DendyInterpolation::prolongate(
     return result;
 }
 const NumericArray& DendyInterpolation::getI(
-    const Position,
+	const Position, 
     const Index sx,
     const Index sy, 
     const Index nx,
     const Index ny,
-    const Stencil& stencil)
+    const Stencil& stencil) const
 {
     PositionArray jx=stencil.getJx(C);
     PositionArray jy=stencil.getJy(C);
-    std::valarray<Index> position(9);
+    std::valarray<Index> position((Index)0, 9);
 
-    for (Index i=0; i<jx.size(); ++i)
-        position[(jx[i]+1)+3*(jy[i]+1)]=i;
+	for (Index j=0; j<jx.size(); ++j)
+	{
+		if (jy[j] == 1)		// north
+		{
+			if (jx[j] == -1)
+				position[NW] = j;
+			else if (jx[j] == 0)
+				position[N] = j;
+			else if (jx[j] == 1)
+				position[NE] = j;
+		}
+		if (jy[j] == 0)		// center
+		{
+			if (jx[j] == -1)
+				position[W] = j;
+			else if (jx[j] == 0)
+				position[C] = j;
+			else if (jx[j] == 1)
+				position[E] = j;
+		}
+		if (jy[j] == -1)	// south
+		{
+			if (jx[j] == -1)
+				position[SW] = j;
+			else if (jx[j] == 0)
+				position[S] = j;
+			else if (jx[j] == 1)
+				position[SE] = j;
+		}
+	}
 
     Precision scale=0;
     Precision weight1=0;

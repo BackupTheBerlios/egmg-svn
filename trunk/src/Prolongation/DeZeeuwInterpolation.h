@@ -25,7 +25,7 @@ namespace mg
 class DeZeeuwInterpolation : public mg::Prolongation
 {
 private:
-    NumericArray t_;
+    mutable NumericArray t_;
     const PositionArray jx_;
     const PositionArray jy_;
 
@@ -47,18 +47,7 @@ private:
     DeZeeuwInterpolation(const DeZeeuwInterpolation&);
     DeZeeuwInterpolation& operator=(const DeZeeuwInterpolation&);
     
-    /**
-     * \todo for this the enum Position should be used
-    static const int SW=0;
-    static const int S=1;
-    static const int SE=2;
-    static const int W=3;
-    static const int C=4;
-    static const int E=5;
-    static const int NW=6;
-    static const int N=7;
-    static const int NE=8;
-     */
+
 public:
     DeZeeuwInterpolation() : t_(9), jx_(initJx_()), jy_(initJy_()) {}
 
@@ -81,12 +70,12 @@ public:
         const Index ny) const;
 
     const NumericArray& getI(
-        const Position pos,
+		const Position,
         const Index sx,
         const Index sy, 
         const Index nx,
         const Index ny,
-        const Stencil& stencil);
+        const Stencil& stencil) const;
 
     const PositionArray& getJx( const Position ) const
     {

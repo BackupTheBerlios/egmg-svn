@@ -24,23 +24,39 @@ NumericArray DeZeeuwInterpolation::prolongate(
     PositionArray jx=stencil.getJx(C);
     PositionArray jy=stencil.getJy(C);
     NumericArray stencilL=stencil.getL(C,0,0,nx,ny);
-    std::valarray<Index> position(9);
+    std::valarray<Index> position((Index)0, 9);
     NumericArray ms(9);
     NumericArray mt(9);
-    // position[0]=No. of the sw-element of the stencil
-    // position[1]=No. of the s-element of the stencil
-    // position[2]=No. of the se-element of the stencil
-    // position[3]=No. of the w-element of the stencil
-    // position[4]=No. of the c-element of the stencil (i.e. 0)
-    // position[5]=No. of the e-element of the stencil
-    // position[6]=No. of the nw-element of the stencil
-    // position[7]=No. of the n-element of the stencil
-    // position[8]=No. of the ne-element of the stencil
-    // (see also the definitions of the constants in the .h-file)
-    for (Index j=0; j<jx.size(); ++j)
-    {
-        position[(jx[j]+1)+3*(jy[j]+1)]=j;
-    }
+	for (Index j=0; j<jx.size(); ++j)
+	{
+		if (jy[j] == 1)		// north
+		{
+			if (jx[j] == -1)
+				position[NW] = j;
+			else if (jx[j] == 0)
+				position[N] = j;
+			else if (jx[j] == 1)
+				position[NE] = j;
+		}
+		if (jy[j] == 0)		// center
+		{
+			if (jx[j] == -1)
+				position[W] = j;
+			else if (jx[j] == 0)
+				position[C] = j;
+			else if (jx[j] == 1)
+				position[E] = j;
+		}
+		if (jy[j] == -1)	// south
+		{
+			if (jx[j] == -1)
+				position[SW] = j;
+			else if (jx[j] == 0)
+				position[S] = j;
+			else if (jx[j] == 1)
+				position[SE] = j;
+		}
+	}
 
     Precision scale=0;
     Precision weight1=0;
@@ -74,13 +90,24 @@ NumericArray DeZeeuwInterpolation::prolongate(
             
             // Divide the stencil defined by stencilL und position into a
             // symmetric and an antisymmetric part.
-            for (Index k=0; k<9; ++k)
-            {
-                ms[k]=0.5*(stencilL[position[k]]+stencilL[position[8-k]]);
-                symsum+=ms[k];
-                mt[k]=0.5*(stencilL[position[k]]-stencilL[position[8-k]]);
-            }
-            d_w=std::max(std::fabs(ms[SW]+ms[W]+ms[NW]),
+
+			ms[NE]=ms[SW]=0.5*(stencilL[position[SW]]+stencilL[position[NE]]);
+			ms[N]=ms[S]=0.5*(stencilL[position[S]]+stencilL[position[N]]);
+			ms[NW]=ms[SE]=0.5*(stencilL[position[SE]]+stencilL[position[NW]]);
+			ms[E]=ms[W]=0.5*(stencilL[position[W]]+stencilL[position[E]]);
+			ms[C]=stencilL[position[C]];
+            symsum+=2*ms[NE]+2*ms[N]+2*ms[NW]+2*ms[E]+ms[C];
+			mt[SW]=0.5*(stencilL[position[SW]]-stencilL[position[NE]]);
+			mt[S]=0.5*(stencilL[position[S]]-stencilL[position[N]]);
+			mt[SE]=0.5*(stencilL[position[SE]]-stencilL[position[NW]]);
+			mt[W]=0.5*(stencilL[position[W]]-stencilL[position[E]]);
+			mt[NE]=0.5*(stencilL[position[NE]]-stencilL[position[SW]]);
+			mt[N]=0.5*(stencilL[position[N]]-stencilL[position[S]]);
+			mt[NW]=0.5*(stencilL[position[NW]]-stencilL[position[SE]]);
+			mt[E]=0.5*(stencilL[position[E]]-stencilL[position[E]]);
+			mt[C]=0.0;
+
+			d_w=std::max(std::fabs(ms[SW]+ms[W]+ms[NW]),
                          std::max(std::fabs(ms[SW]),
                                   std::fabs(ms[NW])));
             d_e=std::max(std::fabs(ms[SE]+ms[E]+ms[NE]),
@@ -113,13 +140,23 @@ NumericArray DeZeeuwInterpolation::prolongate(
             
             // Divide the stencil defined by stencilL und position into a
             // symmetric and an antisymmetric part.
-            for (int k=0; k<9; ++k)
-            {
-                ms[k]=0.5*(stencilL[position[k]]+stencilL[position[8-k]]);
-                symsum+=ms[k];
-                mt[k]=0.5*(stencilL[position[k]]-stencilL[position[8-k]]);
-            }
-            d_w=std::max(std::fabs(ms[SW]+ms[W]+ms[NW]),
+			ms[NE]=ms[SW]=0.5*(stencilL[position[SW]]+stencilL[position[NE]]);
+			ms[N]=ms[S]=0.5*(stencilL[position[S]]+stencilL[position[N]]);
+			ms[NW]=ms[SE]=0.5*(stencilL[position[SE]]+stencilL[position[NW]]);
+			ms[E]=ms[W]=0.5*(stencilL[position[W]]+stencilL[position[E]]);
+			ms[C]=stencilL[position[C]];
+            symsum+=2*ms[NE]+2*ms[N]+2*ms[NW]+2*ms[E]+ms[C];
+			mt[SW]=0.5*(stencilL[position[SW]]-stencilL[position[NE]]);
+			mt[S]=0.5*(stencilL[position[S]]-stencilL[position[N]]);
+			mt[SE]=0.5*(stencilL[position[SE]]-stencilL[position[NW]]);
+			mt[W]=0.5*(stencilL[position[W]]-stencilL[position[E]]);
+			mt[NE]=0.5*(stencilL[position[NE]]-stencilL[position[SW]]);
+			mt[N]=0.5*(stencilL[position[N]]-stencilL[position[S]]);
+			mt[NW]=0.5*(stencilL[position[NW]]-stencilL[position[SE]]);
+			mt[E]=0.5*(stencilL[position[E]]-stencilL[position[E]]);
+			mt[C]=0.0;
+
+			d_w=std::max(std::fabs(ms[SW]+ms[W]+ms[NW]),
                          std::max(std::fabs(ms[SW]),
                                   std::fabs(ms[NW])));
             d_e=std::max(std::fabs(ms[SE]+ms[E]+ms[NE]),
@@ -170,23 +207,49 @@ NumericArray DeZeeuwInterpolation::prolongate(
     return result;
 }
 const NumericArray& DeZeeuwInterpolation::getI(
-    const Position,
+	const Position,
     const Index sx,
     const Index sy, 
     const Index nx,
     const Index ny,
-    const Stencil& stencil)
+    const Stencil& stencil) const
 {
     NumericArray stencilL=stencil.getL(C,0,0,nx,ny);
     PositionArray jx=stencil.getJx(C);
     PositionArray jy=stencil.getJy(C);
-    std::valarray<Index> position(9);
-    for (Index jj=0;jj<jx.size();jj++)
-    {
-        position[(jx[jj]+1)+3*(jy[jj]+1)]=jj;
-    }
-    NumericArray mS(9);
-    NumericArray mT(9);
+    std::valarray<Index> position((Index)0, 9);
+	for (Index j=0; j<jx.size(); ++j)
+	{
+		if (jy[j] == 1)		// north
+		{
+			if (jx[j] == -1)
+				position[NW] = j;
+			else if (jx[j] == 0)
+				position[N] = j;
+			else if (jx[j] == 1)
+				position[NE] = j;
+		}
+		if (jy[j] == 0)		// center
+		{
+			if (jx[j] == -1)
+				position[W] = j;
+			else if (jx[j] == 0)
+				position[C] = j;
+			else if (jx[j] == 1)
+				position[E] = j;
+		}
+		if (jy[j] == -1)	// south
+		{
+			if (jx[j] == -1)
+				position[SW] = j;
+			else if (jx[j] == 0)
+				position[S] = j;
+			else if (jx[j] == 1)
+				position[SE] = j;
+		}
+	}
+    NumericArray ms(9);
+    NumericArray mt(9);
 
     Precision scale=0;
     Precision weight1=0;
@@ -215,26 +278,35 @@ const NumericArray& DeZeeuwInterpolation::getI(
     
     // Divide the stencil defined by stencilL und position into a symmetric 
     // and an antisymmetric part.
-    for (Index k=0; k<9; ++k)
-    {
-        mS[k]=0.5*(stencilL[position[k]]+stencilL[position[8-k]]);
-        symsum+=mS[k];
-        mT[k]=0.5*(stencilL[position[k]]-stencilL[position[8-k]]);
-    }
-    d_w=std::max(std::fabs(mS[SW]+mS[W]+mS[NW]),
-                 std::max(std::fabs(mS[SW]),
-                          std::fabs(mS[NW])));
-    d_e=std::max(std::fabs(mS[SE]+mS[E]+mS[NE]),
-                 std::max(std::fabs(mS[SE]),
-                          std::fabs(mS[NE])));
-    d_n=std::max(std::fabs(mS[NW]+mS[N]+mS[NE]),
-                 std::max(std::fabs(mS[NW]),
-                          std::fabs(mS[NE])));
-    d_s=std::max(std::fabs(mS[SW]+mS[S]+mS[SE]),
-                 std::max(std::fabs(mS[SW]),
-                          std::fabs(mS[SE])));
+	ms[NE]=ms[SW]=0.5*(stencilL[position[SW]]+stencilL[position[NE]]);
+	ms[N]=ms[S]=0.5*(stencilL[position[S]]+stencilL[position[N]]);
+	ms[NW]=ms[SE]=0.5*(stencilL[position[SE]]+stencilL[position[NW]]);
+	ms[E]=ms[W]=0.5*(stencilL[position[W]]+stencilL[position[E]]);
+	ms[C]=stencilL[position[C]];
+    symsum+=2*ms[NE]+2*ms[N]+2*ms[NW]+2*ms[E]+ms[C];
+	mt[SW]=0.5*(stencilL[position[SW]]-stencilL[position[NE]]);
+	mt[S]=0.5*(stencilL[position[S]]-stencilL[position[N]]);
+	mt[SE]=0.5*(stencilL[position[SE]]-stencilL[position[NW]]);
+	mt[W]=0.5*(stencilL[position[W]]-stencilL[position[E]]);
+	mt[NE]=0.5*(stencilL[position[NE]]-stencilL[position[SW]]);
+	mt[N]=0.5*(stencilL[position[N]]-stencilL[position[S]]);
+	mt[NW]=0.5*(stencilL[position[NW]]-stencilL[position[SE]]);
+	mt[E]=0.5*(stencilL[position[E]]-stencilL[position[E]]);
+	mt[C]=0.0;
+    d_w=std::max(std::fabs(ms[SW]+ms[W]+ms[NW]),
+                 std::max(std::fabs(ms[SW]),
+                          std::fabs(ms[NW])));
+    d_e=std::max(std::fabs(ms[SE]+ms[E]+ms[NE]),
+                 std::max(std::fabs(ms[SE]),
+                          std::fabs(ms[NE])));
+    d_n=std::max(std::fabs(ms[NW]+ms[N]+ms[NE]),
+                 std::max(std::fabs(ms[NW]),
+                          std::fabs(ms[NE])));
+    d_s=std::max(std::fabs(ms[SW]+ms[S]+ms[SE]),
+                 std::max(std::fabs(ms[SW]),
+                          std::fabs(ms[SE])));
     sigma1=0.5*std::min(1.0, std::fabs(1-symsum/stencilL[0]));
-    c_1=mT[SE]+mT[E]+mT[NE]-mT[SW]-mT[W]-mT[NW];
+    c_1=mt[SE]+mt[E]+mt[NE]-mt[SW]-mt[W]-mt[NW];
     w_w=sigma1*(1+(d_w-d_e)/(d_w+d_e)+c_1/(d_w+d_e+d_n+d_s));
     w_e=2*sigma1-w_w;
     weight2=std::min(2*sigma1, std::max(w_e, 0.0));
@@ -246,26 +318,35 @@ const NumericArray& DeZeeuwInterpolation::getI(
     
     // Divide the stencil defined by stencilL und position into a symmetric 
     // and an antisymmetric part.
-    for (int k=0; k<9; ++k)
-    {
-        mS[k]=0.5*(stencilL[position[k]]+stencilL[position[8-k]]);
-        symsum+=mS[k];
-        mT[k]=0.5*(stencilL[position[k]]-stencilL[position[8-k]]);
-    }
-    d_w=std::max(std::fabs(mS[SW]+mS[W]+mS[NW]),
-                 std::max(std::fabs(mS[SW]),
-                          std::fabs(mS[NW])));
-    d_e=std::max(std::fabs(mS[SE]+mS[E]+mS[NE]),
-                 std::max(std::fabs(mS[SE]),
-                          std::fabs(mS[NE])));
-    d_n=std::max(std::fabs(mS[NW]+mS[N]+mS[NE]),
-                 std::max(std::fabs(mS[NW]),
-                          std::fabs(mS[NE])));
-    d_s=std::max(std::fabs(mS[SW]+mS[S]+mS[SE]),
-                 std::max(std::fabs(mS[SW]),
-                          std::fabs(mS[SE])));
+	ms[NE]=ms[SW]=0.5*(stencilL[position[SW]]+stencilL[position[NE]]);
+	ms[N]=ms[S]=0.5*(stencilL[position[S]]+stencilL[position[N]]);
+	ms[NW]=ms[SE]=0.5*(stencilL[position[SE]]+stencilL[position[NW]]);
+	ms[E]=ms[W]=0.5*(stencilL[position[W]]+stencilL[position[E]]);
+	ms[C]=stencilL[position[C]];
+    symsum+=2*ms[NE]+2*ms[N]+2*ms[NW]+2*ms[E]+ms[C];
+	mt[SW]=0.5*(stencilL[position[SW]]-stencilL[position[NE]]);
+	mt[S]=0.5*(stencilL[position[S]]-stencilL[position[N]]);
+	mt[SE]=0.5*(stencilL[position[SE]]-stencilL[position[NW]]);
+	mt[W]=0.5*(stencilL[position[W]]-stencilL[position[E]]);
+	mt[NE]=0.5*(stencilL[position[NE]]-stencilL[position[SW]]);
+	mt[N]=0.5*(stencilL[position[N]]-stencilL[position[S]]);
+	mt[NW]=0.5*(stencilL[position[NW]]-stencilL[position[SE]]);
+	mt[E]=0.5*(stencilL[position[E]]-stencilL[position[E]]);
+	mt[C]=0.0;
+    d_w=std::max(std::fabs(ms[SW]+ms[W]+ms[NW]),
+                 std::max(std::fabs(ms[SW]),
+                          std::fabs(ms[NW])));
+    d_e=std::max(std::fabs(ms[SE]+ms[E]+ms[NE]),
+                 std::max(std::fabs(ms[SE]),
+                          std::fabs(ms[NE])));
+    d_n=std::max(std::fabs(ms[NW]+ms[N]+ms[NE]),
+                 std::max(std::fabs(ms[NW]),
+                          std::fabs(ms[NE])));
+    d_s=std::max(std::fabs(ms[SW]+ms[S]+ms[SE]),
+                 std::max(std::fabs(ms[SW]),
+                          std::fabs(ms[SE])));
     sigma2=0.5*std::min(1.0, std::fabs(1-symsum/stencilL[0]));
-    c_2=mT[NW]+mT[N]+mT[NE]-mT[SW]-mT[S]-mT[SE];
+    c_2=mt[NW]+mt[N]+mt[NE]-mt[SW]-mt[S]-mt[SE];
     w_n=sigma2*(1+(d_s-d_n)/(d_s+d_n)+c_2/(d_w+d_e+d_n+d_s));
     w_s=2*sigma2-w_n;
     weight1=std::min(2*sigma2, std::max(w_s, 0.0));
@@ -279,25 +360,35 @@ const NumericArray& DeZeeuwInterpolation::getI(
     // Divide the stencil defined by stencilL und position into a symmetric 
     // and an antisymmetric part.
     for (Index k=0; k<9; ++k)
-    {
-        mS[k]=0.5*(stencilL[position[k]]+stencilL[position[8-k]]);
-        symsum+=mS[k];
-        mT[k]=0.5*(stencilL[position[k]]-stencilL[position[8-k]]);
-    }
-    d_w=std::max(std::fabs(mS[SW]+mS[W]+mS[NW]),
-                 std::max(std::fabs(mS[SW]),
-                          std::fabs(mS[NW])));
-    d_e=std::max(std::fabs(mS[SE]+mS[E]+mS[NE]),
-                 std::max(std::fabs(mS[SE]),
-                          std::fabs(mS[NE])));
-    d_n=std::max(std::fabs(mS[NW]+mS[N]+mS[NE]),
-                 std::max(std::fabs(mS[NW]),
-                          std::fabs(mS[NE])));
-    d_s=std::max(std::fabs(mS[SW]+mS[S]+mS[SE]),
-                 std::max(std::fabs(mS[SW]),
-                          std::fabs(mS[SE])));
+	ms[NE]=ms[SW]=0.5*(stencilL[position[SW]]+stencilL[position[NE]]);
+	ms[N]=ms[S]=0.5*(stencilL[position[S]]+stencilL[position[N]]);
+	ms[NW]=ms[SE]=0.5*(stencilL[position[SE]]+stencilL[position[NW]]);
+	ms[E]=ms[W]=0.5*(stencilL[position[W]]+stencilL[position[E]]);
+	ms[C]=stencilL[position[C]];
+    symsum+=2*ms[NE]+2*ms[N]+2*ms[NW]+2*ms[E]+ms[C];
+	mt[SW]=0.5*(stencilL[position[SW]]-stencilL[position[NE]]);
+	mt[S]=0.5*(stencilL[position[S]]-stencilL[position[N]]);
+	mt[SE]=0.5*(stencilL[position[SE]]-stencilL[position[NW]]);
+	mt[W]=0.5*(stencilL[position[W]]-stencilL[position[E]]);
+	mt[NE]=0.5*(stencilL[position[NE]]-stencilL[position[SW]]);
+	mt[N]=0.5*(stencilL[position[N]]-stencilL[position[S]]);
+	mt[NW]=0.5*(stencilL[position[NW]]-stencilL[position[SE]]);
+	mt[E]=0.5*(stencilL[position[E]]-stencilL[position[E]]);
+	mt[C]=0.0;
+    d_w=std::max(std::fabs(ms[SW]+ms[W]+ms[NW]),
+                 std::max(std::fabs(ms[SW]),
+                          std::fabs(ms[NW])));
+    d_e=std::max(std::fabs(ms[SE]+ms[E]+ms[NE]),
+                 std::max(std::fabs(ms[SE]),
+                          std::fabs(ms[NE])));
+    d_n=std::max(std::fabs(ms[NW]+ms[N]+ms[NE]),
+                 std::max(std::fabs(ms[NW]),
+                          std::fabs(ms[NE])));
+    d_s=std::max(std::fabs(ms[SW]+ms[S]+ms[SE]),
+                 std::max(std::fabs(ms[SW]),
+                          std::fabs(ms[SE])));
     sigma1=0.5*std::min(1.0, std::fabs(1-symsum/stencilL[0]));
-    c_1=mT[SE]+mT[E]+mT[NE]-mT[SW]-mT[W]-mT[NW];
+    c_1=mt[SE]+mt[E]+mt[NE]-mt[SW]-mt[W]-mt[NW];
     w_w=sigma1*(1+(d_w-d_e)/(d_w+d_e)+c_1/(d_w+d_e+d_n+d_s));
     w_e=2*sigma1-w_w;
     weight1=std::min(2*sigma1, std::max(w_w, 0.0));
@@ -309,26 +400,35 @@ const NumericArray& DeZeeuwInterpolation::getI(
     
     // Divide the stencil defined by stencilL und position into a symmetric 
     // and an antisymmetric part.
-    for (int k=0; k<9; ++k)
-    {
-        mS[k]=0.5*(stencilL[position[k]]+stencilL[position[8-k]]);
-        symsum+=mS[k];
-        mT[k]=0.5*(stencilL[position[k]]-stencilL[position[8-k]]);
-    }
-    d_w=std::max(std::fabs(mS[SW]+mS[W]+mS[NW]),
-                 std::max(std::fabs(mS[SW]),
-                          std::fabs(mS[NW])));
-    d_e=std::max(std::fabs(mS[SE]+mS[E]+mS[NE]),
-                 std::max(std::fabs(mS[SE]),
-                          std::fabs(mS[NE])));
-    d_n=std::max(std::fabs(mS[NW]+mS[N]+mS[NE]),
-                 std::max(std::fabs(mS[NW]),
-                          std::fabs(mS[NE])));
-    d_s=std::max(std::fabs(mS[SW]+mS[S]+mS[SE]),
-                 std::max(std::fabs(mS[SW]),
-                          std::fabs(mS[SE])));
+	ms[NE]=ms[SW]=0.5*(stencilL[position[SW]]+stencilL[position[NE]]);
+	ms[N]=ms[S]=0.5*(stencilL[position[S]]+stencilL[position[N]]);
+	ms[NW]=ms[SE]=0.5*(stencilL[position[SE]]+stencilL[position[NW]]);
+	ms[E]=ms[W]=0.5*(stencilL[position[W]]+stencilL[position[E]]);
+	ms[C]=stencilL[position[C]];
+    symsum+=2*ms[NE]+2*ms[N]+2*ms[NW]+2*ms[E]+ms[C];
+	mt[SW]=0.5*(stencilL[position[SW]]-stencilL[position[NE]]);
+	mt[S]=0.5*(stencilL[position[S]]-stencilL[position[N]]);
+	mt[SE]=0.5*(stencilL[position[SE]]-stencilL[position[NW]]);
+	mt[W]=0.5*(stencilL[position[W]]-stencilL[position[E]]);
+	mt[NE]=0.5*(stencilL[position[NE]]-stencilL[position[SW]]);
+	mt[N]=0.5*(stencilL[position[N]]-stencilL[position[S]]);
+	mt[NW]=0.5*(stencilL[position[NW]]-stencilL[position[SE]]);
+	mt[E]=0.5*(stencilL[position[E]]-stencilL[position[E]]);
+	mt[C]=0.0;
+    d_w=std::max(std::fabs(ms[SW]+ms[W]+ms[NW]),
+                 std::max(std::fabs(ms[SW]),
+                          std::fabs(ms[NW])));
+    d_e=std::max(std::fabs(ms[SE]+ms[E]+ms[NE]),
+                 std::max(std::fabs(ms[SE]),
+                          std::fabs(ms[NE])));
+    d_n=std::max(std::fabs(ms[NW]+ms[N]+ms[NE]),
+                 std::max(std::fabs(ms[NW]),
+                          std::fabs(ms[NE])));
+    d_s=std::max(std::fabs(ms[SW]+ms[S]+ms[SE]),
+                 std::max(std::fabs(ms[SW]),
+                          std::fabs(ms[SE])));
     sigma2=0.5*std::min(1.0, std::fabs(1-symsum/stencilL[0]));
-    c_2=mT[NW]+mT[N]+mT[NE]-mT[SW]-mT[S]-mT[SE];
+    c_2=mt[NW]+mt[N]+mt[NE]-mt[SW]-mt[S]-mt[SE];
     w_n=sigma2*(1+(d_s-d_n)/(d_s+d_n)+c_2/(d_w+d_e+d_n+d_s));
     w_s=2*sigma2-w_n;
     weight2=std::min(2*sigma2, std::max(w_n, 0.0));
