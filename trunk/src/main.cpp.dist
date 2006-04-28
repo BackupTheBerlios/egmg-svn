@@ -16,9 +16,9 @@ using namespace mg;
 
 void testInit()
 {
-    FCycle fCycle(3);
-    VCycle vCycle(3);
-    WCycle wCycle(3,2);
+    FCycle fCycle(1,1,3);
+    VCycle vCycle(1,1,3);
+    WCycle wCycle(1,1,3,2);
     BicubicInterpolation bicubicInterpolation;
     BilinearInterpolation bilinearInterpolation;
     SevenPointInterpolation sevenPointInterpolation;
@@ -58,13 +58,13 @@ int main()
     const Precision eps = 1e-30;
     std::cout<<"Genauigkeit : "<<eps<<std::endl;
     Laplacian2D2 lap;
-    GSRedBlack relaxation(2,1);
+    GSRedBlack relaxation;
     Precision resnull = twonormResiduum(u,fv,lap,nx,ny);
     Precision resnew = resnull;
     Precision resold = resnull;
     FullWeighting restriction;
     BilinearInterpolation prolongation;
-    VCycle vCycle(k-1);
+    VCycle vCycle(1,1,k-1);
     //residues is used to store the intermediate residues, there are printed
     //after the cycle iterations because writing to std out takes a long time
     std::vector<Precision> residues;
