@@ -31,7 +31,7 @@ void printStencil(
                     {
                         out<<" ";
                     }
-                    out<<std::setw(8)<<std::setprecision(2)<<L[k];
+                    out<<std::setw(10)<<std::setprecision(6)<<L[k];
                     if ( sx == 0 && sy == 0 )
                     {
                         out<<"]";
@@ -43,8 +43,10 @@ void printStencil(
                     break;
                 }   
             }
-            if ( k == jX.size() )
-                out<<"          ";
+            if ( k == jX.size() && sx == 0 && sy == 0 )
+                out<<" [        ] ";
+            else if ( k == jX.size() )
+                out<<"     --     ";
             out<<" ";
         }
         out<<"\n\n";
