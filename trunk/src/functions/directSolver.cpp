@@ -29,7 +29,7 @@ void fillBorderValues(
         rightSide[sx]=u[sx];
         //upper border
         matrix[(dimension-1-sx)*dimension+(dimension-1-sx)]=1;
-        rightSide[dimension-1-sx]=u[dimension-sx];
+        rightSide[dimension-1-sx]=u[dimension-1-sx];
     }
     //border values YDIR
     //corners have been process in XDIR (y=1..ny-1 instead of y=0..ny)
@@ -40,7 +40,7 @@ void fillBorderValues(
         rightSide[sy*(nx+1)]=u[sy*(nx+1)];
         //right border
         matrix[(sy*(nx+1)+nx)*dimension+(sy*(nx+1)+nx)]=1;
-        rightSide[(sy*(nx+1)+nx)]=u[(sy*(nx+1)+nx)];
+        rightSide[sy*(nx+1)+nx]=u[sy*(nx+1)+nx];
     }
 }
 
