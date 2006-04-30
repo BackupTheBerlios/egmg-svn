@@ -30,7 +30,7 @@ void generatePositionArrays(
     PositionArray& jY,
     const Position pos,
     const Index size,
-    const Index sizeToBorder);
+    Index sizeToBorder);
     
 }
 

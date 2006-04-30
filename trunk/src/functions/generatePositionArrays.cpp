@@ -13,9 +13,13 @@ void generatePositionArrays(
     PositionArray& jY,
     const Position pos,
     const Index size,
-    const Index sizeToBorder)
+    Index sizeToBorder)
 {
     //ASSERT( sizeToBorder > 1 )
+    if ( size < sizeToBorder )
+    {
+        sizeToBorder = size;
+    }
     if ( C == pos )
     {
         jX.resize((2*size+1)*(2*size+1));
