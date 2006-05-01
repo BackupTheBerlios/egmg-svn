@@ -9,6 +9,6 @@
 #include "HalfWeighting.h"
 #include "Injection.h"
 #include "SevenPointRestriction.h"
-#include "TranspProlong.h"
+#include "TransposedProlongation.h"
 
 #endif /*RESTRICTIONINCLUDES_H_*/

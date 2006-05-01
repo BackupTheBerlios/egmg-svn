@@ -35,6 +35,7 @@ void testInit()
     HalfWeighting halfWeighting;
     Injection injection;
     SevenPointRestriction sevenPointRestriction;
+    TransposedProlongation transposedProlongation(HalfWeighting);
     Biharmonic2D2 biharmonic2D2;
     ConDiff2D1 conDiff2D1;
     ConDiff2Dkap conDiff2Dkap;
