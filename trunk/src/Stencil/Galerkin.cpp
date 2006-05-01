@@ -3,18 +3,11 @@
  * \brief Contains the implementation of the class Galerkin.
  */
 
-#include <cstdlib>
-#include "Galerkin.h"
-#include "Stencil.h"
-#include "../general/parameters.h"
-#include "../functions/expansion.h"
-#include "../Prolongation/Prolongation.h"
-#include "../Restriction/Restriction.h"
-#include "../functions/generatePositionArrays.h"
-#include "../functions/printStencil.h"
 #include <stack>
-#include <iostream>
-#include <iomanip>
+
+#include "Galerkin.h"
+#include "../functions/expansion.h"
+#include "../functions/generatePositionArrays.h"
 
 namespace mg
 {
@@ -41,23 +34,7 @@ Index computeSize(
     return result+prolongSize;
 }
 
-Index ComputeSize(
-    const PositionArray& jX,
-    const PositionArray& jY,
-    const Prolongation& prolong)
-{
-    PositionArray prolongJx = prolong.getJx( C );
-    PositionArray prolongJy = prolong.getJy( C );
-    const Index prolongSize = expansion( prolongJx, prolongJy );
-    const Index result = expansion( jX, jY );
-    if ( result%2 == 0 )
-    {
-        return result/2-1+prolongSize;
-    }
-    return ( result-1 )/2+prolongSize;
-}
-
-inline Position getNewPos(
+Position getNewPos(
     const Position pos,
     const Integer jX,
     const Integer jY)
@@ -151,10 +128,10 @@ inline Position getNewPos(
     return newPos;
 }
 
-void RestritionTimesStencil(
+void restritionTimesStencil(
     NumericArray& resultL,
-    PositionArray& resultJx,
-    PositionArray& resultJy,
+    const PositionArray& resultJx,
+    const PositionArray& resultJy,
     const Position pos,
     const Index sx,
     const Index sy,
@@ -195,10 +172,10 @@ void RestritionTimesStencil(
     }
 }
 
-void ProlongateStencil(
+void prolongateStencil(
     NumericArray& resultL,
-    PositionArray& resultJx,
-    PositionArray& resultJy,
+    const PositionArray& resultJx,
+    const PositionArray& resultJy,
     const Position pos,
     const Index sx,
     const Index sy,
@@ -282,92 +259,51 @@ void shrinkStencil(
     NumericArray& resultL,
     PositionArray& resultJx,
     PositionArray& resultJy,
-    const NumericArray& L,
+    const NumericArray& opL,
     const PositionArray& jX,
     const PositionArray& jY,
     const Position pos,
-    const Integer newSize,
-    const Integer newSizeToBorder)
+    Index newSize,
+    Index newSizeToBorder)
 {
-    
-    generatePositionArrays( resultJx,resultJy,pos,newSize,newSizeToBorder );
-    for ( Index i=0; i<L.size(); ++i )
+    newSize = std::min( expansion( jX, jY )/2, newSize );
+    newSizeToBorder = std::min( expansion( jX, jY )/2, newSizeToBorder );
+    generatePositionArrays( resultJx, resultJy, pos, newSize, newSizeToBorder );
+    resultL.resize(resultJx.size());
+    resultL = 0.0;
+    Integer sizeToBorder = newSizeToBorder;
+    for ( Index i = 0; i < opL.size(); ++i )
     {
-        switch ( pos )
+        if ( jX[i]%2 == 0 && jY[i]%2 == 0 )
         {
-        case W:
-            if ( jX[i] < 0 )
+            const Integer posX = jX[i]/2;
+            const Integer posY = jY[i]/2;
+            const Index absPosX = std::abs( posX );
+            const Index absPosY = std::abs( posY );
+            if ((pos == C ||
+                 pos == W && posX>=-1*sizeToBorder || 
+                 pos == N && posY<=sizeToBorder ||
+                 pos == E && posX<=sizeToBorder ||
+                 pos == S && posY>=-1*sizeToBorder ||
+                 pos == NW && posX>=-1*sizeToBorder && posY<=sizeToBorder ||
+                 pos == NE && posX<=sizeToBorder && posY<=sizeToBorder ||
+                 pos == SE && posX<=sizeToBorder && posY>=-1*sizeToBorder ||
+                 pos == SW && posX>=-1*sizeToBorder && posY>=-1*sizeToBorder)
+                 && absPosX <= newSize && absPosY <= newSize )
             {
+                for ( Index j = 0; j < resultL.size(); ++j )
+                {
+                    if ( resultJx[j] == posX && resultJy[j] == posY )
+                    {
+                        resultL[j] = opL[i];
+                        break;
+                    }
+                }
             }
-            break;
-        case N:
-            if ( jY[i] > 0 )
-            {
-            }
-            break;
-        case E:
-            if ( jX[i] > 0 )
-            {
-            }
-            break;
-        case S:
-            if ( jY[i] < 0 )
-            {
-            }
-            break;
-        case NW:
-            if ( jX[i] < 0 && jY[i] > 0 )
-            {
-            }
-            else if ( jX[i] < 0 )
-            {
-            }
-            else if ( jY[i] > 0 )
-            {
-            }
-            break;
-        case NE:
-            if ( jX[i] > 0 && jY[i] > 0 )
-            {
-            }
-            else if ( jX[i] > 0 )
-            {
-            }
-            else if ( jY[i] > 0 )
-            {
-            }
-            break;
-        case SE:
-            if ( jX[i] > 0 && jY[i] < 0 )
-            {
-            }
-            else if ( jX[i] > 0 )
-            {
-            }
-            else if ( jY[i] < 0 )
-            {
-            }
-            break;
-        case SW:
-            if ( jX[i] < 0 && jY[i] < 0 )
-            {
-            }
-            else if ( jX[i] < 0 )
-            {
-            }
-            else if ( jY[i] < 0 )
-            {
-            }
-            break;
-        default:        // case C:
-            if ( std::abs( jX[i] ) > newSize || std::abs( jY[i] ) > newSize )
-            {
-                Integer diff = newSize - jX[i];
-            }
-        }        
+            else
+                resultL[0]+=opL[i];
+        }
     }
-}
-
 }
 
 void computeGalerkin(
@@ -384,364 +320,26 @@ void computeGalerkin(
     const Prolongation& prolongation)
 {
     const Index resultSize = computeSize( restriction, stencil, prolongation );
-
-    generatePositionArrays( resultJx, resultJy, pos, resultSize, 2 );
-    resultL.resize( resultJx.size() );
-    resultL = 0.0;
-    RestritionTimesStencil(
-        resultL,resultJx,resultJy,
+    PositionArray interResultJx;
+    PositionArray interResultJy;
+    generatePositionArrays( interResultJx, interResultJy, pos, resultSize, 2 );
+    NumericArray interResultL( 0.0, interResultJx.size() );
+    restritionTimesStencil(
+        interResultL,interResultJx,interResultJy,
         pos,sx,sy,nx,ny,
         restriction,
         stencil);
-    ProlongateStencil(
-        resultL,resultJx,resultJy,
+    prolongateStencil(
+        interResultL,interResultJx,interResultJy,
         pos,sx,sy,nx,ny,
         prolongation,
         stencil);
-    
-}
-}
-/*
-void testGenPosArray(const Index size, const Index size2)
-{
-    PositionArray jX;
-    PositionArray jY;
-    GeneratePositionArrays(jX,jY,C,size,size2);
-    Integer neg = size;
-    for ( mg::Integer sy=neg; sy>=-1*neg; --sy )
-    {
-        for ( mg::Integer sx=-1*neg; sx<=neg; ++sx )
-        {
-            for ( mg::Index k=0; k<jX.size(); ++k )
-            {
-                if ( jY[k] == sy && jX[k] == sx )
-                {
-                    std::cout<<std::setw(3)<<k;
-                }   
-            }
-            std::cout<<" ";
-        }
-        std::cout<<std::endl<<std::endl;
-    }
-    std::cout<<std::endl;
-    GeneratePositionArrays(jX,jY,W,size,size2);
-    std::cout<<"W"<<std::endl;
-    for ( mg::Integer sy=neg; sy>=-1*neg; --sy )
-    {
-        for ( mg::Integer sx=-1*neg; sx<=neg; ++sx )
-        {
-            mg::Index k=0;
-            for ( k=0; k<jX.size(); ++k )
-            {
-                if ( jY[k] == sy && jX[k] == sx )
-                {
-                    std::cout<<std::setw(3)<<k;
-                    break;
-                }   
-            }
-            if ( k == jX.size() )
-                std::cout<<"0x0";
-            std::cout<<" ";
-        }
-        std::cout<<std::endl<<std::endl;
-    }
-    std::cout<<std::endl;
-    GeneratePositionArrays(jX,jY,N,size,size2);
-    std::cout<<"N"<<std::endl;
-    for ( mg::Integer sy=neg; sy>=-1*neg; --sy )
-    {
-        for ( mg::Integer sx=-1*neg; sx<=neg; ++sx )
-        {
-            mg::Index k=0;
-            for ( k=0; k<jX.size(); ++k )
-            {
-                if ( jY[k] == sy && jX[k] == sx )
-                {
-                    std::cout<<std::setw(3)<<k;
-                    break;
-                }   
-            }
-            if ( k == jX.size() )
-                std::cout<<"0x0";
-            std::cout<<" ";
-        }
-        std::cout<<std::endl<<std::endl;
-    }
-    std::cout<<std::endl;
-    GeneratePositionArrays(jX,jY,E,size,size2);
-    std::cout<<"E"<<std::endl;
-    for ( mg::Integer sy=neg; sy>=-1*neg; --sy )
-    {
-        for ( mg::Integer sx=-1*neg; sx<=neg; ++sx )
-        {
-            mg::Index k=0;
-            for ( k=0; k<jX.size(); ++k )
-            {
-                if ( jY[k] == sy && jX[k] == sx )
-                {
-                    std::cout<<std::setw(3)<<k;
-                    break;
-                }   
-            }
-            if ( k == jX.size() )
-                std::cout<<"0x0";
-            std::cout<<" ";
-        }
-        std::cout<<std::endl<<std::endl;
-    }
-    std::cout<<std::endl;
-    GeneratePositionArrays(jX,jY,S,size,size2);
-    std::cout<<"S"<<std::endl;
-    for ( mg::Integer sy=neg; sy>=-1*neg; --sy )
-    {
-        for ( mg::Integer sx=-1*neg; sx<=neg; ++sx )
-        {
-            mg::Index k=0;
-            for ( k=0; k<jX.size(); ++k )
-            {
-                if ( jY[k] == sy && jX[k] == sx )
-                {
-                    std::cout<<std::setw(3)<<k;
-                    break;
-                }   
-            }
-            if ( k == jX.size() )
-                std::cout<<"0x0";
-            std::cout<<" ";
-        }
-        std::cout<<std::endl<<std::endl;
-    }
-    std::cout<<std::endl;
-    GeneratePositionArrays(jX,jY,NW,size,size2);
-    std::cout<<"NW"<<std::endl;
-    for ( mg::Integer sy=neg; sy>=-1*neg; --sy )
-    {
-        for ( mg::Integer sx=-1*neg; sx<=neg; ++sx )
-        {
-            mg::Index k=0;
-            for ( k=0; k<jX.size(); ++k )
-            {
-                if ( jY[k] == sy && jX[k] == sx )
-                {
-                    std::cout<<std::setw(3)<<k;
-                    break;
-                }   
-            }
-            if ( k == jX.size() )
-                std::cout<<"0x0";
-            std::cout<<" ";
-        }
-        std::cout<<std::endl<<std::endl;
-    }
-    std::cout<<"NE"<<std::endl;
-    GeneratePositionArrays(jX,jY,NE,size,size2);
-    for ( mg::Integer sy=neg; sy>=-1*neg; --sy )
-    {
-        for ( mg::Integer sx=-1*neg; sx<=neg; ++sx )
-        {
-            mg::Index k=0;
-            for ( k=0; k<jX.size(); ++k )
-            {
-                if ( jY[k] == sy && jX[k] == sx )
-                {
-                    std::cout<<std::setw(3)<<k;
-                    break;
-                }   
-            }
-            if ( k == jX.size() )
-                std::cout<<"0x0";
-            std::cout<<" ";
-        }
-        std::cout<<std::endl<<std::endl;
-    }
-    GeneratePositionArrays(jX,jY,SE,size,size2);
-    std::cout<<"SE"<<std::endl;
-    for ( mg::Integer sy=neg; sy>=-1*neg; --sy )
-    {
-        for ( mg::Integer sx=-1*neg; sx<=neg; ++sx )
-        {
-            mg::Index k=0;
-            for ( k=0; k<jX.size(); ++k )
-            {
-                if ( jY[k] == sy && jX[k] == sx )
-                {
-                    std::cout<<std::setw(3)<<k;
-                    break;
-                }   
-            }
-            if ( k == jX.size() )
-                std::cout<<"0x0";
-            std::cout<<" ";
-        }
-        std::cout<<std::endl<<std::endl;
-    }
-    GeneratePositionArrays(jX,jY,SW,size,size2);
-    std::cout<<"SW"<<std::endl;
-    for ( mg::Integer sy=neg; sy>=-1*neg; --sy )
-    {
-        for ( mg::Integer sx=-1*neg; sx<=neg; ++sx )
-        {
-            mg::Index k=0;
-            for ( k=0; k<jX.size(); ++k )
-            {
-                if ( jY[k] == sy && jX[k] == sx )
-                {
-                    std::cout<<std::setw(3)<<k;
-                    break;
-                }   
-            }
-            if ( k == jX.size() )
-                std::cout<<"0x0";
-            std::cout<<" ";
-        }
-        std::cout<<std::endl<<std::endl;
-    }
-    
-}
-
-}*/
-
-
-
-/*std::vector<PositionArray > TwoGridGalerkin::initJX_(
-    const Restriction& restriction,
-    const Stencil& stencil,
-    const Prolongation& prolongation)
-{
-    std::vector<PositionArray > result;
-    for (Index i=0; i<9; ++i)
-        result.push_back(computeJ(i,restriction.getJx(i),stencil.getJx(i),prolongation.getJx(i)));
-    return result;
-}
-
-std::vector<PositionArray > TwoGridGalerkin::initJY_(
-    const Restriction& restriction,
-    const Stencil& stencil,
-    const Prolongation& prolongation)
-{
-    std::vector<PositionArray > result(9);
-    for (Index i=0; i<9; ++i)
-        somecall;
-    return result;
-}
-
-Index TwoGridGalerkin::initSize_(
-    const Restriction& restriction,
-    const Stencil& stencil,
-    const Prolongation& prolongation)
-{
-    Index resultSize=2;
-    Index restrictionSize=std::max(
-        std::max(
-            std::abs(restriction.getJx(C).max()),
-            std::abs(restriction.getJx(C).min())),
-        std::max(
-            std::abs(restriction.getJy(C).max()),
-            std::abs(restriction.getJy(C).min())));
-    Index prolongationSize=std::max(
-        std::max(
-            std::abs(prolongation.getJx(C).max()),
-            std::abs(prolongation.getJx(C).min())),
-        std::max(
-            std::abs(prolongation.getJy(C).max()),
-            std::abs(prolongation.getJy(C).min())));
-    if (stencil.size()<=1 && restrictionSize<=1
-                          && prolongationSize<=1)
-        resultSize=1;
-    return resultSize;
+    shrinkStencil(
+        resultL,resultJx,resultJy,
+        interResultL,interResultJx,interResultJy,
+        pos,2,1);
 }
 
 }
 
-//std::vector<std::vector<PositionArray > > Galerkin::initJx_(const Stencil& stencil)
-//{
-//  std::vector<std::vector<PositionArray > > jx(1);
-//  jx[0]->resize(9);
-//  for (Index i=0; i<9; ++i)
-//  {
-//      PositionArray temp=stencil.getJx(static_cast<Position>(i));
-//      jx[0][i]->resize(temp.size());
-//      jx[0][i]=temp;
-//  }
-//  return jx;
-//}
-//
-//std::vector<std::vector<PositionArray > > Galerkin::initJy_(const Stencil& stencil)
-//{
-//  std::vector<std::vector<PositionArray > > jy(1);
-//  jy[0]->resize(9);
-//  for (Index i=0; i<9; ++i)
-//  {
-//      PositionArray temp=stencil.getJy(static_cast<Position>(i));
-//      jy[0][i].resize(temp.size());
-//      jy[0][i]=temp;
-//  }
-//  return jy;
-//}
-//
-//void Galerkin::updateSize_()
-//{
-//  if (size_==2)
-//      return;
-//  else
-//  {
-//      std::vector<const Prolongation&>::const_iterator prolongation=prolongations_.front();
-//  }
-//}
-//void Galerkin::updateJxJy_()
-//{
-//  
-//}
-//
-//NumericArray Galerkin::computeL(
-//    const Position position,
-//  const Index sx,
-//  const Index sy,
-//  const Index nx,
-//  const Index ny) const
-//{
-//  NumericArray result;
-//  return result;
-//}
-//
-//virtual Precision Galerkin::apply(
-//  const NumericArray& u,
-//    const Position position,
-//    const Index sx,
-//    const Index sy,
-//    const Index nx,
-//    const Index ny) const
-//{
-//  Precision result=0;
-//  NumericArray operatorL=getL(position,sx,sy,nx,ny);
-//  PositionArray jX=getJx(position);
-//  PositionArray jY=getJy(position);
-//  for (Index i=0; i<operatorL.size(); ++i)
-//      result+=operatorL[i]*u[(sy+jY[i])*(nx+1)+sx+jX[i]];
-//  return result;
-//}
-//
-//virtual Precision Galerkin::getCenter(
-//  const Position position,
-//  const Index sx,
-//  const Index sy,
-//  const Index nx,
-//  const Index ny) const
-//{
-//  NumericArray operatorL=getL(position,sx,sy,nx,ny);
-//  return operatorL[0];
-//}
-//
-//virtual const NumericArray& Galerkin::getL(
-//    const Position position,
-//  const Index sx,
-//  const Index sy,
-//  const Index nx,
-//  const Index ny) const
-//{
-//    if (data_[position].find(Quadruple(sx,sy,nx,ny))==data_[postition].end())
-//      data_[postition].insert(Quadruple(sx,sy,nx,ny),computeL(postition,sx,sy,nx,ny);
-//    return data_[position][Quadruple(sx,sy,nx,ny)];
-//}
-
-}*/
+}
