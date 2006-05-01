@@ -22,14 +22,23 @@ namespace mg
 namespace
 {
 
-Index ComputeSize(
+Index computeSize(
     const Restriction& restriction,
-    const Stencil& stencil)
+    const Stencil& stencil,
+    const Prolongation& prolongation)
 {
     PositionArray restrictionJx = restriction.getJx( C );
     PositionArray restrictionJy = restriction.getJy( C );
-    const Index restSize = expansion(restrictionJx,restrictionJy);
-    return restSize + stencil.size();
+    PositionArray prolongationJx = prolongation.getJx( C );
+    PositionArray prolongationJy = prolongation.getJy( C );
+    const Index restSize = expansion( restrictionJx, restrictionJy );
+    const Index prolongSize = expansion( prolongationJx, prolongationJy );
+    const Index result = restSize+stencil.size();
+    if ( result%2 == 0 )
+    {
+        return result-1+prolongSize;
+    }
+    return result+prolongSize;
 }
 
 Index ComputeSize(
@@ -39,13 +48,13 @@ Index ComputeSize(
 {
     PositionArray prolongJx = prolong.getJx( C );
     PositionArray prolongJy = prolong.getJy( C );
-    const Index prolongSize = expansion(prolongJx, prolongJy);
-    const Index result = expansion(jX, jY);
+    const Index prolongSize = expansion( prolongJx, prolongJy );
+    const Index result = expansion( jX, jY );
     if ( result%2 == 0 )
     {
-        return result/2 -1 + prolongSize;
+        return result/2-1+prolongSize;
     }
-    return (result - 1)/2 + prolongSize;
+    return ( result-1 )/2+prolongSize;
 }
 
 inline Position getNewPos(
@@ -144,8 +153,8 @@ inline Position getNewPos(
 
 void RestritionTimesStencil(
     NumericArray& resultL,
-    PositionArray& jX,
-    PositionArray& jY,
+    PositionArray& resultJx,
+    PositionArray& resultJy,
     const Position pos,
     const Index sx,
     const Index sy,
@@ -157,12 +166,6 @@ void RestritionTimesStencil(
     const PositionArray restrictionJx = restriction.getJx( C );
     const PositionArray restriciionJy = restriction.getJy( C );
     const NumericArray restrictionI = restriction.getI( C,sx,sy,nx,ny,stencil );
-    
-    const Index size = ComputeSize(restriction,stencil);
-
-    generatePositionArrays(jX,jY,pos,size,2);
-    resultL.resize(jX.size());
-    resultL = 0.0;
     for ( Index i=0; i<restrictionI.size(); ++i )
     {
         const Position newPos = getNewPos(
@@ -182,7 +185,7 @@ void RestritionTimesStencil(
         {
             for ( Index k=0; k<resultL.size(); ++k )
             {
-                if ( stencilJx[j] == jX[k] && stencilJy[j] == jY[k] )
+                if ( stencilJx[j] == resultJx[k] && stencilJy[j] == resultJy[k] )
                 {
                     resultL[k] += stencilL[j];
                     break;
@@ -196,9 +199,6 @@ void ProlongateStencil(
     NumericArray& resultL,
     PositionArray& resultJx,
     PositionArray& resultJy,
-    const NumericArray& opL,
-    const PositionArray& jX,
-    const PositionArray& jY,
     const Position pos,
     const Index sx,
     const Index sy,
@@ -207,41 +207,23 @@ void ProlongateStencil(
     const Prolongation& prolongation,
     const Stencil& stencil)
 {
-    const Index size = ComputeSize(jX,jY,prolongation);
-    generatePositionArrays( resultJx,resultJy,pos,size,1 );
-    resultL.resize( resultJx.size() );
-    resultL = 0.0;
-    for (Index i=0; i<opL.size(); ++i)
+    const NumericArray opL(resultL);
+    for (Index i=0; i<resultL.size(); ++i)
     {
         const Position newPos = getNewPos(
-            pos, jX[i], jY[i] );
+            pos, resultJx[i], resultJy[i] );
         const PositionArray prolongJx = prolongation.getJx( newPos );
         const PositionArray prolongJy = prolongation.getJy( newPos );
         const NumericArray prolongI = prolongation.getI( 
-            newPos,sx+jX[i],sy+jY[i],2*nx,2*ny,stencil );
-        if (jX[i]%2 == 0 && jY[i]%2 == 0) //coars grid point
-        {
-            for (Index j=0; j<resultL.size(); ++j)
-            {
-                if (resultJx[j] == jX[i]/2 && resultJy[j] == jY[i]/2)
-                {
-                    resultL[j]+=prolongI[0]*opL[i];
-                    break;
-                }
-            }
-        }
-        else if (jX[i]%2 == 0) //fine grid point on x-coars grid line
+            newPos,sx+resultJx[i],sy+resultJy[i],2*nx,2*ny,stencil );
+        if ( resultJx[i]%2 == 0 ) //fine grid point on x-coars grid line
         {
             for ( Index j=0; j<prolongI.size(); ++j )
             {
                 if ( prolongJy[j] != 0 && prolongJx[j] == 0 )
                 {
-                    Integer posX = jX[i]/2;
-                    Integer posY = jY[i]/2 + prolongJy[j];
-                    if ( jY[i] > 0 && posY < jY[i]/2 )
-                        ++posY;
-                    else if ( jY[i] < 0 && posY > jY[i]/2 )
-                        --posY;
+                    Integer posX = resultJx[i];
+                    Integer posY = resultJy[i] + prolongJy[j];
                     for ( Index k=0; k<resultL.size(); ++k )
                     {
                         if ( resultJx[k] == posX &&
@@ -254,18 +236,14 @@ void ProlongateStencil(
                 }
             }
         }
-        else if (jY[i]%2 == 0) //fine grid point on y-coars grid line
+        else if (resultJy[i]%2 == 0) //fine grid point on y-coars grid line
         {
             for ( Index j=0; j<prolongI.size(); ++j )
             {
                 if ( prolongJx[j] != 0 && prolongJy[j] == 0 )
                 {
-                    Integer posX = jX[i]/2 + prolongJx[j];
-                    if ( jX[i] > 0 && posX < jX[i]/2 )
-                        ++posX;
-                    else if ( jX[i] < 0 && posX > jX[i]/2 )
-                        --posX;
-                    Integer posY = jY[i]/2;
+                    Integer posX = resultJx[i]+prolongJx[j];
+                    Integer posY = resultJy[i];
                     for ( Index k=0; k<resultL.size(); ++k )
                     {
                         if ( resultJx[k] == posX &&
@@ -277,7 +255,6 @@ void ProlongateStencil(
                     }
                 }
             }
-            std::cout<<std::endl;
         }
         else
         {
@@ -285,16 +262,8 @@ void ProlongateStencil(
             {
                 if ( prolongJx[j] != 0 && prolongJy[j] != 0 )
                 {
-                    Integer posX = jX[i]/2 + prolongJx[j];
-                    if ( jX[i] > 0 && posX < jX[i]/2 )
-                        ++posX;
-                    else if ( jX[i] < 0 && posX > jX[i]/2 )
-                        --posX;
-                    Integer posY = jY[i]/2 + prolongJy[j];
-                    if ( jY[i] > 0 && posY < jY[i]/2 )
-                        ++posY;
-                    else if ( jY[i] < 0 && posY > jY[i]/2 )
-                        --posY;
+                    const Integer posX = resultJx[i] + prolongJx[j];
+                    const Integer posY = resultJy[i] + prolongJy[j];
                     for ( Index k=0; k<resultL.size(); ++k )
                     {
                         if ( resultJx[k] == posX &&
@@ -414,17 +383,18 @@ void computeGalerkin(
     const Stencil& stencil,
     const Prolongation& prolongation)
 {
-    NumericArray interResultL;
-    PositionArray interJx;
-    PositionArray interJy;
+    const Index resultSize = computeSize( restriction, stencil, prolongation );
+
+    generatePositionArrays( resultJx, resultJy, pos, resultSize, 2 );
+    resultL.resize( resultJx.size() );
+    resultL = 0.0;
     RestritionTimesStencil(
-        interResultL,interJx,interJy,
+        resultL,resultJx,resultJy,
         pos,sx,sy,nx,ny,
         restriction,
         stencil);
     ProlongateStencil(
         resultL,resultJx,resultJy,
-        interResultL,interJx,interJy,
         pos,sx,sy,nx,ny,
         prolongation,
         stencil);
