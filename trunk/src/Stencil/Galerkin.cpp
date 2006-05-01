@@ -306,6 +306,8 @@ void shrinkStencil(
     }
 }
 
+}
+
 void computeGalerkin(
     NumericArray& resultL,
     PositionArray& resultJx,
@@ -338,8 +340,6 @@ void computeGalerkin(
         resultL,resultJx,resultJy,
         interResultL,interResultJx,interResultJy,
         pos,2,1);
-}
-
 }
 
 }
