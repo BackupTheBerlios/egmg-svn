@@ -31,7 +31,7 @@ Precision Galerkin::apply(
 
 void Galerkin::update( const Index nx, const Index ny )
 {
-    currentDepth_ = prolongations_.size();
+    
     PositionArray jX;
     PositionArray jY;
     NumericArray operatorL;
@@ -48,8 +48,8 @@ void Galerkin::update( const Index nx, const Index ny )
                 C,sx,sy,nx,ny,
                 *restrictions_.front(),*this,*prolongations_.front());
             if ( sx == nx/2 && sy == ny/2 )
-                data_.insert( currentDepth_, C, jX, jY );
-            data_.insert( currentDepth_, sx, sy, nx, ny, operatorL );
+                data_.insert( currentDepth_+1, C, jX, jY );
+            data_.insert( currentDepth_+1, sx, sy, nx, ny, operatorL );
         }
     }
     //W
@@ -60,8 +60,8 @@ void Galerkin::update( const Index nx, const Index ny )
             W,1,sy,nx,ny,
             *restrictions_.front(),*this,*prolongations_.front());
         if ( sy == ny/2 )
-            data_.insert( currentDepth_, W, jX, jY );
-        data_.insert( currentDepth_, 1, sy, nx, ny, operatorL );
+            data_.insert( currentDepth_+1, W, jX, jY );
+        data_.insert( currentDepth_+1, 1, sy, nx, ny, operatorL );
     }
     //N
     for ( Index sx = 2; sx < nx-1; ++sx )
@@ -71,8 +71,8 @@ void Galerkin::update( const Index nx, const Index ny )
             N,sx,ny-1,nx,ny,
             *restrictions_.front(),*this,*prolongations_.front());
         if ( sx == nx/2 )
-            data_.insert( currentDepth_, N, jX, jY );
-        data_.insert( currentDepth_, sx, ny-1, nx, ny, operatorL );
+            data_.insert( currentDepth_+1, N, jX, jY );
+        data_.insert( currentDepth_+1, sx, ny-1, nx, ny, operatorL );
     }
     //E
     for ( Index sy = 2; sy < ny-1; ++sy )
@@ -82,8 +82,8 @@ void Galerkin::update( const Index nx, const Index ny )
             E,nx-1,sy,nx,ny,
             *restrictions_.front(),*this,*prolongations_.front());
         if ( sy == ny/2 )
-            data_.insert( currentDepth_, E, jX, jY );
-        data_.insert( currentDepth_, nx-1, sy, nx, ny, operatorL );
+            data_.insert( currentDepth_+1, E, jX, jY );
+        data_.insert( currentDepth_+1, nx-1, sy, nx, ny, operatorL );
     }
     //S
     for ( Index sx = 2; sx < nx-1; ++sx )
@@ -93,30 +93,30 @@ void Galerkin::update( const Index nx, const Index ny )
             S,sx,1,nx,ny,
             *restrictions_.front(),*this,*prolongations_.front());
         if ( sx == nx/2 )
-            data_.insert( currentDepth_, S, jX, jY );
-        data_.insert( currentDepth_, sx, 1, nx, ny, operatorL );
+            data_.insert( currentDepth_+1, S, jX, jY );
+        data_.insert( currentDepth_+1, sx, 1, nx, ny, operatorL );
     }
     //NW
     computeGalerkin(
         operatorL,jX,jY,
         NW,1,ny-1,nx,ny,
         *restrictions_.front(),*this,*prolongations_.front());
-    data_.insert( currentDepth_, NW, jX, jY );
-    data_.insert( currentDepth_, 1, ny-1, nx, ny, operatorL );
+    data_.insert( currentDepth_+1, NW, jX, jY );
+    data_.insert( currentDepth_+1, 1, ny-1, nx, ny, operatorL );
     //NE
     computeGalerkin(
         operatorL,jX,jY,
         NE,nx-1,ny-1,nx,ny,
         *restrictions_.front(),*this,*prolongations_.front());
-    data_.insert( currentDepth_, NE, jX, jY );
-    data_.insert( currentDepth_, nx-1, ny-1, nx, ny, operatorL );
+    data_.insert( currentDepth_+1, NE, jX, jY );
+    data_.insert( currentDepth_+1, nx-1, ny-1, nx, ny, operatorL );
     //SE
     computeGalerkin(
         operatorL,jX,jY,
         SE,nx-1,1,nx,ny,
         *restrictions_.front(),*this,*prolongations_.front());
-    data_.insert( currentDepth_, SE, jX, jY );
-    data_.insert( currentDepth_, nx-1, 1, nx, ny, operatorL );
+    data_.insert( currentDepth_+1, SE, jX, jY );
+    data_.insert( currentDepth_+1, nx-1, 1, nx, ny, operatorL );
     //SW
     computeGalerkin(
         operatorL,jX,jY,
@@ -124,8 +124,9 @@ void Galerkin::update( const Index nx, const Index ny )
         *restrictions_.front(),*this,*prolongations_.front());
     jXvector.push_back( jX );
     jYvector.push_back( jY );
-    data_.insert( currentDepth_, SW, jX, jY );
-    data_.insert( currentDepth_, 1, 1, nx, ny, operatorL );
+    data_.insert( currentDepth_+1, SW, jX, jY );
+    data_.insert( currentDepth_+1, 1, 1, nx, ny, operatorL );
+    currentDepth_ = prolongations_.size();
 }
 
 namespace
