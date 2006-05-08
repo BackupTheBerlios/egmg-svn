@@ -163,40 +163,29 @@ public:
     virtual const PositionArray& getJy(const Position pos) const =0;
     
     /**
-     * \brief pushs a new Prolongation on the stack of prolongations
+     * \brief pushs new TransferOperators on the stack
      * 
-     * pushProlongation is needed for galerkin like operators. Each time
+     * pushTransferOperators is needed for galerkin like operators. Each time
      * we are going to a coarser grid we need to tell the galerkin operator
-     * what Prolongation we are using to get back to the finer grid.
+     * what TransferOperators we are using.
      * 
+     * \param[in] restriction   the Restriction to put on the stack 
      * \param[in] prolongation  the Prolongation to put on the stack
+     * \param[in] nx            the number of steps in x-dir. on coarse grid
+     * \param[in] ny            the number of steps in y-dir. on coarse grid
      */
-    virtual void pushProlongation(const Prolongation& prolongation) =0;
+    virtual void pushTransferOperators(
+        const Restriction& restriction,
+        const Prolongation& prolongation,
+        const Index nx,
+        const Index ny ) =0;
     
     /**
-     * \brief removes the top Prolongation from the stack of prolongations
+     * \brief removes the top TransferOperators from the stack
      * 
-     * \see pushProlongation
+     * \see pushTransferOperators
      */
-    virtual void popProlongation() =0;
-    
-    /**
-     * \brief pushs a new restriction on the stack of restrictions
-     * 
-     * pushRestriction is needed for galerkin like operators. Each time
-     * we are going to a coaser grid we need to tell the galerkin operator
-     * what Restriction we are using for this
-     * 
-     * \param[in] restriction   the Restriction to put on the stack
-     */
-    virtual void pushRestriction(const Restriction& restriction) =0;
-    
-    /**
-     * \brief removes the top Restriction from the stack of restrictions
-     * 
-     * \see pushRestriction
-     */
-    virtual void popRestriction() =0;
+    virtual void popTransferOperators() =0;
     
     /**
      * \brief returns the size of the stencil

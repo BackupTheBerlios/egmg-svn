@@ -13,5 +13,6 @@
 #include "Laplacian2D2.h"
 #include "Laplacian2D4.h"
 #include "MSV2D4.h"
+#include "Galerkin.h"
 
 #endif /*STENCILINCLUDES_H_*/

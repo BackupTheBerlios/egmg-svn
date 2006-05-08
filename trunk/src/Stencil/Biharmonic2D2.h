@@ -487,30 +487,22 @@ public:
     {
         return jy_[pos];
     }
-
+    
     /**
      * \brief does nothing for Biharmonic2D2
      * \see Stencil
      */
-    void pushProlongation(const Prolongation&) {}
-
+    virtual void pushTransferOperators(
+        const Restriction&,
+        const Prolongation&,
+        const Index,
+        const Index ) {}
+    
     /**
      * \brief does nothing for Biharmonic2D2
      * \see Stencil
      */
-    void popProlongation() {}
-
-    /**
-     * \brief does nothing for Biharmonic2D2
-     * \see Stencil
-     */
-    void pushRestriction(const Restriction&) {}
-
-    /**
-     * \brief does nothing for Biharmonic2D2
-     * \see Stencil
-     */
-    void popRestriction() {}
+    virtual void popTransferOperators() {}
 
     /**
      * \brief gives the max expansion of Biharmonic2D2
