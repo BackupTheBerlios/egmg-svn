@@ -19,7 +19,7 @@ void StencilBoard::insert( const Index level,
                            const NumericArray& opL )
 {
     //ASSERT( level <= m_coefficients.size() )
-    if ( level == m_coefficients.size() )
+    if ( level == m_coefficients.size() + 1 )
     {
         m_coefficients.push_back( std::vector<NumericArray>( nx*ny ) );
     }
@@ -33,7 +33,7 @@ void StencilBoard::insert( const Index level,
 {
     //ASSERT( level <= m_posJx.size() && m_posJx.size() == m_posJy.size() )
     //ASSERT( jX.size() == jY.size() )
-    if ( level == m_posJx.size() )
+    if ( level == m_posJx.size() + 1 )
     {
         m_posJx.push_back( std::vector<PositionArray>( 9 ) );
         m_posJy.push_back( std::vector<PositionArray>( 9 ) );
