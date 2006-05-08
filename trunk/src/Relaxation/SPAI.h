@@ -78,12 +78,8 @@ public:
      * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
      * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      */
-    SPAI(
-        const int preSmoothingSteps =1,
-        const int postSmoothingSteps =1,
-		const int stencilSize = 9)
-        : Relaxation(preSmoothingSteps,postSmoothingSteps), 
-		stencilSize_(stencilSize),phiTable(169),jXW(9), jYW(9),
+    SPAI(const int stencilSize = 9)
+        : stencilSize_(stencilSize),phiTable(169),jXW(9), jYW(9),
 		phiX(9),phiY(9)	{ initTable(); initArrays(); }
 
     virtual ~SPAI() {}

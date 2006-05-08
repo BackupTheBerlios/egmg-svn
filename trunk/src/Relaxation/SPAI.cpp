@@ -86,7 +86,7 @@ void SPAI::relax(
     NumericArray W(0.0,9);	
 
 //  Table Check
-/*	for(int i=3; i<10;i++)
+	for(int i=3; i<10;i++)
 	{
 		for(int j=3; j<10; j++)
 		{
@@ -94,15 +94,16 @@ void SPAI::relax(
 		}
 		std::cout<< std::endl << std::endl;
 	}
-*/
 
-	for(Index px=1; px<nx; px++)
+
+/*	for(Index px=1; px<nx; px++)
 	{
 		for(Index py=1; py<ny; py++)
 		{
 		   choleskySolve(W, phiTable, stencil, phiX, phiY, px, py, nx, ny);
 		}
 	}
+*/
 
 	
 }
