@@ -25,15 +25,12 @@ void cycle(
     const Index ny)
 {
     cycleType.incrementGridLevel();
-    if (cycleType.solve() || std::min(nx,ny)<=6)
+    if ( cycleType.solve() || std::min(nx,ny)<=6 || nx%2!=0 || ny%2!=0 )
     {
         directSolver(u,f,stencil,nx,ny);
     }
     else
     {
-        //if it is not possible to do standard coarsening throw an exeption
-        if (nx%2!=0 || ny%2!=0)
-            throw std::domain_error("u");
         while(cycleType.repeat())
         {
             for(int i=0; i<cycleType.getPreSmoothingSteps(); ++i)
@@ -43,12 +40,11 @@ void cycle(
             //restrict the residuum to the coars grid
             NumericArray coarsResiduum=restriction.restriction
                     (residv,stencil,nx,ny);
-            //we going to a coarser grid so Galerkin Operator needs to know
-            //the transfer operators
-            stencil.pushProlongation(prolongation);
-            stencil.pushRestriction(restriction);
             const Index nxNew = nx/2;
             const Index nyNew = ny/2;
+            //we going to a coarser grid so Galerkin Operator needs to know
+            //the transfer operators
+            stencil.pushTransferOperators(restriction,prolongation,nxNew,nyNew);
             NumericArray coarsGridCor
                     (0.0,(nxNew+1)*(nyNew+1));
             //do a multigrid cycle on the coars grid
@@ -65,8 +61,7 @@ void cycle(
             //approximation
             u+=prolongation.prolongate(coarsGridCor,stencil,nxNew,nyNew);
             //we are going to a smaler grid so remove transfer operators
-            stencil.popRestriction();
-            stencil.popProlongation();
+            stencil.popTransferOperators();
 
             for(int i=0; i<cycleType.getPostSmoothingSteps(); ++i)
                 relaxation.relax(u,f,stencil,nx,ny);
