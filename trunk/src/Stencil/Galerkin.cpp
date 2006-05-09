@@ -274,7 +274,7 @@ void restritionTimesStencil(
 
         stencilJx+=restrictionJx[i];
         stencilJy+=restriciionJy[i];
-        stencilL*=restrictionI[i];        
+        stencilL*=restrictionI[i];
         for ( Index j=0; j<stencilL.size(); ++j)
         {
             for ( Index k=0; k<resultL.size(); ++k )

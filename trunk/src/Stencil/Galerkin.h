@@ -114,7 +114,7 @@ public:
     {
         prolongations_.pop_back();
         restrictions_.pop_back();
-        update( 1, 1 );
+        currentDepth_ = prolongations_.size();
     }
     
     inline Index size() const
