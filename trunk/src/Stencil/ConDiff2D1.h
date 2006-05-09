@@ -131,22 +131,6 @@ public:
     }
 
     /**
-     * \brief does nothing for ConDiff2D1
-     * \see Stencil
-     */
-    virtual void pushTransferOperators(
-        const Restriction&,
-        const Prolongation&,
-        const Index,
-        const Index ) {}
-    
-    /**
-     * \brief does nothing for ConDiff2D1
-     * \see Stencil
-     */
-    virtual void popTransferOperators() {}
-
-    /**
      * \brief gives the max expansion of ConDiff2D1
      * 
      * \return  1

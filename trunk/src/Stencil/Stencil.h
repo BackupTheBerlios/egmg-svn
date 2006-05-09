@@ -175,17 +175,17 @@ public:
      * \param[in] ny            the number of steps in y-dir. on coarse grid
      */
     virtual void pushTransferOperators(
-        const Restriction& restriction,
-        const Prolongation& prolongation,
-        const Index nx,
-        const Index ny ) =0;
+        const Restriction&,
+        const Prolongation&,
+        const Index,
+        const Index ) {}
     
     /**
      * \brief removes the top TransferOperators from the stack
      * 
      * \see pushTransferOperators
      */
-    virtual void popTransferOperators() =0;
+    virtual void popTransferOperators() {}
     
     /**
      * \brief returns the size of the stencil

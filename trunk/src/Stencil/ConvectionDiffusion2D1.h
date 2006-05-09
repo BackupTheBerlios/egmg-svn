@@ -175,22 +175,6 @@ public:
     }
 
     /**
-     * \brief does nothing for ConvectionDiffusion2D1
-     * \see Stencil
-     */
-    virtual void pushTransferOperators(
-        const Restriction&,
-        const Prolongation&,
-        const Index,
-        const Index ) {}
-    
-    /**
-     * \brief does nothing for ConvectionDiffusion2D1
-     * \see Stencil
-     */
-    virtual void popTransferOperators() {}
-
-    /**
      * \brief gives the max expansion of ConvectionDiffusion2D1
      * 
      * \return  1

@@ -302,22 +302,6 @@ public:
     }
 
     /**
-     * \brief does nothing for ConDiff2Dkap
-     * \see Stencil
-     */
-    virtual void pushTransferOperators(
-        const Restriction&,
-        const Prolongation&,
-        const Index,
-        const Index ) {}
-    
-    /**
-     * \brief does nothing for ConDiff2Dkap
-     * \see Stencil
-     */
-    virtual void popTransferOperators() {}
-
-    /**
      * \brief gives the max expansion of ConDiff2Dkap
      * 
      * \return  2

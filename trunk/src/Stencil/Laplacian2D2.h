@@ -113,22 +113,6 @@ public:
     }
     
     /**
-     * \brief does nothing for Laplacian2D2
-     * \see Stencil
-     */
-    virtual void pushTransferOperators(
-        const Restriction&,
-        const Prolongation&,
-        const Index,
-        const Index ) {}
-    
-    /**
-     * \brief does nothing for Laplacian2D2
-     * \see Stencil
-     */
-    virtual void popTransferOperators() {}
-
-    /**
      * \brief gives the max expansion of Laplacian2D2
      * 
      * \return  1
