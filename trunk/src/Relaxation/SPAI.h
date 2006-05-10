@@ -19,7 +19,7 @@ namespace mg
 class SPAI : public mg::Relaxation
 {
 private: 
-	const Index stencilSize_;
+	const int weightingSize_;
 	NumericArray phiTable;
 	
 	void initTable() 
@@ -28,7 +28,7 @@ private:
 		{
 			for (int j=-6; j<7; j++)
 			{
-				phiTable[6+i+13*(6+j)] = 0.0;				
+				phiTable[6+i+13*(6+j)] = 0.0;	
 			}
 		}
 		// only tableelements with uneven index (exept (0/0))
@@ -49,6 +49,7 @@ private:
 			phiTable[6+13*(6+j)] = SPAIScalarProduct(0,j);
 		}
 		phiTable[6+13*6] = SPAIScalarProduct(0,0);
+
 	}	
 
 	PositionArray jXW;
@@ -78,8 +79,8 @@ public:
      * \param[in] preSmoothingSteps     number of pre smoothing steps  (def. 1)
      * \param[in] postSmoothingSteps    number of post smoothing steps (def. 1)
      */
-    SPAI(const int stencilSize = 9)
-        : stencilSize_(stencilSize),phiTable(169),jXW(9), jYW(9),
+    SPAI(const int weightingSize = 9)
+        : weightingSize_(weightingSize),phiTable(169),jXW(9), jYW(9),
 		phiX(9),phiY(9)	{ initTable(); initArrays(); }
 
     virtual ~SPAI() {}
