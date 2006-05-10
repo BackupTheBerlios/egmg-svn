@@ -31,14 +31,19 @@ Precision Galerkin::apply(
 
 void Galerkin::update( const Index nx, const Index ny )
 {
-    
+    //check if we have already calculated this level
+    if ( data_.find( currentDepth_ + 1, C ) )
+    {
+        currentDepth_ = prolongations_.size();
+        return;
+    }
     PositionArray jX;
     PositionArray jY;
     NumericArray operatorL;
     //C
-    for ( Index sx = 0; sx <=nx; ++sx )
+    for ( Index sx = 1; sx <nx; ++sx )
     {
-        for ( Index sy = 0; sy <=ny; ++sy )
+        for ( Index sy = 1; sy <ny; ++sy )
         {
 
             computeGalerkin(
@@ -51,7 +56,7 @@ void Galerkin::update( const Index nx, const Index ny )
         }
     }
     //W
-    for ( Index sy = 0; sy <= ny; ++sy )
+    for ( Index sy = 1; sy < ny; ++sy )
     {
         computeGalerkin(
             operatorL,jX,jY,
@@ -62,7 +67,7 @@ void Galerkin::update( const Index nx, const Index ny )
         data_.insert( currentDepth_+1, W, 1, sy, nx, ny, operatorL );
     }
     //N
-    for ( Index sx = 0; sx <= nx; ++sx )
+    for ( Index sx = 1; sx < nx; ++sx )
     {
         computeGalerkin(
             operatorL,jX,jY,
@@ -73,7 +78,7 @@ void Galerkin::update( const Index nx, const Index ny )
         data_.insert( currentDepth_+1, N, sx, ny-1, nx, ny, operatorL );
     }
     //E
-    for ( Index sy = 0; sy <= ny; ++sy )
+    for ( Index sy = 1; sy < ny; ++sy )
     {
         computeGalerkin(
             operatorL,jX,jY,
@@ -84,7 +89,7 @@ void Galerkin::update( const Index nx, const Index ny )
         data_.insert( currentDepth_+1, E, nx-1, sy, nx, ny, operatorL );
     }
     //S
-    for ( Index sx = 0; sx <= nx; ++sx )
+    for ( Index sx = 1; sx < nx; ++sx )
     {
         computeGalerkin(
             operatorL,jX,jY,
