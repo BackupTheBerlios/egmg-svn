@@ -82,7 +82,7 @@ public:
         if ( currentDepth_ == 0 )
             return fineGridOperator_.getL( position, sx, sy, nx, ny );
         //ASSERT( data_.find( currentDepth_, sx, sy, nx, ny ) );
-        return data_.getL( currentDepth_, sx, sy, nx, ny );
+        return data_.getL( currentDepth_, position, sx, sy, nx, ny );
     }
 
     inline const PositionArray& getJx(const Position p) const

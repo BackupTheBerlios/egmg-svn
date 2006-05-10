@@ -35,12 +35,10 @@ void Galerkin::update( const Index nx, const Index ny )
     PositionArray jX;
     PositionArray jY;
     NumericArray operatorL;
-    std::vector< PositionArray> jXvector;
-    std::vector< PositionArray> jYvector;
     //C
-    for ( Index sx = 2; sx < nx-1; ++sx )
+    for ( Index sx = 0; sx <=nx; ++sx )
     {
-        for ( Index sy = 2; sy < ny-1; ++sy )
+        for ( Index sy = 0; sy <=ny; ++sy )
         {
 
             computeGalerkin(
@@ -49,11 +47,11 @@ void Galerkin::update( const Index nx, const Index ny )
                 *restrictions_.front(),*this,*prolongations_.front());
             if ( sx == nx/2 && sy == ny/2 )
                 data_.insert( currentDepth_+1, C, jX, jY );
-            data_.insert( currentDepth_+1, sx, sy, nx, ny, operatorL );
+            data_.insert( currentDepth_+1, C, sx, sy, nx, ny, operatorL );
         }
     }
     //W
-    for ( Index sy = 2; sy < ny-1; ++sy )
+    for ( Index sy = 0; sy <= ny; ++sy )
     {
         computeGalerkin(
             operatorL,jX,jY,
@@ -61,10 +59,10 @@ void Galerkin::update( const Index nx, const Index ny )
             *restrictions_.front(),*this,*prolongations_.front());
         if ( sy == ny/2 )
             data_.insert( currentDepth_+1, W, jX, jY );
-        data_.insert( currentDepth_+1, 1, sy, nx, ny, operatorL );
+        data_.insert( currentDepth_+1, W, 1, sy, nx, ny, operatorL );
     }
     //N
-    for ( Index sx = 2; sx < nx-1; ++sx )
+    for ( Index sx = 0; sx <= nx; ++sx )
     {
         computeGalerkin(
             operatorL,jX,jY,
@@ -72,10 +70,10 @@ void Galerkin::update( const Index nx, const Index ny )
             *restrictions_.front(),*this,*prolongations_.front());
         if ( sx == nx/2 )
             data_.insert( currentDepth_+1, N, jX, jY );
-        data_.insert( currentDepth_+1, sx, ny-1, nx, ny, operatorL );
+        data_.insert( currentDepth_+1, N, sx, ny-1, nx, ny, operatorL );
     }
     //E
-    for ( Index sy = 2; sy < ny-1; ++sy )
+    for ( Index sy = 0; sy <= ny; ++sy )
     {
         computeGalerkin(
             operatorL,jX,jY,
@@ -83,10 +81,10 @@ void Galerkin::update( const Index nx, const Index ny )
             *restrictions_.front(),*this,*prolongations_.front());
         if ( sy == ny/2 )
             data_.insert( currentDepth_+1, E, jX, jY );
-        data_.insert( currentDepth_+1, nx-1, sy, nx, ny, operatorL );
+        data_.insert( currentDepth_+1, E, nx-1, sy, nx, ny, operatorL );
     }
     //S
-    for ( Index sx = 2; sx < nx-1; ++sx )
+    for ( Index sx = 0; sx <= nx; ++sx )
     {
         computeGalerkin(
             operatorL,jX,jY,
@@ -94,7 +92,7 @@ void Galerkin::update( const Index nx, const Index ny )
             *restrictions_.front(),*this,*prolongations_.front());
         if ( sx == nx/2 )
             data_.insert( currentDepth_+1, S, jX, jY );
-        data_.insert( currentDepth_+1, sx, 1, nx, ny, operatorL );
+        data_.insert( currentDepth_+1, S, sx, 1, nx, ny, operatorL );
     }
     //NW
     computeGalerkin(
@@ -102,30 +100,28 @@ void Galerkin::update( const Index nx, const Index ny )
         NW,1,ny-1,nx,ny,
         *restrictions_.front(),*this,*prolongations_.front());
     data_.insert( currentDepth_+1, NW, jX, jY );
-    data_.insert( currentDepth_+1, 1, ny-1, nx, ny, operatorL );
+    data_.insert( currentDepth_+1, NW, 1, ny-1, nx, ny, operatorL );
     //NE
     computeGalerkin(
         operatorL,jX,jY,
         NE,nx-1,ny-1,nx,ny,
         *restrictions_.front(),*this,*prolongations_.front());
     data_.insert( currentDepth_+1, NE, jX, jY );
-    data_.insert( currentDepth_+1, nx-1, ny-1, nx, ny, operatorL );
+    data_.insert( currentDepth_+1, NE, nx-1, ny-1, nx, ny, operatorL );
     //SE
     computeGalerkin(
         operatorL,jX,jY,
         SE,nx-1,1,nx,ny,
         *restrictions_.front(),*this,*prolongations_.front());
     data_.insert( currentDepth_+1, SE, jX, jY );
-    data_.insert( currentDepth_+1, nx-1, 1, nx, ny, operatorL );
+    data_.insert( currentDepth_+1, SE, nx-1, 1, nx, ny, operatorL );
     //SW
     computeGalerkin(
         operatorL,jX,jY,
         SW,1,1,nx,ny,
         *restrictions_.front(),*this,*prolongations_.front());
-    jXvector.push_back( jX );
-    jYvector.push_back( jY );
     data_.insert( currentDepth_+1, SW, jX, jY );
-    data_.insert( currentDepth_+1, 1, 1, nx, ny, operatorL );
+    data_.insert( currentDepth_+1, SW, 1, 1, nx, ny, operatorL );
     currentDepth_ = prolongations_.size();
 }
 

@@ -14,6 +14,7 @@ public:
 	StencilBoard();
 	virtual ~StencilBoard();
     void insert( const Index level,
+                 const Position pos,
                  const Index sx,
                  const Index sy,
                  const Index nx,
@@ -24,6 +25,7 @@ public:
                  const PositionArray& jX,
                  const PositionArray& jY );
     bool find( const Index level,
+               const Position pos,
                const Index sx,
                const Index sy,
                const Index nx,
@@ -31,6 +33,7 @@ public:
     bool find( const Index level,
                const Position pos ) const;
     const NumericArray& getL( const Index level,
+                              const Position pos,
                               const Index sx,
                               const Index sy,
                               const Index nx,
@@ -41,6 +44,8 @@ public:
                                 const Position pos ) const;
 private:
     std::vector<std::vector<NumericArray> >     m_coefficients;
+    std::vector<std::vector<NumericArray> >     m_coefficients_b[4];
+    std::vector<std::vector<NumericArray> >     m_coefficients_c;
     std::vector<std::vector<PositionArray> >    m_posJx;
     std::vector<std::vector<PositionArray> >    m_posJy;
 };
