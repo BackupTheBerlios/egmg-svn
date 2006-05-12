@@ -75,6 +75,7 @@ void choleskySolve(NumericArray& W, const NumericArray& phiTable,
 		std::cout<< std::endl << std::endl;
 	}
 */
+
 	// Cholesky Zerlegung für Matrix * W = rhs
 	Matrix[0][0] = sqrt(Matrix[0][0]);
 	for(int j=1; j<weightingSize; j++)
@@ -230,9 +231,6 @@ void SPAI::relax(
 			}
 		}
 	}
-
-
-
 
 
 

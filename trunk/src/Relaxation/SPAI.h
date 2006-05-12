@@ -1,5 +1,5 @@
 /** \file SPAI.h
- * \author André Oeckerath
+ * \author Andre Oeckerath
  * \brief SPAI.h contains the interface of the class SPAI.
  * \see Relaxation.h
  */
