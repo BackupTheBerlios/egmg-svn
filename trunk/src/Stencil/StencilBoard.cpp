@@ -124,7 +124,7 @@ const NumericArray& StencilBoard::getL(
     const Index sx,
     const Index sy,
     const Index nx,
-    const Index ny ) const
+    const Index ) const
 {
     if ( pos == C )
     {

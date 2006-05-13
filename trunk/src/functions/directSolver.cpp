@@ -93,8 +93,8 @@ PositionArray pivotLU(
     const Index dimension)
 {
     PositionArray permutation(dimension);
-    for (Index sx=0; sx<dimension; ++sx)
-        permutation[sx]=sx;
+    for (Index sx = 0; sx < dimension; ++sx)
+        permutation[sx]=static_cast<Integer>( sx );
 
     for (Index sx=0; sx<dimension; ++sx)
     {

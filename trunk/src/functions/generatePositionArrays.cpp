@@ -44,8 +44,8 @@ void generatePositionArrays(
     std::stack<Integer> xPositions;
     std::stack<Integer> yPositions;
     
-    Integer intSize = size;
-    Integer intSizeToBorder = sizeToBorder;
+    Integer intSize = static_cast<Integer>( size );
+    Integer intSizeToBorder = static_cast<Integer>( sizeToBorder );
     for ( Integer k=intSize; k>=1; --k)
     {
         xPositions.push(k);

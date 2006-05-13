@@ -389,7 +389,7 @@ void shrinkStencil(
     generatePositionArrays( resultJx, resultJy, pos, newSize, newSizeToBorder );
     resultL.resize(resultJx.size());
     resultL = 0.0;
-    Integer sizeToBorder = newSizeToBorder;
+    Integer sizeToBorder = static_cast<Integer>( newSizeToBorder );
     for ( Index i = 0; i < opL.size(); ++i )
     {
         if ( jX[i]%2 == 0 && jY[i]%2 == 0 )
