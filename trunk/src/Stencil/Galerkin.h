@@ -8,11 +8,9 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 
 #include "Stencil.h"
 #include "StencilBoard.h"
-#include "../general/parameters.h"
 #include "../Prolongation/Prolongation.h"
 #include "../Restriction/Restriction.h"
 
