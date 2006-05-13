@@ -8,7 +8,7 @@
 
 
 #include "Relaxation.h"
-#include "../functions/SPAIScalarProduct.cpp"
+#include "../functions/SPAIScalarProduct.h"
 
 namespace mg
 {

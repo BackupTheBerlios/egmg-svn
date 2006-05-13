@@ -1,15 +1,16 @@
-/** \file SPAIScalarProduct.cpp
+/** \file SPAIScalarProduct.h
  * \author André Oeckerath
  */
 #ifndef SPAIScalarProduct_H_
 #define SPAIScalarProduct_H_
 
 #include <cmath>
+#include "../general/parameters.h"
 
 
 namespace mg
 {
-	const Precision halfPi = asin( 1 );
+	const Precision halfPi = asin( 1.0 );
 
 	inline Precision SPAIScalarProduct
 		(const int i, const int j) 
