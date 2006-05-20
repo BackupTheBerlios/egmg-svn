@@ -12,6 +12,6 @@
 #include "LineJAC.h"
 #include "ZebraLine.h"
 #include "ZebraLineGS.h"
-#include "SPAI.h"
+#include "WHighJac.h"
 
 #endif /*RELAXATIONINCLUDES_H_*/

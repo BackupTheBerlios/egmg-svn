@@ -76,7 +76,7 @@ void LineJAC::ninepointxline(
     const Index ny) const
                    
 { 
-    NumericArray rhs(0.0,nx-1);
+    NumericArray rhs(0.0,u.size());
     NumericArray temp(0.0,(nx+1)*(ny+1));       
     //valarrays needed for saving the tridiagonal matrix A of linear system A u = rhs       
     NumericArray diagR(nx-1);
@@ -92,7 +92,7 @@ void LineJAC::ninepointxline(
         {
             for(Index sx=0; sx<nx-1; sx++)  
             {
-                rhs[sx]=resid[sy*(nx+1)+sx+1];
+                rhs[sy*(nx+1)+sx+1]=resid[sy*(nx+1)+sx+1];
             }                               
             // set tridiagonalmatrix for solving A u = rhs
             // A[i][i] = L[c]; A[i-1][i] = L[w]; A[i+1][i] = L[e]
@@ -110,61 +110,55 @@ void LineJAC::ninepointxline(
         NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
         PositionArray jX=stencil.getJx(C);
         PositionArray jY=stencil.getJy(C);
-        if(nx > 2)
+        
+		rhs = resid;
+
+		if(nx > 2)
         {
             operatorL=stencil.getL(SW,1,1,nx,ny);
             diagR[0]=operatorL[C];
             ndiagR[0]=operatorL[E];
-            rhs[0]=resid[nx+1+1];
             for(Index sx=2; sx<nx-1; sx++)
             {
                 operatorL=stencil.getL(S,sx,1,nx,ny);
                 diagR[sx-1]=operatorL[C];
                 ndiagR[sx-1]=operatorL[E];
                 ndiagL[sx-2]=operatorL[W];
-                rhs[sx-1]=resid[nx+1+sx];
             }
             operatorL=stencil.getL(SE,nx-1,1,nx,ny);
             diagR[nx-2]=operatorL[C];
             ndiagL[nx-3]=operatorL[W];
-            rhs[nx-2]=resid[nx+1+nx-1];
             xLRSolver(temp,1,nx,rhs,ndiagL,diagR,ndiagR);
             for(Index sy=2; sy<ny-1 ; sy++)
             {
                 operatorL=stencil.getL(W,1,sy,nx,ny);
                 diagR[0]=operatorL[C];
-                ndiagR[0]=operatorL[E];
-                rhs[0]=resid[sy*(nx+1)+1];
+                ndiagR[0]=operatorL[E];                
                 for(Index sx=2; sx<nx-1; sx++)
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sx-1]=operatorL[C];
                     ndiagR[sx-1]=operatorL[E];
                     ndiagL[sx-2]=operatorL[W];
-                    rhs[sx-1]=resid[sy*(nx+1)+sx];
                 }
                 operatorL=stencil.getL(E,nx-1,sy,nx,ny);
                 diagR[nx-2]=operatorL[C];
                 ndiagL[nx-3]=operatorL[W];
-                rhs[nx-2]=resid[sy*(nx+1)+nx-1];
                 xLRSolver(temp,sy,nx,rhs,ndiagL,diagR,ndiagR);
             }
             operatorL=stencil.getL(NW,1,ny-1,nx,ny);
             diagR[0]=operatorL[C];
             ndiagR[0]=operatorL[E];
-            rhs[0]=resid[(ny-1)*(nx+1)+1];
             for(Index sx=2; sx<nx-1; sx++)
             {
                 operatorL=stencil.getL(N,sx,ny-1,nx,ny);
                 diagR[sx-1]=operatorL[C];
                 ndiagR[sx-1]=operatorL[E];
                 ndiagL[sx-2]=operatorL[W];
-                rhs[sx-1]=resid[(ny-1)*(nx+1)+sx];
             }
             operatorL=stencil.getL(NE,nx-1,ny-1,nx,ny);
             diagR[nx-2]=operatorL[C];
             ndiagL[nx-3]=operatorL[W];
-            rhs[nx-2]=resid[(ny-1)*(nx+1)+nx-1];
             xLRSolver(temp,ny-1,nx,rhs,ndiagL,diagR,ndiagR);
             u+=omega_*temp;
         }
@@ -182,7 +176,7 @@ void LineJAC::ninepointyline(
     const Index nx, 
     const Index ny) const             
 { 
-    NumericArray rhs(0.0,ny+1);
+    NumericArray rhs(0.0,u.size());
     NumericArray temp(0.0,(nx+1)*(ny+1));
     //valarrays needed for saving the tridiagonal matrix A of linear system A u = rhs
     NumericArray diagR(ny-1);
@@ -201,7 +195,7 @@ void LineJAC::ninepointyline(
         {
             for(Index sy=0; sy<ny-1; sy++)  
             {
-                rhs[sy]=resid[(sy+1)*(nx+1)+sx];
+                rhs[(sy+1)*(nx+1)+sx]=resid[(sy+1)*(nx+1)+sx];
             }
             // set tridiagonalmatrix for solving A u = rhs
             // A[i][i] = L[c]; A[i-1][i] = L[s]; A[i+1][i] = L[n]
@@ -219,61 +213,55 @@ void LineJAC::ninepointyline(
         NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
         PositionArray jX=stencil.getJx(C);
         PositionArray jY=stencil.getJy(C);
+
+		rhs = resid;
+
         if(ny > 2)
         {
             operatorL=stencil.getL(SW,1,1,nx,ny);                
             diagR[0]=operatorL[C];
-            ndiagR[0]=operatorL[N];           
-            rhs[0]=resid[nx+1+1];
+            ndiagR[0]=operatorL[N];
             for(Index sy=2; sy<ny-1; sy++) 
             {
                 operatorL=stencil.getL(W,1,sy,nx,ny);
                 diagR[sy-1]=operatorL[C];
                 ndiagR[sy-1]=operatorL[N];
-                ndiagL[sy-2]=operatorL[S];
-                rhs[sy-1]=resid[sy*(nx+1)+1];                   
+                ndiagL[sy-2]=operatorL[S];                   
             }
             operatorL=stencil.getL(NW,1,ny-1,nx,ny);
             diagR[ny-2]=operatorL[C];
-            ndiagL[ny-3]=operatorL[S]; 
-            rhs[ny-2]=resid[(ny-1)*(nx+1)+1];
+            ndiagL[ny-3]=operatorL[S];
             yLRSolver(temp,1,nx,ny,rhs,ndiagL,diagR,ndiagR);
             for(Index sx=2; sx<nx-1 ; sx++)
             {
                 operatorL=stencil.getL(S,sx,1,nx,ny);
                 diagR[0]=operatorL[C];
-                ndiagR[0]=operatorL[N];   
-                rhs[0]=resid[nx+1+sx];
+                ndiagR[0]=operatorL[N];
                 for(Index sy=2; sy<ny-1; sy++) 
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
                     diagR[sy-1]=operatorL[C];
                     ndiagR[sy-1]=operatorL[N];
                     ndiagL[sy-2]=operatorL[S];
-                    rhs[sy-1]=resid[sy*(nx+1)+sx];
                 }
                 operatorL=stencil.getL(N,sx,ny-1,nx,ny);
                 diagR[ny-2]=operatorL[C];
                 ndiagL[ny-3]=operatorL[S];
-                rhs[ny-2]=resid[(ny-1)*(nx+1)+sx];
                 yLRSolver(temp,sx,nx,ny,rhs,ndiagL,diagR,ndiagR);
             }
             operatorL=stencil.getL(SE,nx-1,1,nx,ny);
             diagR[0]=operatorL[C];
-            ndiagR[0]=operatorL[N];   
-            rhs[0]=resid[nx+1+nx-1];
+            ndiagR[0]=operatorL[N];
             for(Index sy=2; sy<ny-1; sy++) 
             {
                 operatorL=stencil.getL(E,nx-1,sy,nx,ny);
                 diagR[sy-1]=operatorL[C];
                 ndiagR[sy-1]=operatorL[N];
-                ndiagL[sy-2]=operatorL[S];
-                rhs[sy-1]=resid[sy*(nx+1)+nx-1];                    
+                ndiagL[sy-2]=operatorL[S];                    
             }
             operatorL=stencil.getL(NE,nx-1,ny-1,nx,ny);
             diagR[ny-2]=operatorL[C];
             ndiagL[ny-3]=operatorL[S];
-            rhs[ny-2]=resid[(ny-1)*(nx+1)+nx-1];
             yLRSolver(temp,nx-1,nx,ny,rhs,ndiagL,diagR,ndiagR);
             u += omega_ * temp;
         }
@@ -294,7 +282,7 @@ void LineJAC::xline(
 {
     if((ny > 4) && (nx > 4))
     {
-        NumericArray rhs(0.0,nx-1);
+        NumericArray rhs(0.0,u.size());
         NumericArray temp(0.0,(nx+1)*(ny+1));
         NumericArray diagR(0.0,nx-1);
         NumericArray ndiagR1(0.0,nx-2);
@@ -313,16 +301,15 @@ void LineJAC::xline(
             NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
             PositionArray jXC=stencil.getJx(SW);
             PositionArray jYC=stencil.getJy(SW);
-            // set rhs for line 1                   
+            // set rhs for line 1
+			rhs=resid;
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[E];
             ndiagR2[0]=operatorLC[NE];         
-            rhs[0]=resid[nx+1+1];
             ndiagL1[0]=operatorLB[W];
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[E];                    
             ndiagR2[1]=operatorLB[SE];
-            rhs[1]=resid[nx+1+2];
             for(Index sx=3; sx<nx-2; sx++)  
             {
                 ndiagL2[sx-3]=operatorLB[NW];
@@ -330,13 +317,11 @@ void LineJAC::xline(
                 diagR[sx-1]=operatorLB[C];
                 ndiagR1[sx-1]=operatorLB[E];                  
                 ndiagR2[sx-1]=operatorLB[SE]; 
-                rhs[sx-1]=resid[nx+1+sx];
             }
             ndiagL2[nx-5]=operatorLB[NW];
             ndiagL1[nx-4]=operatorLB[W];
             diagR[nx-3]=operatorLB[C];
             ndiagR1[nx-3]=operatorLB[E];
-            rhs[nx-3]=resid[nx+1+nx-2];
             
             operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
             jXC=stencil.getJx(SE);
@@ -344,7 +329,6 @@ void LineJAC::xline(
             ndiagL2[nx-4]=operatorLC[NW];
             ndiagL1[nx-3]=operatorLC[W];
             diagR[nx-2]=operatorLC[C];
-            rhs[nx-2]=resid[nx+1+nx-1];
             xLRSolver(temp,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process all inner lines
@@ -357,12 +341,10 @@ void LineJAC::xline(
                 diagR[0]=operatorLB[C];
                 ndiagR1[0]=operatorLB[E];
                 ndiagR2[0]=operatorLB[NE];
-                rhs[0]=resid[sy*(nx+1)+1];
                 ndiagL1[0]=operatorL[W];
                 diagR[1]=operatorL[C];
                 ndiagR1[1]=operatorL[E];                  
                 ndiagR2[1]=operatorL[SE];
-                rhs[1]=resid[sy*(nx+1)+2];
                 for(Index sx=3; sx<nx-2; sx++)  
                 {
                     ndiagL2[sx-3]=operatorL[NW];
@@ -370,20 +352,17 @@ void LineJAC::xline(
                     diagR[sx-1]=operatorL[C];
                     ndiagR1[sx-1]=operatorL[E];                    
                     ndiagR2[sx-1]=operatorL[SE];
-                    rhs[sx-1]=resid[sy*(nx+1)+sx];
                 }
                 ndiagL2[nx-5]=operatorL[NW];
                 ndiagL1[nx-4]=operatorL[W];
                 diagR[nx-3]=operatorL[C];
                 ndiagR1[nx-3]=operatorL[E];
-                rhs[nx-3]=resid[sy*(nx+1)+nx-2];
                 operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
                 jXB=stencil.getJx(E);
                 jYB=stencil.getJy(E);
                 ndiagL2[nx-4]=operatorLB[NW];
                 ndiagL1[nx-3]=operatorLB[W];
                 diagR[nx-2]=operatorLB[C];
-                rhs[nx-2]=resid[sy*(nx+1)+nx-1];
                 xLRSolver(temp,sy,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             }
 ////////////////////////////////////////////////////////////////////////////////
@@ -393,8 +372,7 @@ void LineJAC::xline(
             jYC=stencil.getJy(NW);
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[E];
-            ndiagR2[0]=operatorLC[NW];         
-            rhs[0]=resid[(ny-1)*(nx+1)+1];
+            ndiagR2[0]=operatorLC[NW];
             operatorLB=stencil.getL(N,2,ny-1,nx,ny);
             jXB=stencil.getJx(N);
             jYB=stencil.getJy(N);
@@ -402,7 +380,6 @@ void LineJAC::xline(
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[E];                    
             ndiagR2[1]=operatorLB[NE];
-            rhs[1]=resid[(ny-1)*(nx+1)+2];
             for(Index sx=3; sx<nx-2; sx++)  
             {
                 ndiagL2[sx-3]=operatorLB[NW];
@@ -410,20 +387,17 @@ void LineJAC::xline(
                 diagR[sx-1]=operatorLB[C];
                 ndiagR1[sx-1]=operatorLB[E];                  
                 ndiagR2[sx-1]=operatorLB[NE];
-                rhs[sx-1]=resid[(ny-1)*(nx+1)+sx];
             }
             ndiagL2[nx-5]=operatorLB[NW];
             ndiagL1[nx-4]=operatorLB[W];
             diagR[nx-3]=operatorLB[C];
             ndiagR1[nx-3]=operatorLB[E];
-            rhs[nx-3]=resid[(ny-1)*(nx+1)+nx-2];
             operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
             jXC=stencil.getJx(NE);
             jYC=stencil.getJy(NE);
             ndiagL2[nx-4]=operatorLC[NW];
             ndiagL1[nx-3]=operatorLC[W];
             diagR[nx-2]=operatorLC[C];
-            rhs[nx-2]=resid[(ny-1)*(nx+1)+nx-1];
             xLRSolver(temp,ny-1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             u += omega_ * temp;
         }
@@ -438,15 +412,16 @@ void LineJAC::xline(
             NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
             PositionArray jXC=stencil.getJx(SW);
             PositionArray jYC=stencil.getJy(SW);
-            diagR[0]=operatorLC[C];
+            
+			rhs=resid;
+
+			diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[E];
             ndiagR2[0]=operatorLC[NE];
-            rhs[0]=resid[nx+1+1];
             ndiagL1[0]=operatorLB[W];
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[E];                    
             ndiagR2[1]=operatorLB[SE];
-            rhs[1]=resid[nx+1+2];
             for(Index sx=3; sx<nx-2; sx++)  
             {
                 operatorLB=stencil.getL(S,sx,1,nx,ny);   
@@ -455,21 +430,18 @@ void LineJAC::xline(
                 diagR[sx-1]=operatorLB[C];
                 ndiagR1[sx-1]=operatorLB[E];                  
                 ndiagR2[sx-1]=operatorLB[SE];
-                rhs[sx-1]=resid[nx+1+sx];
             }
             operatorLB=stencil.getL(S,nx-2,1,nx,ny);
             ndiagL2[nx-5]=operatorLB[NW];
             ndiagL1[nx-4]=operatorLB[W];
             diagR[nx-3]=operatorLB[C];
             ndiagR1[nx-3]=operatorLB[E];
-            rhs[nx-3]=resid[nx+1+nx-2];
             operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
             jXC=stencil.getJx(SE);
             jYC=stencil.getJy(SE);
             ndiagL2[nx-4]=operatorLC[NW];
             ndiagL1[nx-3]=operatorLC[W];
             diagR[nx-2]=operatorLC[C];
-            rhs[nx-2]=resid[nx+1+nx-1];
             xLRSolver(temp,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process all inner lines                
@@ -481,14 +453,12 @@ void LineJAC::xline(
                 jYB=stencil.getJy(W);
                 diagR[0]=operatorLB[C];
                 ndiagR1[0]=operatorLB[E];
-                ndiagR2[0]=operatorLB[NE];     
-                rhs[0]=resid[sy*(nx+1)+1];             
+                ndiagR2[0]=operatorLB[NE];             
                 operatorL=stencil.getL(C,2,sy,nx,ny);
                 ndiagL1[0]=operatorL[W];
                 diagR[1]=operatorL[C];
                 ndiagR1[1]=operatorL[E];                  
                 ndiagR2[1]=operatorL[SE];
-                rhs[1]=resid[sy*(nx+1)+2];
                 for(Index sx=3; sx<nx-2; sx++)  
                 {
                     operatorL=stencil.getL(C,sx,sy,nx,ny);
@@ -497,21 +467,18 @@ void LineJAC::xline(
                     diagR[sx-1]=operatorL[C];
                     ndiagR1[sx-1]=operatorL[E];                    
                     ndiagR2[sx-1]=operatorL[SE];
-                    rhs[sx-1]=resid[sy*(nx+1)+sx];
                 }
                 operatorL=stencil.getL(C,nx-2,sy,nx,ny);
                 ndiagL2[nx-5]=operatorL[NW];
                 ndiagL1[nx-4]=operatorL[W];
                 diagR[nx-3]=operatorL[C];
                 ndiagR1[nx-3]=operatorL[E];
-                rhs[nx-3]=resid[sy*(nx+1)+nx-2];
                 operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
                 jXB=stencil.getJx(E);
                 jYB=stencil.getJy(E);
                 ndiagL2[nx-4]=operatorLB[NW];
                 ndiagL1[nx-3]=operatorLB[W];
                 diagR[nx-2]=operatorLB[C];
-                rhs[nx-2]=resid[sy*(nx+1)+nx-1];
                 xLRSolver(temp,sy,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             }
 ////////////////////////////////////////////////////////////////////////////////
@@ -521,8 +488,7 @@ void LineJAC::xline(
             jYC=stencil.getJy(NW);
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[E];
-            ndiagR2[0]=operatorLC[NW];         
-            rhs[0]=resid[(ny-1)*(nx+1)+1];
+            ndiagR2[0]=operatorLC[NW];
             operatorLB=stencil.getL(N,2,ny-1,nx,ny);
             jXB=stencil.getJx(N);
             jYB=stencil.getJy(N);
@@ -530,7 +496,6 @@ void LineJAC::xline(
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[E];                    
             ndiagR2[1]=operatorLB[NE];
-            rhs[1]=resid[(ny-1)*(nx+1)+2];
             for(Index sx=3; sx<nx-2; sx++)  
             {
                 operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
@@ -539,21 +504,18 @@ void LineJAC::xline(
                 diagR[sx-1]=operatorLB[C];
                 ndiagR1[sx-1]=operatorLB[E];                  
                 ndiagR2[sx-1]=operatorLB[NE];
-                rhs[sx-1]=resid[(ny-1)*(nx+1)+sx];
             }
             operatorLB=stencil.getL(N,nx-2,ny-1,nx,ny);
             ndiagL2[nx-5]=operatorLB[NW];
             ndiagL1[nx-4]=operatorLB[W];
             diagR[nx-3]=operatorLB[C];
             ndiagR1[nx-3]=operatorLB[E];
-            rhs[nx-3]=resid[(ny-1)*(nx+1)+nx-2];
             operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
             jXC=stencil.getJx(NE);
             jYC=stencil.getJy(NE);
             ndiagL2[nx-4]=operatorLC[NW];
             ndiagL1[nx-3]=operatorLC[W];
             diagR[nx-2]=operatorLC[C];
-            rhs[nx-2]=resid[(ny-1)*(nx+1)+nx-1];
             xLRSolver(temp,ny-1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             u += omega_ * temp;
         }
@@ -576,7 +538,7 @@ void LineJAC::yline(
 {
     if((ny > 4) && (nx > 4))
     {
-        NumericArray rhs(0.0,ny-1);
+        NumericArray rhs(0.0,u.size());
         NumericArray temp(0.0,(nx+1)*(ny+1));
         NumericArray diagR(0.0,ny-1);
         NumericArray ndiagR1(0.0,ny-2);
@@ -595,15 +557,14 @@ void LineJAC::yline(
             NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
             PositionArray jXC=stencil.getJx(SW);
             PositionArray jYC=stencil.getJy(SW);
+			rhs=resid;
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[N];
             ndiagR2[0]=operatorLC[NW];
-            rhs[0]=resid[nx+1+1];
             ndiagL1[0]=operatorLB[S];
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[N];                    
             ndiagR2[1]=operatorLB[NW];
-            rhs[1]=resid[2*(nx+1)+1];
             for(Index sy=3; sy<ny-2; sy++)  
             {
                 ndiagL2[sy-3]=operatorLB[SE];
@@ -611,20 +572,17 @@ void LineJAC::yline(
                 diagR[sy-1]=operatorLB[C];
                 ndiagR1[sy-1]=operatorLB[N];                  
                 ndiagR2[sy-1]=operatorLB[NW];
-                rhs[sy-1]=resid[sy*(nx+1)+1];
             }
             ndiagL2[ny-5]=operatorLB[SE];
             ndiagL1[ny-4]=operatorLB[S];
             diagR[ny-3]=operatorLB[C];
             ndiagR1[ny-3]=operatorLB[N];
-            rhs[ny-3]=resid[(ny-2)*(nx+1)+1];
             operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
             jXC=stencil.getJx(NW);
             jYC=stencil.getJy(NW);
             ndiagL2[ny-4]=operatorLC[NE];
             ndiagL1[ny-3]=operatorLC[S];
             diagR[ny-2]=operatorLC[C];
-            rhs[ny-2]=resid[(ny-1)*(nx+1)+1];
             yLRSolver(temp,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process all inner lines             
@@ -637,40 +595,34 @@ void LineJAC::yline(
                 diagR[0]=operatorLB[C];
                 ndiagR1[0]=operatorLB[N];
                 ndiagR2[0]=operatorLB[NE];
-                rhs[0]=resid[nx+1+sx];
                 ndiagL1[0]=operatorL[S];
                 diagR[1]=operatorL[C];
                 ndiagR1[1]=operatorL[N];                  
-                ndiagR2[1]=operatorL[NE];
-                rhs[1]=resid[2*(nx+1)+sx];                     
+                ndiagR2[1]=operatorL[NE];                     
                 for(Index sy=3; sy<ny-2; sy++)
                 {
                    ndiagL2[sy-3]=operatorL[SW];
                    ndiagL1[sy-2]=operatorL[S];
                    diagR[sy-1]=operatorL[C];
                    ndiagR1[sy-1]=operatorL[N];
-                   ndiagR2[sy-1]=operatorL[NE];
-                   rhs[sy-1]=resid[sy*(nx+1)+sx];                       
+                   ndiagR2[sy-1]=operatorL[NE];                       
                 }
                 ndiagL2[nx-5]=operatorL[SW];
                 ndiagL1[nx-4]=operatorL[S];
                 diagR[nx-3]=operatorL[C];
                 ndiagR1[nx-3]=operatorL[N];
-                rhs[ny-3]=resid[(ny-2)*(nx+1)+sx];
                 operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
                 jXB=stencil.getJx(N);
                 jYB=stencil.getJy(N);
                 ndiagL2[nx-4]=operatorLB[SW];
                 ndiagL1[nx-3]=operatorLB[S];
                 diagR[nx-2]=operatorLB[C];
-                rhs[ny-2]=resid[(ny-1)*(nx+1)+sx];
                 yLRSolver(temp,sx,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
             }
 ////////////////last column//////////////////
             operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
             jXC=stencil.getJx(SE);
             jYC=stencil.getJy(SE);
-            rhs[0]=resid[nx+1+nx-1];
             operatorLB=stencil.getL(E,nx-1,2,nx,ny);
             jXB=stencil.getJx(E);
             jYB=stencil.getJy(E);
@@ -678,7 +630,6 @@ void LineJAC::yline(
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[N];                    
             ndiagR2[1]=operatorLB[NE];
-            rhs[1]=resid[2*(nx+1)+nx-1];
             for(Index sy=3; sy<ny-2; sy++)  
             {
                 ndiagL2[sy-3]=operatorLB[SE];
@@ -686,20 +637,17 @@ void LineJAC::yline(
                 diagR[sy-1]=operatorLB[C];
                 ndiagR1[sy-1]=operatorLB[N];                  
                 ndiagR2[sy-1]=operatorLB[NE];
-                rhs[sy-1]=resid[sy*(nx+1)+nx-1];
             }
             ndiagL2[ny-5]=operatorLB[SE];
             ndiagL1[ny-4]=operatorLB[S];
             diagR[ny-3]=operatorLB[C];
             ndiagR1[ny-3]=operatorLB[N];
-            rhs[ny-3]=resid[(ny-2)*(nx+1)+nx-1];
             operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
             jXC=stencil.getJx(NE);
             jYC=stencil.getJy(NE);
             ndiagL2[ny-4]=operatorLC[NE];
             ndiagL1[ny-3]=operatorLC[S];
             diagR[ny-2]=operatorLC[C];
-            rhs[ny-2]=resid[(ny-1)*(nx+1)+nx-1];
             yLRSolver(
                 temp,
                 nx-1,nx,ny,
@@ -719,15 +667,14 @@ void LineJAC::yline(
             NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
             PositionArray jXC=stencil.getJx(SW);
             PositionArray jYC=stencil.getJy(SW);
+			rhs=resid;
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[N];
             ndiagR2[0]=operatorLC[NW];
-            rhs[0]=resid[nx+1+1];
             ndiagL1[0]=operatorLB[S];
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[N];                    
             ndiagR2[1]=operatorLB[NW];
-            rhs[1]=resid[2*(nx+1)+1];
             for(Index sy=3; sy<ny-2; sy++)  
             {
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
@@ -736,21 +683,18 @@ void LineJAC::yline(
                 diagR[sy-1]=operatorLB[C];
                 ndiagR1[sy-1]=operatorLB[N];                  
                 ndiagR2[sy-1]=operatorLB[NW];
-                rhs[sy-1]=resid[sy*(nx+1)+1];
             }
             operatorLB=stencil.getL(W,1,ny-2,nx,ny);
             ndiagL2[ny-5]=operatorLB[SE];
             ndiagL1[ny-4]=operatorLB[S];
             diagR[ny-3]=operatorLB[C];
             ndiagR1[ny-3]=operatorLB[N];
-            rhs[ny-3]=resid[(ny-2)*(nx+1)+1];
             operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
             jXC=stencil.getJx(NW);
             jYC=stencil.getJy(NW);
             ndiagL2[ny-4]=operatorLC[NE];
             ndiagL1[ny-3]=operatorLC[S];
             diagR[ny-2]=operatorLC[C];
-            rhs[ny-2]=resid[(ny-1)*(nx+1)+1];
             yLRSolver(temp,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
 ////////////////////////////////////////////////////////////////////////////////
             // process all inner columns  
@@ -763,13 +707,11 @@ void LineJAC::yline(
                 diagR[0]=operatorLB[C];
                 ndiagR1[0]=operatorLB[N];
                 ndiagR2[0]=operatorLB[NE];
-                rhs[0]=resid[nx+1+sx];
                 operatorL=stencil.getL(C,sx,2,nx,ny);
                 ndiagL1[0]=operatorL[S];
                 diagR[1]=operatorL[C];
                 ndiagR1[1]=operatorL[N];                  
-                ndiagR2[1]=operatorL[NE];
-                rhs[1]=resid[2*(nx+1)+sx];  
+                ndiagR2[1]=operatorL[NE];  
                 for(Index sy=3; sy<ny-2; sy++)
                 {
                    operatorL=stencil.getL(C,sx,sy,nx,ny);
@@ -778,21 +720,18 @@ void LineJAC::yline(
                    diagR[sy-1]=operatorL[C];
                    ndiagR1[sy-1]=operatorL[N];
                    ndiagR2[sy-1]=operatorL[NE];
-                   rhs[sy-1]=resid[sy*(nx+1)+sx];
                 }       
                 operatorL=stencil.getL(C,sx,ny-2,nx,ny);
                 ndiagL2[nx-5]=operatorL[SW];
                 ndiagL1[nx-4]=operatorL[S];
                 diagR[nx-3]=operatorL[C];
                 ndiagR1[nx-3]=operatorL[N];
-                rhs[ny-3]=resid[(ny-2)*(nx+1)+sx];
                 operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
                 jXB=stencil.getJx(N);
                 jYB=stencil.getJy(N);
                 ndiagL2[nx-4]=operatorLB[SW];
                 ndiagL1[nx-3]=operatorLB[S];
                 diagR[nx-2]=operatorLB[C];
-                rhs[ny-2]=resid[(ny-1)*(nx+1)+sx];
                 yLRSolver(
                     temp,
                     sx,nx,ny,
@@ -804,7 +743,6 @@ void LineJAC::yline(
             operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
             jXC=stencil.getJx(SE);
             jYC=stencil.getJy(SE);
-            rhs[0]=resid[nx+1+nx-1];
             operatorLB=stencil.getL(E,nx-1,2,nx,ny);
             jXB=stencil.getJx(E);
             jYB=stencil.getJy(E);
@@ -812,7 +750,6 @@ void LineJAC::yline(
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[N];                    
             ndiagR2[1]=operatorLB[NE];
-            rhs[1]=resid[2*(nx+1)+nx-1];
             for(Index sy=3; sy<ny-2; sy++)  
             {
                 operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
@@ -821,21 +758,18 @@ void LineJAC::yline(
                 diagR[sy-1]=operatorLB[C];
                 ndiagR1[sy-1]=operatorLB[N];                  
                 ndiagR2[sy-1]=operatorLB[NE];
-                rhs[sy-1]=resid[sy*(nx+1)+nx-1];
             }
             operatorLB=stencil.getL(E,nx-1,ny-2,nx,ny);
             ndiagL2[ny-5]=operatorLB[SE];
             ndiagL1[ny-4]=operatorLB[S];
             diagR[ny-3]=operatorLB[C];
             ndiagR1[ny-3]=operatorLB[N];
-            rhs[ny-3]=resid[(ny-2)*(nx+1)+nx-1];
             operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
             jXC=stencil.getJx(NE);
             jYC=stencil.getJy(NE);
             ndiagL2[ny-4]=operatorLC[NE];
             ndiagL1[ny-3]=operatorLC[S];
             diagR[ny-2]=operatorLC[C];
-            rhs[ny-2]=resid[(ny-1)*(nx+1)+nx-1];
             yLRSolver(
                 temp,
                 nx-1,nx,ny,
