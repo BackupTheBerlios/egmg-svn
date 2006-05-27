@@ -153,162 +153,173 @@ const NumericArray& DendyInterpolation::getI(
     const Index ny,
     const Stencil& stencil) const
 {
-    PositionArray jx=stencil.getJx(C);
-    PositionArray jy=stencil.getJy(C);
-    std::valarray<Index> position((Index)0, 9);
-
-	for (Index j=0; j<jx.size(); ++j)
+	if (sx==0 || sx==nx || sy==0 || sy==ny)
 	{
-		if (jy[j] == 1)		// north
-		{
-			if (jx[j] == -1)
-				position[NW] = j;
-			else if (jx[j] == 0)
-				position[N] = j;
-			else if (jx[j] == 1)
-				position[NE] = j;
-		}
-		if (jy[j] == 0)		// center
-		{
-			if (jx[j] == -1)
-				position[W] = j;
-			else if (jx[j] == 0)
-				position[C] = j;
-			else if (jx[j] == 1)
-				position[E] = j;
-		}
-		if (jy[j] == -1)	// south
-		{
-			if (jx[j] == -1)
-				position[SW] = j;
-			else if (jx[j] == 0)
-				position[S] = j;
-			else if (jx[j] == 1)
-				position[SE] = j;
-		}
+		const Precision t[] = {
+            1.0,   1.0/2, 1.0/2,
+            1.0/2, 1.0/2, 1.0/4,
+            1.0/4, 1.0/4, 1.0/4};
+		t_ = NumericArray(t,9);
 	}
+	else
+	{
+		PositionArray jx=stencil.getJx(C);
+		PositionArray jy=stencil.getJy(C);
+		std::valarray<Index> position((Index)0, 9);
 
-    Precision scale=0;
-    Precision weight1=0;
-    Precision weight2=0;
-    Precision erg=0;
+		for (Index j=0; j<jx.size(); ++j)
+		{
+			if (jy[j] == 1)		// north
+			{
+				if (jx[j] == -1)
+					position[NW] = j;
+				else if (jx[j] == 0)
+					position[N] = j;
+				else if (jx[j] == 1)
+					position[NE] = j;
+			}
+			if (jy[j] == 0)		// center
+			{
+				if (jx[j] == -1)
+					position[W] = j;
+				else if (jx[j] == 0)
+					position[C] = j;
+				else if (jx[j] == 1)
+					position[E] = j;
+			}
+			if (jy[j] == -1)	// south
+			{
+				if (jx[j] == -1)
+					position[SW] = j;
+				else if (jx[j] == 0)
+					position[S] = j;
+				else if (jx[j] == 1)
+					position[SE] = j;
+			}
+		}
 
-    // C
-    t_[0]=1.0;
+		Precision scale=0;
+		Precision weight1=0;
+		Precision weight2=0;
+		Precision erg=0;
 
-    // W
-    NumericArray stencilL=stencil.getL(C,sx-1,sy,nx,ny);
-    scale=-stencilL[0];
-    weight2=0;
-    if (position[S]!=0)
-        scale-=stencilL[position[S]];
-    if (position[N]!=0)
-        scale-=stencilL[position[N]];
-    if (position[E]!=0)
-        weight2+=stencilL[position[E]];
-    if (position[SE]!=0)
-        weight2+=stencilL[position[SE]];
-    if (position[NE]!=0)
-        weight2+=stencilL[position[NE]];
-    t_[1]=weight2/scale; 
+		// C
+		t_[0]=1.0;
 
-    // N
-    stencilL=stencil.getL(C,sx,sy+1,nx,ny);
-    scale=-stencilL[0];
-    weight1=0;
-    if (position[W]!=0)
-        scale-=stencilL[position[W]];
-    if (position[E]!=0)
-        scale-=stencilL[position[E]];
-    if (position[S]!=0)
-        weight1+=stencilL[position[S]];
-    if (position[SW]!=0)
-        weight1+=stencilL[position[SW]];
-    if (position[SE]!=0)
-        weight1+=stencilL[position[SE]];
-    t_[2]=weight1/scale;
+		// W
+		NumericArray stencilL=stencil.getL(C,sx-1,sy,nx,ny);
+		scale=-stencilL[0];
+		weight2=0;
+		if (position[S]!=0)
+			scale-=stencilL[position[S]];
+		if (position[N]!=0)
+			scale-=stencilL[position[N]];
+		if (position[E]!=0)
+			weight2+=stencilL[position[E]];
+		if (position[SE]!=0)
+			weight2+=stencilL[position[SE]];
+		if (position[NE]!=0)
+			weight2+=stencilL[position[NE]];
+		t_[1]=weight2/scale; 
 
-    // E
-    stencilL=stencil.getL(C,sx+1,sy,nx,ny);
-    scale=-stencilL[0];
-    weight1=0;
-    if (position[S]!=0)
-        scale-=stencilL[position[S]];
-    if (position[N]!=0)
-        scale-=stencilL[position[N]];
-    if (position[W]!=0)
-        weight1+=stencilL[position[W]];
-    if (position[SW]!=0)
-        weight1+=stencilL[position[SW]];
-    if (position[NW]!=0)
-        weight1+=stencilL[position[NW]];
-    t_[3]=weight1/scale;      
+		// N
+		stencilL=stencil.getL(C,sx,sy+1,nx,ny);
+		scale=-stencilL[0];
+		weight1=0;
+		if (position[W]!=0)
+			scale-=stencilL[position[W]];
+		if (position[E]!=0)
+			scale-=stencilL[position[E]];
+		if (position[S]!=0)
+			weight1+=stencilL[position[S]];
+		if (position[SW]!=0)
+			weight1+=stencilL[position[SW]];
+		if (position[SE]!=0)
+			weight1+=stencilL[position[SE]];
+		t_[2]=weight1/scale;
 
-    // S
-    stencilL=stencil.getL(C,sx,sy-1,nx,ny);
-    scale=-stencilL[0];
-    weight2=0;
-    if (position[W]!=0)
-        scale-=stencilL[position[W]];
-    if (position[E]!=0)
-        scale-=stencilL[position[E]];
-    if (position[N]!=0)
-        weight2+=stencilL[position[N]];
-    if (position[NW]!=0)
-        weight2+=stencilL[position[NW]];
-    if (position[NE]!=0)
-        weight2+=stencilL[position[NE]];
-    t_[4]=weight2/scale;
+		// E
+		stencilL=stencil.getL(C,sx+1,sy,nx,ny);
+		scale=-stencilL[0];
+		weight1=0;
+		if (position[S]!=0)
+			scale-=stencilL[position[S]];
+		if (position[N]!=0)
+			scale-=stencilL[position[N]];
+		if (position[W]!=0)
+			weight1+=stencilL[position[W]];
+		if (position[SW]!=0)
+			weight1+=stencilL[position[SW]];
+		if (position[NW]!=0)
+			weight1+=stencilL[position[NW]];
+		t_[3]=weight1/scale;      
 
-    // NW
-    stencilL=stencil.getL(C,sx-1,sy+1,nx,ny);
-    scale=-stencilL[0];
-    erg=0;
-    if (position[E]!=0)
-        erg+=stencilL[position[E]]*t_[2];
-    if (position[S]!=0)
-        erg+=stencilL[position[S]]*t_[1];
-    if (position[SE]!=0)
-        erg+=stencilL[position[SE]];
-    t_[5]=erg/scale;
+		// S
+		stencilL=stencil.getL(C,sx,sy-1,nx,ny);
+		scale=-stencilL[0];
+		weight2=0;
+		if (position[W]!=0)
+			scale-=stencilL[position[W]];
+		if (position[E]!=0)
+			scale-=stencilL[position[E]];
+		if (position[N]!=0)
+			weight2+=stencilL[position[N]];
+		if (position[NW]!=0)
+			weight2+=stencilL[position[NW]];
+		if (position[NE]!=0)
+			weight2+=stencilL[position[NE]];
+		t_[4]=weight2/scale;
 
-    // NE
-    stencilL=stencil.getL(C,sx+1,sy+1,nx,ny);
-    scale=-stencilL[0];
-    erg=0;
-    if (position[W]!=0)
-        erg+=stencilL[position[W]]*t_[2];
-    if (position[S]!=0)
-        erg+=stencilL[position[S]]*t_[3];
-    if (position[SW]!=0)
-        erg+=stencilL[position[SW]];
-    t_[6]=erg/scale;
+		// NW
+		stencilL=stencil.getL(C,sx-1,sy+1,nx,ny);
+		scale=-stencilL[0];
+		erg=0;
+		if (position[E]!=0)
+			erg+=stencilL[position[E]]*t_[2];
+		if (position[S]!=0)
+			erg+=stencilL[position[S]]*t_[1];
+		if (position[SE]!=0)
+			erg+=stencilL[position[SE]];
+		t_[5]=erg/scale;
 
-    // SE
-    stencilL=stencil.getL(C,sx+1,sy-1,nx,ny);
-    scale=-stencilL[0];
-    erg=0;
-    if (position[W]!=0)
-        erg+=stencilL[position[W]]*t_[4];
-    if (position[N]!=0)
-        erg+=stencilL[position[N]]*t_[3];
-    if (position[NW]!=0)
-        erg+=stencilL[position[NW]];
-    t_[7]=erg/scale;
+		// NE
+		stencilL=stencil.getL(C,sx+1,sy+1,nx,ny);
+		scale=-stencilL[0];
+		erg=0;
+		if (position[W]!=0)
+			erg+=stencilL[position[W]]*t_[2];
+		if (position[S]!=0)
+			erg+=stencilL[position[S]]*t_[3];
+		if (position[SW]!=0)
+			erg+=stencilL[position[SW]];
+		t_[6]=erg/scale;
 
-    // SW
-    stencilL=stencil.getL(C,sx-1,sy-1,nx,ny);
-    scale=-stencilL[0];
-    erg=0;
-    if (position[E]!=0)
-        erg+=stencilL[position[E]]*t_[4];
-    if (position[N]!=0)
-        erg+=stencilL[position[N]]*t_[1];
-    if (position[NE]!=0)
-        erg+=stencilL[position[NE]];
-    t_[8]=erg/scale;      
+		// SE
+		stencilL=stencil.getL(C,sx+1,sy-1,nx,ny);
+		scale=-stencilL[0];
+		erg=0;
+		if (position[W]!=0)
+			erg+=stencilL[position[W]]*t_[4];
+		if (position[N]!=0)
+			erg+=stencilL[position[N]]*t_[3];
+		if (position[NW]!=0)
+			erg+=stencilL[position[NW]];
+		t_[7]=erg/scale;
 
-    return t_;          
+		// SW
+		stencilL=stencil.getL(C,sx-1,sy-1,nx,ny);
+		scale=-stencilL[0];
+		erg=0;
+		if (position[E]!=0)
+			erg+=stencilL[position[E]]*t_[4];
+		if (position[N]!=0)
+			erg+=stencilL[position[N]]*t_[1];
+		if (position[NE]!=0)
+			erg+=stencilL[position[NE]];
+		t_[8]=erg/scale;      
+
+		return t_;          
+		}
 }
 
 }
