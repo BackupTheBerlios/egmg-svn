@@ -271,15 +271,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\functions\SPAIScalarProduct.h"
-					>
-				</File>
-				<File
 					RelativePath=".\src\functions\twonormResiduum.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\src\functions\twonormResiduum.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\functions\WHighJacScalarProduct.h"
 					>
 				</File>
 				<File
@@ -463,11 +463,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\Relaxation\SPAI.cpp"
+					RelativePath=".\src\Relaxation\WHighJac.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Relaxation\SPAI.h"
+					RelativePath=".\src\Relaxation\WHighJac.h"
 					>
 				</File>
 				<File
@@ -528,6 +528,14 @@
 				</File>
 				<File
 					RelativePath=".\src\Stencil\MSV2D4.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Stencil\PreCalculatedStencil.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Stencil\PreCalculatedStencil.h"
 					>
 				</File>
 				<File

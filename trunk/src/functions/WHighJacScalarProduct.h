@@ -9,7 +9,7 @@
 
 namespace mg
 {
-	const Precision halfPi = asin( 1 );
+	const Precision halfPi = asin( 1.0 );
 
 	inline Precision WHighJacScalarProduct
 		(const int i, const int j) 

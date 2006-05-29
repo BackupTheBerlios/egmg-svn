@@ -74,8 +74,9 @@ private:
 		const Stencil& stencil, const PositionArray& phiX, const PositionArray& phiY,
 		const int weightingSize, const Index px, const Index py, const Index nx,
 		const Index ny) const;
-
-    
+    //We don't want auto generated copy constructors and assignment operators
+	WHighJac( const WHighJac& );
+	WHighJac& operator=(const WHighJac&);
 public:
     /**
      * \brief The constructor of a WHighJac object
