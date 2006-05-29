@@ -19,6 +19,6 @@
 #include "expansion.h"
 #include "generatePositionArrays.h"
 #include "printStencil.h"
-#include "SPAIScalarProduct.h"
+#include "WHighJacScalarProduct.h"
 
 #endif /*FUNCTIONSINCLUDES_H_*/

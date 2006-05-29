@@ -8,7 +8,7 @@
 
 
 #include "Relaxation.h"
-#include "../functions/WHighJacScalarProduct.cpp"
+#include "../functions/WHighJacScalarProduct.h"
 
 namespace mg
 {
