@@ -153,15 +153,7 @@ const NumericArray& DendyInterpolation::getI(
     const Index ny,
     const Stencil& stencil) const
 {
-	if (sx==0 || sx==nx || sy==0 || sy==ny)
-	{
-		const Precision t[] = {
-            1.0,   1.0/2, 1.0/2,
-            1.0/2, 1.0/2, 1.0/4,
-            1.0/4, 1.0/4, 1.0/4};
-		t_ = NumericArray(t,9);
-	}
-	else
+	if ( ! (sx==0 || sx==nx || sy==0 || sy==ny) )
 	{
 		PositionArray jx=stencil.getJx(C);
 		PositionArray jy=stencil.getJy(C);
@@ -319,7 +311,13 @@ const NumericArray& DendyInterpolation::getI(
 		t_[8]=erg/scale;      
 
 		return t_;          
-		}
+    }
+    const Precision t[] = {
+            1.0,   1.0/2, 1.0/2,
+            1.0/2, 1.0/2, 1.0/4,
+            1.0/4, 1.0/4, 1.0/4};
+    t_ = NumericArray(t,9);
+    return t_;
 }
 
 }

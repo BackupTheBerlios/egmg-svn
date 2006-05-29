@@ -214,15 +214,7 @@ const NumericArray& DeZeeuwInterpolation::getI(
     const Index ny,
     const Stencil& stencil) const
 {
-	if (sx==0 || sx==nx || sy==0 || sy==ny)
-	{
-		const Precision t[] = {
-            1.0,   1.0/2, 1.0/2,
-            1.0/2, 1.0/2, 1.0/4,
-            1.0/4, 1.0/4, 1.0/4};
-		t_ = NumericArray(t,9);
-	}
-	else
+	if ( ! (sx==0 || sx==nx || sy==0 || sy==ny) )
 	{
 		NumericArray stencilL=stencil.getL(C,0,0,nx,ny);
 		PositionArray jx=stencil.getJx(C);
@@ -494,6 +486,12 @@ const NumericArray& DeZeeuwInterpolation::getI(
 
 		return t_;   
 	}
+    const Precision t[] = {
+    1.0,   1.0/2, 1.0/2,
+    1.0/2, 1.0/2, 1.0/4,
+    1.0/4, 1.0/4, 1.0/4};
+    t_ = NumericArray(t,9);
+    return t_;
 }
 
 }
