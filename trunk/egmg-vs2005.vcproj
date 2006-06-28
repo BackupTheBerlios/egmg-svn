@@ -164,10 +164,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\main.cpp.dist"
-				>
-			</File>
-			<File
 				RelativePath=".\src\Multigrid.Doxyfile"
 				>
 			</File>
@@ -355,6 +351,14 @@
 				Name="Restriction"
 				>
 				<File
+					RelativePath=".\src\Restriction\DendyRestriction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Restriction\DendyRestriction.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Restriction\FullWeighting.cpp"
 					>
 				</File>
@@ -420,6 +424,14 @@
 				</File>
 				<File
 					RelativePath=".\src\Relaxation\GSRedBlack.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Relaxation\ILULexicographic.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Relaxation\ILULexicographic.h"
 					>
 				</File>
 				<File
