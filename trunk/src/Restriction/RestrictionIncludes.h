@@ -10,5 +10,6 @@
 #include "Injection.h"
 #include "SevenPointRestriction.h"
 #include "TransposedProlongation.h"
+#include "DendyRestriction.h"
 
 #endif /*RESTRICTIONINCLUDES_H_*/
