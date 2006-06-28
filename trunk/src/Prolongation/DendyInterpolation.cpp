@@ -68,7 +68,7 @@ NumericArray DendyInterpolation::prolongate(
     for (Index sy=0; sy<=nyNew; sy+=2)
         for (Index sx=1; sx<=nxNew; sx+=2)
         {
-            stencilL=stencil.getL(C,sx,sy,nx,ny);
+            stencilL=stencil.getL(C,sx,sy,nxNew,nyNew);
             scale=-stencilL[0];
             weight1=0;
             weight2=0;
@@ -95,7 +95,7 @@ NumericArray DendyInterpolation::prolongate(
     for (Index sy=1; sy<=nyNew; sy+=2)
         for (Index sx=0; sx<=nxNew; sx+=2)
         {
-            stencilL=stencil.getL(C,sx,sy,nx,ny);
+            stencilL=stencil.getL(C,sx,sy,nxNew,nyNew);
             scale=-stencilL[0];
             weight1=0;
             weight2=0;
@@ -122,7 +122,7 @@ NumericArray DendyInterpolation::prolongate(
     for (Index sy=1; sy<=nyNew; sy+=2)
         for (Index sx=1; sx<=nxNew; sx+=2)
         {
-            stencilL=stencil.getL(C,sx,sy,nx,ny);
+            stencilL=stencil.getL(C,sx,sy,nxNew,nyNew);
             erg=0;
             scale=-stencilL[0];
             if (position[W]!=0)
@@ -310,6 +310,7 @@ const NumericArray& DendyInterpolation::getI(
 			erg+=stencilL[position[NE]];
 		t_[8]=erg/scale;      
 
+		}
 		return t_;          
     }
     const Precision t[] = {
