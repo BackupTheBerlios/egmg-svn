@@ -7,6 +7,8 @@
 
 
 #include "../general/parameters.h"
+#include <stdexcept>
+
 
 namespace mg
 {
@@ -19,6 +21,8 @@ class Restriction;
  */
 class Stencil
 {
+private:
+	mutable NumericArray l_;
 public:
     virtual ~Stencil() {}
     
@@ -144,6 +148,78 @@ public:
         const Index nx,
         const Index ny) const =0;
     
+    const NumericArray& getL_inSize(
+        const Position pos,
+        const Index sx,
+        const Index sy,
+        const Index nx,
+        const Index ny,
+		const int Size) const
+	{
+		if (Size==1)
+		{
+			l_.resize(9);
+			l_=NumericArray(0.0, 9);
+		}
+		else if (Size == 2)
+		{
+			l_.resize(25);
+			l_=NumericArray(0.0, 25);
+		}
+		else
+			throw std::domain_error("u");
+
+		NumericArray L = getL(pos,sx,sy,nx,ny);
+		PositionArray Jx = getJx(pos);
+		PositionArray Jy = getJy(pos);
+
+		for (Index i=0; i<L.size(); i++)
+		{
+			if(Jx[i] == -2 && Size > 1)
+			{
+				if     (Jy[i] == -2) l_[SSWW] = L[i];
+				else if(Jy[i] == -1) l_[SWW] = L[i];
+				else if(Jy[i] ==  0) l_[WW] = L[i];
+				else if(Jy[i] ==  1) l_[NWW] = L[i];
+				else if(Jy[i] ==  2) l_[NNWW] = L[i];
+			}
+			else if(Jx[i] == -1)
+			{
+				if     (Jy[i] == -2 && Size > 1) l_[SSW] = L[i];
+				else if(Jy[i] == -1) l_[SW] = L[i];
+				else if(Jy[i] ==  0) l_[W] = L[i];
+				else if(Jy[i] ==  1) l_[NW] = L[i];
+				else if(Jy[i] ==  2 && Size > 1) l_[NNW] = L[i];
+			}
+			else if(Jx[i] == 0)
+			{
+				if     (Jy[i] == -2 && Size > 1) l_[SS] = L[i];
+				else if(Jy[i] == -1) l_[S] = L[i];
+				else if(Jy[i] ==  0) l_[C] = L[i];
+				else if(Jy[i] ==  1) l_[N] = L[i];
+				else if(Jy[i] ==  2 && Size > 1) l_[NN] = L[i];
+			}
+			else if(Jx[i] == 1)
+			{
+				if     (Jy[i] == -2 && Size > 1) l_[SSE] = L[i];
+				else if(Jy[i] == -1) l_[SE] = L[i];
+				else if(Jy[i] ==  0) l_[E] = L[i];
+				else if(Jy[i] ==  1) l_[NE] = L[i];
+				else if(Jy[i] ==  2 && Size > 1) l_[NNE] = L[i];
+			}
+			else if(Jx[i] == 2 && Size > 1)
+			{
+				if     (Jy[i] == -2) l_[SSEE] = L[i];
+				else if(Jy[i] == -1) l_[SEE] = L[i];
+				else if(Jy[i] ==  0) l_[EE] = L[i];
+				else if(Jy[i] ==  1) l_[NEE] = L[i];
+				else if(Jy[i] ==  2) l_[NNEE] = L[i];
+			}
+		}
+
+		return l_;
+	}
+
     /**
      * \brief returns the coordinate vector in x dir. for the coefficient vector
      * \see getL    for a more detailed description
