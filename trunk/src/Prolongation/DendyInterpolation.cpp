@@ -310,7 +310,6 @@ const NumericArray& DendyInterpolation::getI(
 			erg+=stencilL[position[NE]];
 		t_[8]=erg/scale;      
 
-		}
 		return t_;          
     }
     const Precision t[] = {
