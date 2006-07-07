@@ -6,6 +6,7 @@
 #define PARAMETERS_H_
 
 #include <valarray>
+#include <cassert>
 
 /**
  * \brief the namespace mg is for everything in this library

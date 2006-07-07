@@ -274,19 +274,27 @@ public:
             lCorner_[2]=lCorner_[4]=-1.0*ay_*ny*ny;
             lCorner_[5]=lCorner_[6]=0.0;
             return lCorner_;
+        default:
+            //assert( true );
+            return lCenter_; //never reached
         }
-        return lCenter_; //never reached
     }
 
-    inline const PositionArray& getJx(const Position position) const
+    inline const PositionArray& getJx(
+		const Position pos,
+		const Index,
+		const Index ) const
     {
-        return jx_[position];
+        return jx_[pos];
 
     }
 
-    inline const PositionArray& getJy(const Position position) const
+    inline const PositionArray& getJy(
+		const Position pos,
+		const Index,
+		const Index ) const
     {
-        return jy_[position];
+        return jy_[pos];
     }
 
     /**

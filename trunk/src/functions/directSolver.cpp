@@ -54,8 +54,8 @@ void pointFillMatrix(
     const Index nx,
     const Index ny)
 {
-    PositionArray jX=stencil.getJx(postion);
-    PositionArray jY=stencil.getJy(postion);
+    PositionArray jX=stencil.getJx(postion,nx,ny);
+    PositionArray jY=stencil.getJy(postion,nx,ny);
     NumericArray operatorL=stencil.getL(postion,sx,sy,nx,ny);
     for (Index i=0; i<operatorL.size(); ++i)
         matrix[(sy*(nx+1)+sx)*dimension+((sy+jY[i])*(nx+1)+sx+jX[i])]=operatorL[i];

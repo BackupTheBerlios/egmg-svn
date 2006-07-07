@@ -478,12 +478,18 @@ public:
         }
     }
 
-    inline const PositionArray& getJx(const Position pos) const
+    inline const PositionArray& getJx(
+		const Position pos,
+		const Index,
+		const Index ) const
     {
         return jx_[pos];
     }
 
-    inline const PositionArray& getJy(const Position pos) const
+    inline const PositionArray& getJy(
+		const Position pos,
+		const Index,
+		const Index ) const
     {
         return jy_[pos];
     }

@@ -18,8 +18,8 @@ NumericArray DendyInterpolation::prolongate(
     const Index nxNew=2*nx;
     const Index nyNew=2*ny;
     NumericArray result((nxNew+1)*(nyNew+1));
-    PositionArray jx=stencil.getJx(C);
-    PositionArray jy=stencil.getJy(C);
+    PositionArray jx=stencil.getJx(C,nx,ny);
+    PositionArray jy=stencil.getJy(C,nx,ny);
     NumericArray stencilL=NumericArray();
     std::valarray<Index> position((Index)0, 9);
 
@@ -153,10 +153,10 @@ const NumericArray& DendyInterpolation::getI(
     const Index ny,
     const Stencil& stencil) const
 {
-	if ( ! (sx==0 || sx==nx || sy==0 || sy==ny) )
+	if ( ! ( ( sx <= 1 ) || sx >= ( nx - 1 )  || ( sy <= 1 ) || ( sy >= ( ny - 1) ) ) )
 	{
-		PositionArray jx=stencil.getJx(C);
-		PositionArray jy=stencil.getJy(C);
+		PositionArray jx=stencil.getJx(C,nx,ny);
+		PositionArray jy=stencil.getJy(C,nx,ny);
 		std::valarray<Index> position((Index)0, 9);
 
 		for (Index j=0; j<jx.size(); ++j)

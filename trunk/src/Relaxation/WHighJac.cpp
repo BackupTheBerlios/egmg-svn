@@ -29,8 +29,8 @@ void WHighJac::choleskySolve(NumericArray& W, const NumericArray& phiTable,
 	NumericArray V(0.0,weightingSize);
 
 	NumericArray operatorL=stencil.getL(C,px,py,nx,ny);
-    PositionArray jX=stencil.getJx(C);
-    PositionArray jY=stencil.getJy(C);
+    PositionArray jX=stencil.getJx(C,nx,ny);
+    PositionArray jY=stencil.getJy(C,nx,ny);
 
 	// create right side
 	for(int i=0; i<weightingSize; i++)

@@ -4,6 +4,8 @@
  */
 
 #include <stack>
+#include <algorithm>
+#include <cmath>
 
 #include "Galerkin.h"
 #include "../functions/expansion.h"
@@ -12,124 +14,6 @@
 namespace mg
 {
     
-Precision Galerkin::apply(
-  const NumericArray& u,
-    const Position position,
-    const Index sx,
-    const Index sy,
-    const Index nx,
-    const Index ny) const
-{
-    Precision result=0;
-    NumericArray operatorL=getL(position,sx,sy,nx,ny);
-    PositionArray jX=getJx(position);
-    PositionArray jY=getJy(position);
-    for (Index i=0; i<operatorL.size(); ++i)
-        result+=operatorL[i]*u[(sy+jY[i])*(nx+1)+sx+jX[i]];
-    return result;
-}
-
-void Galerkin::update( const Index nx, const Index ny )
-{
-    //check if we have already calculated this level
-    if ( data_.find( currentDepth_ + 1, C ) )
-    {
-        currentDepth_ = prolongations_.size();
-        return;
-    }
-    PositionArray jX;
-    PositionArray jY;
-    NumericArray operatorL;
-    //C
-    for ( Index sx = 1; sx <nx; ++sx )
-    {
-        for ( Index sy = 1; sy <ny; ++sy )
-        {
-
-            computeGalerkin(
-                operatorL,jX,jY,
-                C,sx,sy,nx,ny,
-                *restrictions_.front(),*this,*prolongations_.front());
-            if ( sx == nx/2 && sy == ny/2 )
-                data_.insert( currentDepth_+1, C, jX, jY );
-            data_.insert( currentDepth_+1, C, sx, sy, nx, ny, operatorL );
-        }
-    }
-    //W
-    for ( Index sy = 1; sy < ny; ++sy )
-    {
-        computeGalerkin(
-            operatorL,jX,jY,
-            W,1,sy,nx,ny,
-            *restrictions_.front(),*this,*prolongations_.front());
-        if ( sy == ny/2 )
-            data_.insert( currentDepth_+1, W, jX, jY );
-        data_.insert( currentDepth_+1, W, 1, sy, nx, ny, operatorL );
-    }
-    //N
-    for ( Index sx = 1; sx < nx; ++sx )
-    {
-        computeGalerkin(
-            operatorL,jX,jY,
-            N,sx,ny-1,nx,ny,
-            *restrictions_.front(),*this,*prolongations_.front());
-        if ( sx == nx/2 )
-            data_.insert( currentDepth_+1, N, jX, jY );
-        data_.insert( currentDepth_+1, N, sx, ny-1, nx, ny, operatorL );
-    }
-    //E
-    for ( Index sy = 1; sy < ny; ++sy )
-    {
-        computeGalerkin(
-            operatorL,jX,jY,
-            E,nx-1,sy,nx,ny,
-            *restrictions_.front(),*this,*prolongations_.front());
-        if ( sy == ny/2 )
-            data_.insert( currentDepth_+1, E, jX, jY );
-        data_.insert( currentDepth_+1, E, nx-1, sy, nx, ny, operatorL );
-    }
-    //S
-    for ( Index sx = 1; sx < nx; ++sx )
-    {
-        computeGalerkin(
-            operatorL,jX,jY,
-            S,sx,1,nx,ny,
-            *restrictions_.front(),*this,*prolongations_.front());
-        if ( sx == nx/2 )
-            data_.insert( currentDepth_+1, S, jX, jY );
-        data_.insert( currentDepth_+1, S, sx, 1, nx, ny, operatorL );
-    }
-    //NW
-    computeGalerkin(
-        operatorL,jX,jY,
-        NW,1,ny-1,nx,ny,
-        *restrictions_.front(),*this,*prolongations_.front());
-    data_.insert( currentDepth_+1, NW, jX, jY );
-    data_.insert( currentDepth_+1, NW, 1, ny-1, nx, ny, operatorL );
-    //NE
-    computeGalerkin(
-        operatorL,jX,jY,
-        NE,nx-1,ny-1,nx,ny,
-        *restrictions_.front(),*this,*prolongations_.front());
-    data_.insert( currentDepth_+1, NE, jX, jY );
-    data_.insert( currentDepth_+1, NE, nx-1, ny-1, nx, ny, operatorL );
-    //SE
-    computeGalerkin(
-        operatorL,jX,jY,
-        SE,nx-1,1,nx,ny,
-        *restrictions_.front(),*this,*prolongations_.front());
-    data_.insert( currentDepth_+1, SE, jX, jY );
-    data_.insert( currentDepth_+1, SE, nx-1, 1, nx, ny, operatorL );
-    //SW
-    computeGalerkin(
-        operatorL,jX,jY,
-        SW,1,1,nx,ny,
-        *restrictions_.front(),*this,*prolongations_.front());
-    data_.insert( currentDepth_+1, SW, jX, jY );
-    data_.insert( currentDepth_+1, SW, 1, 1, nx, ny, operatorL );
-    currentDepth_ = prolongations_.size();
-}
-
 namespace
 {
 
@@ -260,17 +144,17 @@ void restritionTimesStencil(
 {
     const PositionArray restrictionJx = restriction.getJx( C );
     const PositionArray restriciionJy = restriction.getJy( C );
-    const NumericArray restrictionI = restriction.getI( C,sx,sy,nx,ny,stencil );
+    const NumericArray restrictionI = restriction.getI( C, 2 * sx, 2 * sy, 2 * nx, 2 * ny,stencil );
     for ( Index i=0; i<restrictionI.size(); ++i )
     {
         const Position newPos = getNewPos(
             pos, restrictionJx[i], restriciionJy[i] );
-        PositionArray stencilJx = stencil.getJx( newPos );
-        PositionArray stencilJy = stencil.getJy( newPos );
+        PositionArray stencilJx = stencil.getJx( newPos, 2 * nx, 2 * ny );
+        PositionArray stencilJy = stencil.getJy( newPos, 2 * nx, 2 * ny );
         NumericArray stencilL = stencil.getL(
             newPos,
-            sx+restrictionJx[i],
-            sy+restriciionJy[i],
+            2 * sx+restrictionJx[i],
+            2 * sy+restriciionJy[i],
             2*nx, 2*ny);
 
         stencilJx+=restrictionJx[i];
@@ -310,7 +194,7 @@ void prolongateStencil(
         const PositionArray prolongJx = prolongation.getJx( newPos );
         const PositionArray prolongJy = prolongation.getJy( newPos );
         const NumericArray prolongI = prolongation.getI( 
-            newPos,sx+resultJx[i],sy+resultJy[i],2*nx,2*ny,stencil );
+            newPos,2*sx+resultJx[i],2*sy+resultJy[i],2 * nx,2 * ny,stencil );
         if ( resultJx[i]%2 == 0 ) //fine grid point on x-coars grid line
         {
             for ( Index j=0; j<prolongI.size(); ++j )
@@ -373,6 +257,7 @@ void prolongateStencil(
         }
     }
 }
+
 void shrinkStencil(
     NumericArray& resultL,
     PositionArray& resultJx,
@@ -424,8 +309,6 @@ void shrinkStencil(
     }
 }
 
-}
-
 void computeGalerkin(
     NumericArray& resultL,
     PositionArray& resultJx,
@@ -458,6 +341,126 @@ void computeGalerkin(
         resultL,resultJx,resultJy,
         interResultL,interResultJx,interResultJy,
         pos,2,1);
+}
+
+}
+
+Galerkin::Galerkin( const Stencil& fineGridOperator )
+    : PreCalculatedStencil( fineGridOperator ),
+      prolongations_(0),
+      restrictions_(0) {}
+
+Galerkin::~Galerkin() {}
+
+void Galerkin::update()
+{
+    prolongations_.pop_back();
+    restrictions_.pop_back();
+}
+
+void Galerkin::update(
+    const Restriction& restriction,
+    const Prolongation& prolongation,
+    const Index nx,
+    const Index ny )
+{
+    prolongations_.push_back(&prolongation);
+    restrictions_.push_back(&restriction);
+    //check if we have already calculated this level
+    if ( data_.contains( currentDepth_, C, 1, 1 ) )
+    {
+        return;
+    }
+    PositionArray jX;
+    PositionArray jY;
+    NumericArray operatorL;
+    //C
+    for ( Index sx = 1; sx < nx; ++sx )
+    {
+        for ( Index sy = 1; sy < ny; ++sy )
+        {
+            computeGalerkin(
+                operatorL,jX,jY,
+                C,sx,sy,nx,ny,
+                *restrictions_.front(),*this,*prolongations_.front());
+            if ( sx == nx/2 && sy == ny/2 )
+                data_.insert( currentDepth_, C, jX, jY );
+            data_.insert( currentDepth_, C, sx, sy, operatorL );
+        }
+    }
+    //W
+    for ( Index sy = 1; sy < ny; ++sy )
+    {
+        computeGalerkin(
+            operatorL,jX,jY,
+            W,1,sy,nx,ny,
+            *restrictions_.front(),*this,*prolongations_.front());
+        if ( sy == ny/2 )
+            data_.insert( currentDepth_, W, jX, jY );
+        data_.insert( currentDepth_, W, 1, sy, operatorL );
+    }
+    //N
+    for ( Index sx = 1; sx < nx; ++sx )
+    {
+        computeGalerkin(
+            operatorL,jX,jY,
+            N,sx,ny-1,nx,ny,
+            *restrictions_.front(),*this,*prolongations_.front());
+        if ( sx == nx/2 )
+            data_.insert( currentDepth_, N, jX, jY );
+        data_.insert( currentDepth_, N, sx, ny-1, operatorL );
+    }
+    //E
+    for ( Index sy = 1; sy < ny; ++sy )
+    {
+        computeGalerkin(
+            operatorL,jX,jY,
+            E,nx-1,sy,nx,ny,
+            *restrictions_.front(),*this,*prolongations_.front());
+        if ( sy == ny/2 )
+            data_.insert( currentDepth_, E, jX, jY );
+        data_.insert( currentDepth_, E, nx-1, sy, operatorL );
+    }
+    //S
+    for ( Index sx = 1; sx < nx; ++sx )
+    {
+        computeGalerkin(
+            operatorL,jX,jY,
+            S,sx,1,nx,ny,
+            *restrictions_.front(),*this,*prolongations_.front());
+        if ( sx == nx/2 )
+            data_.insert( currentDepth_, S, jX, jY );
+        data_.insert( currentDepth_, S, sx, 1, operatorL );
+    }
+    //NW
+    computeGalerkin(
+        operatorL,jX,jY,
+        NW,1,ny-1,nx,ny,
+        *restrictions_.front(),*this,*prolongations_.front());
+    data_.insert( currentDepth_, NW, jX, jY );
+    data_.insert( currentDepth_, NW, 1, ny-1, operatorL );
+    //NE
+    computeGalerkin(
+        operatorL,jX,jY,
+        NE,nx-1,ny-1,nx,ny,
+        *restrictions_.front(),*this,*prolongations_.front());
+    data_.insert( currentDepth_, NE, jX, jY );
+    data_.insert( currentDepth_, NE, nx-1, ny-1, operatorL );
+    //SE
+    computeGalerkin(
+        operatorL,jX,jY,
+        SE,nx-1,1,nx,ny,
+        *restrictions_.front(),*this,*prolongations_.front());
+    data_.insert( currentDepth_, SE, jX, jY );
+    data_.insert( currentDepth_, SE, nx-1, 1, operatorL );
+    //SW
+    computeGalerkin(
+        operatorL,jX,jY,
+        SW,1,1,nx,ny,
+        *restrictions_.front(),*this,*prolongations_.front());
+    data_.insert( currentDepth_, SW, jX, jY );
+    data_.insert( currentDepth_, SW, 1, 1, operatorL );
+    currentDepth_ = prolongations_.size();
 }
 
 }

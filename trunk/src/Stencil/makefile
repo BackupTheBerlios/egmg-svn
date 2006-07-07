@@ -1,8 +1,9 @@
-Objects = Galerkin.o StencilBoard.o 
+Objects = PreCalculatedStencil.o Galerkin.o StencilBoard.o 
 	
-Laplacian2D2.h Laplacian2D4.h Helmholtz2D2.h Biharmonic2D2.h ConDiff2D1.h ConDiff2Dkap.h ConvectionDiffusion2D1.h MSV2D4.h Galerkin.h: Stencil.h ../Prolongation/Prolongation.h ../Restriction/Restriction.h
+Laplacian2D2.h Laplacian2D4.h Helmholtz2D2.h Biharmonic2D2.h ConDiff2D1.h ConDiff2Dkap.h ConvectionDiffusion2D1.h MSV2D4.h PreCalculatedStencil.h: Stencil.h ../Prolongation/Prolongation.h ../Restriction/Restriction.h
 StencilBoard.h Stencil.h: ../general/parameters.h
-Galerkin.h: StencilBoard.h ../Prolongation/Prolongation.h ../Restriction/Restriction.h
+PreCalculatedStencil.h: StencilBoard.h
+Galerkin.h: PreCalculatedStencil.h
 Galerkin.cpp: ../functions/expansion.h ../functions/generatePositionArrays.h
 
 %.o: %.h %.cpp

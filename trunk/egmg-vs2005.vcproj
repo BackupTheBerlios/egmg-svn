@@ -427,14 +427,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\Relaxation\ILULexicographic.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Relaxation\ILULexicographic.h"
-					>
-				</File>
-				<File
 					RelativePath=".\src\Relaxation\Jacobi.cpp"
 					>
 				</File>

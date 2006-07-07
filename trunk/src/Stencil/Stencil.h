@@ -170,8 +170,8 @@ public:
 			throw std::domain_error("u");
 
 		NumericArray L = getL(pos,sx,sy,nx,ny);
-		PositionArray Jx = getJx(pos);
-		PositionArray Jy = getJy(pos);
+		PositionArray Jx = getJx(pos,nx,ny);
+		PositionArray Jy = getJy(pos,nx,ny);
 
 		for (Index i=0; i<L.size(); i++)
 		{
@@ -225,18 +225,28 @@ public:
      * \see getL    for a more detailed description
      * 
      * \param[in] pos  the relative position to get the coordinates vector at
+     * \param[in] nx   number of points in x direction (stride)
+     * \param[in] ny   number of points in y direction
      * \return         the coordinates vector in x direction
      */
-    virtual const PositionArray& getJx(const Position pos) const =0;
+    virtual const PositionArray& getJx(
+        const Position pos,
+        const Index nx,
+        const Index ny ) const =0;
     
     /**
      * \brief returns the coordinate vector in y dir. for the coefficient vector
      * \see getL    for a more detailed description
      * 
-     * \param[in] pos   the relative position the get the coordinates vector at
+     * \param[in] pos  the relative position to get the coordinates vector at
+     * \param[in] nx   number of points in x direction (stride)
+     * \param[in] ny   number of points in y direction
      * \return          the coordinates vector in y direction
      */
-    virtual const PositionArray& getJy(const Position pos) const =0;
+    virtual const PositionArray& getJy(
+        const Position pos,
+        const Index nx,
+        const Index ny ) const =0;
     
     /**
      * \brief pushs new TransferOperators on the stack

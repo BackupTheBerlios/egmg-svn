@@ -25,6 +25,8 @@ inline Index expansion(
     const PositionArray& jX,
     const PositionArray& jY)
 {
+	assert( jX.size() > 0 );
+	assert( jY.size() > 0 );
     const Index expansionJx1 = static_cast<Index>(std::abs(jX.max()));
     const Index expansionJx2 = static_cast<Index>(std::abs(jX.min()));
     const Index expansionJy1 = static_cast<Index>(std::abs(jY.max()));

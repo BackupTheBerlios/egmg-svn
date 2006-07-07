@@ -21,8 +21,8 @@ NumericArray DeZeeuwInterpolation::prolongate(
     register const Index nxNew=2*nx;
     register const Index nyNew=2*ny;
     NumericArray result((nxNew+1)*(nyNew+1));
-    PositionArray jx=stencil.getJx(C);
-    PositionArray jy=stencil.getJy(C);
+    PositionArray jx=stencil.getJx(C,nx,ny);
+    PositionArray jy=stencil.getJy(C,nx,ny);
     NumericArray stencilL=stencil.getL(C,0,0,nx,ny);
     std::valarray<Index> position((Index)0, 9);
     NumericArray ms(9);
@@ -214,11 +214,10 @@ const NumericArray& DeZeeuwInterpolation::getI(
     const Index ny,
     const Stencil& stencil) const
 {
-	if ( ! (sx==0 || sx==nx || sy==0 || sy==ny) )
+	if ( ! ( ( sx <= 1 ) || sx >= ( nx - 1 )  || ( sy <= 1 ) || ( sy >= ( ny - 1) ) ) )
 	{
-		NumericArray stencilL=stencil.getL(C,0,0,nx,ny);
-		PositionArray jx=stencil.getJx(C);
-		PositionArray jy=stencil.getJy(C);
+		PositionArray jx=stencil.getJx(C,nx,ny);
+		PositionArray jy=stencil.getJy(C,nx,ny);
 		std::valarray<Index> position((Index)0, 9);
 		for (Index j=0; j<jx.size(); ++j)
 		{
@@ -275,7 +274,7 @@ const NumericArray& DeZeeuwInterpolation::getI(
 		t_[0]=1.0;
 
 		// W
-		stencilL=stencil.getL(C,sx-1,sy,nx,ny);
+		NumericArray stencilL=stencil.getL(C,sx-1,sy,nx,ny);
 		symsum=0;
 	    
 		// Divide the stencil defined by stencilL und position into a symmetric 

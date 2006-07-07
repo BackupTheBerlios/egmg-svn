@@ -75,6 +75,7 @@ public:
         const Stencil& stencil) const
 	{
 		Precision scale = 0;
+		i_.resize( prolongation_.getI(pos, sx, sy, nx, ny, stencil).size() );
 		i_ = prolongation_.getI(pos, sx, sy, nx, ny, stencil);
 		for (Index no = 0; no<i_.size(); no++)
 			scale += i_[no];
@@ -85,12 +86,14 @@ public:
     
 	const PositionArray& getJx( const Position pos ) const
 	{
+		jx_.resize( prolongation_.getJx(pos).size() );
 		jx_ = prolongation_.getJx(pos);
 		return jx_;	
 	}
     
 	const PositionArray& getJy( const Position pos ) const
 	{
+		jy_.resize( prolongation_.getJx(pos).size() );
 		jy_ = prolongation_.getJy(pos);
 		return jy_;
 	}

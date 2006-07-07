@@ -78,11 +78,12 @@ const NumericArray& DendyRestriction::getI(
     const Index ny,
     const Stencil& stencil) const
 {
-	if (sx==0 || sx==nx || sy==0 || sy==ny)
+	if ( ( sx <= 1 ) || sx >= ( nx - 1 )  || ( sy <= 1 ) || ( sy >= ( ny - 1) ) )
+	//if (sx==0 || sx==nx || sy==0 || sy==ny)
 	{
 		const Precision t[] = {
+            1.0, 0.0, 0.0,
             0.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
             0.0, 0.0, 0.0};
 		t_ = NumericArray(t,9);
 	}

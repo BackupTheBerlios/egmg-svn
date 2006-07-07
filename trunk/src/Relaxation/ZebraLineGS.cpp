@@ -79,8 +79,8 @@ void ZebraLineGS::ninepointxzebra(
     {
         // get const operator L
         const NumericArray operatorL = stencil.getL(C,2,2,nx,ny);
-        const PositionArray jX = stencil.getJx(C);
-        const PositionArray jY = stencil.getJy(C);
+        const PositionArray jX = stencil.getJx(C,nx,ny);
+        const PositionArray jY = stencil.getJy(C,nx,ny);
             
         // for each line: correction of the rhs given by 
         // rhs = fv - [L[n]  0  L[s]]^t * u and elimination of the 
@@ -167,8 +167,8 @@ void ZebraLineGS::ninepointxzebra(
         //Stencil ist not constant, so L needs to be evaluated in each grid
         //point no other change in the algorithm  
         NumericArray operatorL = stencil.getL(C,2,2,nx,ny);
-        PositionArray jX = stencil.getJx(C);
-        PositionArray jY = stencil.getJy(C);
+        PositionArray jX = stencil.getJx(C,nx,ny);
+        PositionArray jY = stencil.getJy(C,nx,ny);
         if(nx > 2)
         {
             operatorL=stencil.getL(SW,1,1,nx,ny);
@@ -358,8 +358,8 @@ void ZebraLineGS::ninepointyzebra(
     {
         // get const operator L
         const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
-        const PositionArray jX = stencil.getJx(C);
-        const PositionArray jY = stencil.getJy(C);
+        const PositionArray jX = stencil.getJx(C,nx,ny);
+        const PositionArray jY = stencil.getJy(C,nx,ny);
         // for each odd line correction of the rhs given by
         // rhs = fv + [1  0  1] * u and elimination of the 
         // boundary condition in first and last inner point  
@@ -442,8 +442,8 @@ void ZebraLineGS::ninepointyzebra(
         //Stencil ist not constant, so L needs to be evaluated in each grid
         //point no other change in the algorithm  
         NumericArray operatorL = stencil.getL(C,2,2,nx,ny);
-        PositionArray jX = stencil.getJx(C);
-        PositionArray jY = stencil.getJy(C);
+        PositionArray jX = stencil.getJx(C,nx,ny);
+        PositionArray jY = stencil.getJy(C,nx,ny);
         if(ny > 2)
         {
             operatorL=stencil.getL(SW,1,1,nx,ny);
@@ -633,14 +633,14 @@ void ZebraLineGS::xzebra(
         {
             // get const operator L
             const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
-            const PositionArray jX=stencil.getJx(C);
-            const PositionArray jY=stencil.getJy(C);
+            const PositionArray jX=stencil.getJx(C,nx,ny);
+            const PositionArray jY=stencil.getJy(C,nx,ny);
             NumericArray operatorLB=stencil.getL(S,2,1,nx,ny);
-            PositionArray jXB=stencil.getJx(S);
-            PositionArray jYB=stencil.getJy(S);        
+            PositionArray jXB=stencil.getJx(S,nx,ny);
+            PositionArray jYB=stencil.getJy(S,nx,ny);        
             NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
-            PositionArray jXC=stencil.getJx(SW);
-            PositionArray jYC=stencil.getJy(SW);
+            PositionArray jXC=stencil.getJx(SW,nx,ny);
+            PositionArray jYC=stencil.getJy(SW,nx,ny);
             // set right hand side for line 1                   
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[E];
@@ -697,8 +697,8 @@ void ZebraLineGS::xzebra(
                 rhs[nx-2+nx+1]-=operatorLB[i]*u[nx-2+jXB[i]+(1+jYB[i])*(nx+1)];
             }
             operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
-            jXC=stencil.getJx(SE);
-            jYC=stencil.getJy(SE);
+            jXC=stencil.getJx(SE,nx,ny);
+            jYC=stencil.getJy(SE,nx,ny);
             ndiagL2[nx-4]=operatorLC[NW];
             ndiagL1[nx-3]=operatorLC[W];
             diagR[nx-2]=operatorLC[C];
@@ -716,8 +716,8 @@ void ZebraLineGS::xzebra(
             for(Index sy=3; sy<ny-2; sy+=2)
             {                   
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
-                jXB=stencil.getJx(W);
-                jYB=stencil.getJy(W);
+                jXB=stencil.getJx(W,nx,ny);
+                jYB=stencil.getJy(W,nx,ny);
                 diagR[0]=operatorLB[C];
                 ndiagR1[0]=operatorLB[E];
                 ndiagR2[0]=operatorLB[NE];
@@ -780,8 +780,8 @@ void ZebraLineGS::xzebra(
                                    operatorL[i]*u[nx-2+jX[i]+(sy+jY[i])*(nx+1)];
                 }
                 operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
-                jXB=stencil.getJx(E);
-                jYB=stencil.getJy(E);
+                jXB=stencil.getJx(E,nx,ny);
+                jYB=stencil.getJy(E,nx,ny);
                 ndiagL2[nx-4]=operatorLB[NW];
                 ndiagL1[nx-3]=operatorLB[W];
                 diagR[nx-2]=operatorLB[C];
@@ -801,8 +801,8 @@ void ZebraLineGS::xzebra(
             //relax top line Zeile
             //set rhs in top line
             operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
-            jXC=stencil.getJx(NW);
-            jYC=stencil.getJy(NW);
+            jXC=stencil.getJx(NW,nx,ny);
+            jYC=stencil.getJy(NW,nx,ny);
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[E];
             ndiagR2[0]=operatorLC[NW];
@@ -817,8 +817,8 @@ void ZebraLineGS::xzebra(
                                 operatorLC[i]*u[1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
             }
             operatorLB=stencil.getL(N,2,ny-1,nx,ny);
-            jXB=stencil.getJx(N);
-            jYB=stencil.getJy(N);
+            jXB=stencil.getJx(N,nx,ny);
+            jYB=stencil.getJy(N,nx,ny);
             ndiagL1[0]=operatorLB[W];
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[E];                    
@@ -865,8 +865,8 @@ void ZebraLineGS::xzebra(
                             operatorLB[i]*u[nx-2+jXB[i]+(ny-1+jYB[i])*(nx+1)];
             }
             operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
-            jXC=stencil.getJx(NE);
-            jYC=stencil.getJy(NE);
+            jXC=stencil.getJx(NE,nx,ny);
+            jYC=stencil.getJy(NE,nx,ny);
             ndiagL2[nx-4]=operatorLC[NW];
             ndiagL1[nx-3]=operatorLC[W];
             diagR[nx-2]=operatorLC[C];
@@ -886,8 +886,8 @@ void ZebraLineGS::xzebra(
             {
                 // set rhs           
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
-                jXB=stencil.getJx(W);
-                jYB=stencil.getJy(W);
+                jXB=stencil.getJx(W,nx,ny);
+                jYB=stencil.getJy(W,nx,ny);
                 diagR[0]=operatorLB[C];
                 ndiagR1[0]=operatorLB[E];
                 ndiagR2[0]=operatorLB[NE];
@@ -950,8 +950,8 @@ void ZebraLineGS::xzebra(
                                 operatorL[i]*u[nx-2+jX[i]+(sy+jY[i])*(nx+1)];
                 }
                 operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
-                jXB=stencil.getJx(E);
-                jYB=stencil.getJy(E);
+                jXB=stencil.getJx(E,nx,ny);
+                jYB=stencil.getJy(E,nx,ny);
                 ndiagL2[nx-4]=operatorLB[NW];
                 ndiagL1[nx-3]=operatorLB[W];
                 diagR[nx-2]=operatorLB[C];
@@ -972,14 +972,14 @@ void ZebraLineGS::xzebra(
         else // stencil not constant
         {
             NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
-            PositionArray jX=stencil.getJx(C);
-            PositionArray jY=stencil.getJy(C);
+            PositionArray jX=stencil.getJx(C,nx,ny);
+            PositionArray jY=stencil.getJy(C,nx,ny);
             NumericArray operatorLB=stencil.getL(S,2,1,nx,ny);
-            PositionArray jXB=stencil.getJx(S);
-            PositionArray jYB=stencil.getJy(S);
+            PositionArray jXB=stencil.getJx(S,nx,ny);
+            PositionArray jYB=stencil.getJy(S,nx,ny);
             NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
-            PositionArray jXC=stencil.getJx(SW);
-            PositionArray jYC=stencil.getJy(SW);
+            PositionArray jXC=stencil.getJx(SW,nx,ny);
+            PositionArray jYC=stencil.getJy(SW,nx,ny);
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[E];
             ndiagR2[0]=operatorLC[NE];
@@ -993,8 +993,8 @@ void ZebraLineGS::xzebra(
                 rhs[1+nx+1]-=operatorLC[i]*u[1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
             operatorLB=stencil.getL(S,2,1,nx,ny);
-            jXB=stencil.getJx(S);
-            jYB=stencil.getJy(S);
+            jXB=stencil.getJx(S,nx,ny);
+            jYB=stencil.getJy(S,nx,ny);
             ndiagL1[0]=operatorLB[W];
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[E];                    
@@ -1040,8 +1040,8 @@ void ZebraLineGS::xzebra(
                 rhs[nx-2+nx+1]-=operatorLB[i]*u[nx-2+jXB[i]+(1+jYB[i])*(nx+1)];
             }
             operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
-            jXC=stencil.getJx(SE);
-            jYC=stencil.getJy(SE);
+            jXC=stencil.getJx(SE,nx,ny);
+            jYC=stencil.getJy(SE,nx,ny);
             ndiagL2[nx-4]=operatorLC[NW];
             ndiagL1[nx-3]=operatorLC[W];
             diagR[nx-2]=operatorLC[C];
@@ -1061,8 +1061,8 @@ void ZebraLineGS::xzebra(
             {
                 // set rhs                   
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
-                jXB=stencil.getJx(W);
-                jYB=stencil.getJy(W);
+                jXB=stencil.getJx(W,nx,ny);
+                jYB=stencil.getJy(W,nx,ny);
                 diagR[0]=operatorLB[C];
                 ndiagR1[0]=operatorLB[E];
                 ndiagR2[0]=operatorLB[NE];
@@ -1128,8 +1128,8 @@ void ZebraLineGS::xzebra(
                                 operatorL[i]*u[nx-2+jX[i]+(sy+jY[i])*(nx+1)];
                 }
                 operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
-                jXB=stencil.getJx(E);
-                jYB=stencil.getJy(E);
+                jXB=stencil.getJx(E,nx,ny);
+                jYB=stencil.getJy(E,nx,ny);
                 ndiagL2[nx-4]=operatorLB[NW];
                 ndiagL1[nx-3]=operatorLB[W];
                 diagR[nx-2]=operatorLB[C];
@@ -1149,8 +1149,8 @@ void ZebraLineGS::xzebra(
             //relax top line
             // set rhs in top line                
             operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
-            jXC=stencil.getJx(NW);
-            jYC=stencil.getJy(NW);
+            jXC=stencil.getJx(NW,nx,ny);
+            jYC=stencil.getJy(NW,nx,ny);
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[E];
             ndiagR2[0]=operatorLC[NW];
@@ -1165,8 +1165,8 @@ void ZebraLineGS::xzebra(
                             operatorLC[i]*u[1+jXC[i]+(ny-1+jYC[i])*(nx+1)];
             }
             operatorLB=stencil.getL(N,2,ny-1,nx,ny);
-            jXB=stencil.getJx(N);
-            jYB=stencil.getJy(N);
+            jXB=stencil.getJx(N,nx,ny);
+            jYB=stencil.getJy(N,nx,ny);
             ndiagL1[0]=operatorLB[W];
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[E];                    
@@ -1215,8 +1215,8 @@ void ZebraLineGS::xzebra(
                             operatorLB[i]*u[nx-2+jXB[i]+(ny-1+jYB[i])*(nx+1)];
             }
             operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
-            jXC=stencil.getJx(NE);
-            jYC=stencil.getJy(NE);
+            jXC=stencil.getJx(NE,nx,ny);
+            jYC=stencil.getJy(NE,nx,ny);
             ndiagL2[nx-4]=operatorLC[NW];
             ndiagL1[nx-3]=operatorLC[W];
             diagR[nx-2]=operatorLC[C];
@@ -1236,8 +1236,8 @@ void ZebraLineGS::xzebra(
             {
                 // set rhs                   
                 operatorLB=stencil.getL(W,1,sy,nx,ny);
-                jXB=stencil.getJx(W);
-                jYB=stencil.getJy(W);
+                jXB=stencil.getJx(W,nx,ny);
+                jYB=stencil.getJy(W,nx,ny);
                 diagR[0]=operatorLB[C];
                 ndiagR1[0]=operatorLB[E];
                 ndiagR2[0]=operatorLB[NE];
@@ -1303,8 +1303,8 @@ void ZebraLineGS::xzebra(
                                 operatorL[i]*u[nx-2+jX[i]+(sy+jY[i])*(nx+1)];
                 }
                 operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
-                jXB=stencil.getJx(E);
-                jYB=stencil.getJy(E);
+                jXB=stencil.getJx(E,nx,ny);
+                jYB=stencil.getJy(E,nx,ny);
                 ndiagL2[nx-4]=operatorLB[NW];
                 ndiagL1[nx-3]=operatorLB[W];
                 diagR[nx-2]=operatorLB[C];
@@ -1350,14 +1350,14 @@ void ZebraLineGS::yzebra(
         {
             // get const operator L
             const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
-            const PositionArray jX=stencil.getJx(C);
-            const PositionArray jY=stencil.getJy(C);
+            const PositionArray jX=stencil.getJx(C,nx,ny);
+            const PositionArray jY=stencil.getJy(C,nx,ny);
             NumericArray operatorLB=stencil.getL(W,1,2,nx,ny);
-            PositionArray jXB=stencil.getJx(W);
-            PositionArray jYB=stencil.getJy(W);
+            PositionArray jXB=stencil.getJx(W,nx,ny);
+            PositionArray jYB=stencil.getJy(W,nx,ny);
             NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
-            PositionArray jXC=stencil.getJx(SW);
-            PositionArray jYC=stencil.getJy(SW);
+            PositionArray jXC=stencil.getJx(SW,nx,ny);
+            PositionArray jYC=stencil.getJy(SW,nx,ny);
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[N];
             ndiagR2[0]=operatorLC[NW];
@@ -1371,8 +1371,8 @@ void ZebraLineGS::yzebra(
                 rhs[1+nx+1]-=operatorLC[i]*u[1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
             operatorLB=stencil.getL(W,1,2,nx,ny);
-            jXB=stencil.getJx(W);
-            jYB=stencil.getJy(W);
+            jXB=stencil.getJx(W,nx,ny);
+            jYB=stencil.getJy(W,nx,ny);
             ndiagL1[0]=operatorLB[S];
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[N];                    
@@ -1418,8 +1418,8 @@ void ZebraLineGS::yzebra(
                                 operatorLB[i]*u[1+jXB[i]+(ny-2+jYB[i])*(nx+1)];
             }
             operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
-            jXC=stencil.getJx(NW);
-            jYC=stencil.getJy(NW);
+            jXC=stencil.getJx(NW,nx,ny);
+            jYC=stencil.getJy(NW,nx,ny);
             ndiagL2[ny-4]=operatorLC[NE];
             ndiagL1[ny-3]=operatorLC[S];
             diagR[ny-2]=operatorLC[C];
@@ -1440,8 +1440,8 @@ void ZebraLineGS::yzebra(
             {
                 // set rhs
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
-                jXB=stencil.getJx(S);
-                jYB=stencil.getJy(S);
+                jXB=stencil.getJx(S,nx,ny);
+                jYB=stencil.getJy(S,nx,ny);
                 diagR[0]=operatorLB[C];
                 ndiagR1[0]=operatorLB[N];
                 ndiagR2[0]=operatorLB[NE];
@@ -1505,8 +1505,8 @@ void ZebraLineGS::yzebra(
                                operatorL[i]*u[sx+jX[i]+(ny-2+jY[i])*(nx+1)];
                 }
                 operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
-                jXB=stencil.getJx(N);
-                jYB=stencil.getJy(N);
+                jXB=stencil.getJx(N,nx,ny);
+                jYB=stencil.getJy(N,nx,ny);
                 ndiagL2[nx-4]=operatorLB[SW];
                 ndiagL1[nx-3]=operatorLB[S];
                 diagR[nx-2]=operatorLB[C];
@@ -1525,8 +1525,8 @@ void ZebraLineGS::yzebra(
             }
 ////////////////last column//////////////////
             operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
-            jXC=stencil.getJx(SE);
-            jYC=stencil.getJy(SE);
+            jXC=stencil.getJx(SE,nx,ny);
+            jYC=stencil.getJy(SE,nx,ny);
             rhs[nx-1+nx+1]=f[nx-1+nx+1]
                 -operatorLC[S]*u[nx-1+(1+jYC[S])*(nx+1)]
                 -operatorLC[W]*u[nx-2+nx+1]
@@ -1538,8 +1538,8 @@ void ZebraLineGS::yzebra(
                             operatorLC[i]*u[nx-1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
             operatorLB=stencil.getL(E,nx-1,2,nx,ny);
-            jXB=stencil.getJx(E);
-            jYB=stencil.getJy(E);
+            jXB=stencil.getJx(E,nx,ny);
+            jYB=stencil.getJy(E,nx,ny);
             ndiagL1[0]=operatorLB[S];
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[N];                    
@@ -1586,8 +1586,8 @@ void ZebraLineGS::yzebra(
                         operatorLB[i]*u[nx-1+jXB[i]+(ny-2+jYB[i])*(nx+1)];
             }
             operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
-            jXC=stencil.getJx(NE);
-            jYC=stencil.getJy(NE);
+            jXC=stencil.getJx(NE,nx,ny);
+            jYC=stencil.getJy(NE,nx,ny);
             ndiagL2[ny-4]=operatorLC[NE];
             ndiagL1[ny-3]=operatorLC[S];
             diagR[ny-2]=operatorLC[C];
@@ -1607,8 +1607,8 @@ void ZebraLineGS::yzebra(
             {
                 // set rhs
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
-                jXB=stencil.getJx(S);
-                jYB=stencil.getJy(S);
+                jXB=stencil.getJx(S,nx,ny);
+                jYB=stencil.getJy(S,nx,ny);
                 diagR[0]=operatorLB[C];
                 ndiagR1[0]=operatorLB[N];
                 ndiagR2[0]=operatorLB[NE];
@@ -1670,8 +1670,8 @@ void ZebraLineGS::yzebra(
                                 operatorL[i]*u[sx+jX[i]+(ny-2+jY[i])*(nx+1)];
                 }
                 operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
-                jXB=stencil.getJx(N);
-                jYB=stencil.getJy(N);
+                jXB=stencil.getJx(N,nx,ny);
+                jYB=stencil.getJy(N,nx,ny);
                 ndiagL2[nx-4]=operatorLB[SW];
                 ndiagL1[nx-3]=operatorLB[S];
                 diagR[nx-2]=operatorLB[C];
@@ -1692,14 +1692,14 @@ void ZebraLineGS::yzebra(
         else // stencil not constant
         {
             NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
-            PositionArray jX=stencil.getJx(C);
-            PositionArray jY=stencil.getJy(C);
+            PositionArray jX=stencil.getJx(C,nx,ny);
+            PositionArray jY=stencil.getJy(C,nx,ny);
             NumericArray operatorLB=stencil.getL(W,1,2,nx,ny);
-            PositionArray jXB=stencil.getJx(W);
-            PositionArray jYB=stencil.getJy(W);
+            PositionArray jXB=stencil.getJx(W,nx,ny);
+            PositionArray jYB=stencil.getJy(W,nx,ny);
             NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
-            PositionArray jXC=stencil.getJx(SW);
-            PositionArray jYC=stencil.getJy(SW);
+            PositionArray jXC=stencil.getJx(SW,nx,ny);
+            PositionArray jYC=stencil.getJy(SW,nx,ny);
             diagR[0]=operatorLC[C];
             ndiagR1[0]=operatorLC[N];
             ndiagR2[0]=operatorLC[NW];
@@ -1713,8 +1713,8 @@ void ZebraLineGS::yzebra(
                 rhs[1+nx+1]-=operatorLC[i]*u[1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
             operatorLB=stencil.getL(W,1,2,nx,ny);
-            jXB=stencil.getJx(W);
-            jYB=stencil.getJy(W);
+            jXB=stencil.getJx(W,nx,ny);
+            jYB=stencil.getJy(W,nx,ny);
             ndiagL1[0]=operatorLB[S];
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[N];                    
@@ -1762,8 +1762,8 @@ void ZebraLineGS::yzebra(
                                 operatorLB[i]*u[1+jXB[i]+(ny-2+jYB[i])*(nx+1)];
             }
             operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
-            jXC=stencil.getJx(NW);
-            jYC=stencil.getJy(NW);
+            jXC=stencil.getJx(NW,nx,ny);
+            jYC=stencil.getJy(NW,nx,ny);
             ndiagL2[ny-4]=operatorLC[NE];
             ndiagL1[ny-3]=operatorLC[S];
             diagR[ny-2]=operatorLC[C];
@@ -1784,8 +1784,8 @@ void ZebraLineGS::yzebra(
             {
                 //set rhs                  
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
-                jXB=stencil.getJx(S);
-                jYB=stencil.getJy(S);
+                jXB=stencil.getJx(S,nx,ny);
+                jYB=stencil.getJy(S,nx,ny);
                 diagR[0]=operatorLB[C];
                 ndiagR1[0]=operatorLB[N];
                 ndiagR2[0]=operatorLB[NE];
@@ -1850,8 +1850,8 @@ void ZebraLineGS::yzebra(
                                    operatorL[i]*u[sx+jX[i]+(ny-2+jY[i])*(nx+1)];
                 }
                 operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
-                jXB=stencil.getJx(N);
-                jYB=stencil.getJy(N);
+                jXB=stencil.getJx(N,nx,ny);
+                jYB=stencil.getJy(N,nx,ny);
                 ndiagL2[nx-4]=operatorLB[SW];
                 ndiagL1[nx-3]=operatorLB[S];
                 diagR[nx-2]=operatorLB[C];
@@ -1870,8 +1870,8 @@ void ZebraLineGS::yzebra(
             }
 ////////////////last column//////////////////
             operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
-            jXC=stencil.getJx(SE);
-            jYC=stencil.getJy(SE);
+            jXC=stencil.getJx(SE,nx,ny);
+            jYC=stencil.getJy(SE,nx,ny);
             rhs[nx-1+nx+1]=f[nx-1+nx+1]
                 -operatorLC[S]*u[nx-1+(1+jYC[S])*(nx+1)]
                 -operatorLC[W]*u[nx-2+nx+1]
@@ -1882,8 +1882,8 @@ void ZebraLineGS::yzebra(
                 rhs[nx-1+nx+1]-=operatorLC[i]*u[nx-1+jXC[i]+(1+jYC[i])*(nx+1)];
             }
             operatorLB=stencil.getL(E,nx-1,2,nx,ny);
-            jXB=stencil.getJx(E);
-            jYB=stencil.getJy(E);
+            jXB=stencil.getJx(E,nx,ny);
+            jYB=stencil.getJy(E,nx,ny);
             ndiagL1[0]=operatorLB[S];
             diagR[1]=operatorLB[C];
             ndiagR1[1]=operatorLB[N];                    
@@ -1932,8 +1932,8 @@ void ZebraLineGS::yzebra(
                             operatorLB[i]*u[nx-1+jXB[i]+(ny-2+jYB[i])*(nx+1)];
             }
             operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
-            jXC=stencil.getJx(NE);
-            jYC=stencil.getJy(NE);
+            jXC=stencil.getJx(NE,nx,ny);
+            jYC=stencil.getJy(NE,nx,ny);
             ndiagL2[ny-4]=operatorLC[NE];
             ndiagL1[ny-3]=operatorLC[S];
             diagR[ny-2]=operatorLC[C];
@@ -1953,8 +1953,8 @@ void ZebraLineGS::yzebra(
             {
                 // set rhs
                 operatorLB=stencil.getL(S,sx,1,nx,ny);
-                jXB=stencil.getJx(S);
-                jYB=stencil.getJy(S);
+                jXB=stencil.getJx(S,nx,ny);
+                jYB=stencil.getJy(S,nx,ny);
                 diagR[0]=operatorLB[C];
                 ndiagR1[0]=operatorLB[N];
                 ndiagR2[0]=operatorLB[NE];
@@ -2019,8 +2019,8 @@ void ZebraLineGS::yzebra(
                                 operatorL[i]*u[sx+jX[i]+(ny-2+jY[i])*(nx+1)];
                 }
                 operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
-                jXB=stencil.getJx(N);
-                jYB=stencil.getJy(N);
+                jXB=stencil.getJx(N,nx,ny);
+                jYB=stencil.getJy(N,nx,ny);
                 ndiagL2[nx-4]=operatorLB[SW];
                 ndiagL1[nx-3]=operatorLB[S];
                 diagR[nx-2]=operatorLB[C];
