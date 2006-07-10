@@ -76,14 +76,39 @@ NumericArray DeZeeuwInterpolation::prolongate(
     Precision w_s=0;
     Precision w_n=0;
 
+	// linear interpolation on the boarders
+	for (Index sy=0; sy<=ny; sy++)
+	{
+		result[2*sy*(nxNew+1)]=u[sy*(nx+1)];
+		result[2*sy*(nxNew+1)+2*nx]=u[sy*(nx+1)+nx];
+	}
+
+	for (Index sx=0; sx<=nx; sx++)
+	{
+		result[2*sx]=u[sx];
+		result[2*ny*(nxNew+1)+2*sx]=u[ny*(nx+1)+sx];
+	}
+
+	for (Index sy=0; sy<=ny-1; sy++)
+	{
+		result[(2*sy+1)*(nxNew+1)] = 0.5 * (result[2*sy*(nxNew+1)] + result[2*(sy+1)*(nxNew+1)]);
+		result[(2*sy+1)*(nxNew+1)+2*nx] = 0.5 * (result[2*sy*(nxNew+1)+2*nx] + result[2*(sy+1)*(nxNew+1)+2*nx]);
+	}
+
+	for (Index sx=0; sx<=nx-1; sx++)
+	{
+		result[2*sx+1] = 0.5 * (result[2*sx] + result[2*sx+2]);
+		result[2*ny*(nxNew+1)+2*sx+1] = 0.5 * (result[2*ny*(nxNew+1)+2*sx] + result[2*ny*(nxNew+1)+2*sx+2]);
+	}
+    
     //"interpolation" of coarse grid points
-    for (Index sy=0; sy<=ny; ++sy)
-        for (Index sx=0; sx<=nx; ++sx)
+    for (Index sy=1; sy<=ny-1; sy++)
+        for (Index sx=1; sx<=nx-1; sx++)
             result[2*sy*(nxNew+1)+2*sx]=u[sy*(nx+1)+sx];
     
     //interpolation of fine grid points on coarse grid lines
-    for (Index sy=0; sy<=nyNew; sy+=2)
-        for (Index sx=1; sx<=nxNew; sx+=2)
+    for (Index sy=2; sy<=nyNew-2; sy+=2)
+        for (Index sx=1; sx<=nxNew-1; sx+=2)
         {
             stencilL=stencil.getL(C,sx,sy,nx,ny);
             symsum=0;
@@ -132,8 +157,8 @@ NumericArray DeZeeuwInterpolation::prolongate(
     
     // interpolation of fine grid points on fine grid lines and coarse grid 
     // columns
-    for (Index sy=1; sy<=nyNew; sy+=2)
-        for (Index sx=0; sx<=nxNew; sx+=2)
+    for (Index sy=1; sy<=nyNew-1; sy+=2)
+        for (Index sx=2; sx<=nxNew-2; sx+=2)
         {
             stencilL=stencil.getL(C,sx,sy,nx,ny);
             symsum=0;
@@ -180,8 +205,8 @@ NumericArray DeZeeuwInterpolation::prolongate(
         }
             
     //interpolation of fine grid points on fine grid lines and fine grid columns
-    for (Index sy=1; sy<=nyNew; sy+=2)
-        for (Index sx=1; sx<=nxNew; sx+=2)
+    for (Index sy=1; sy<=nyNew-1; sy+=2)
+        for (Index sx=1; sx<=nxNew-1; sx+=2)
         {
             stencilL=stencil.getL(C,sx,sy,nx,ny);
             erg=0;
