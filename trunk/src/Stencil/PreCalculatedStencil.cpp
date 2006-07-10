@@ -99,11 +99,18 @@ void PreCalculatedStencil::popTransferOperators()
 {
     --currentDepth_;
     update();
-    size_ = std::max(
-        std::max( std::abs( data_.getJx( currentDepth_, C ).max() ),
-                  std::abs( data_.getJx( currentDepth_, C ).min() ) ),
-        std::max( std::abs( data_.getJy( currentDepth_, C ).max() ),
-                  std::abs( data_.getJy( currentDepth_, C ).min() ) ) );
+	if ( currentDepth_ > 0 )
+	{
+		size_ = std::max(
+			std::max( std::abs( data_.getJx( currentDepth_, C ).max() ),
+				      std::abs( data_.getJx( currentDepth_, C ).min() ) ),
+			std::max( std::abs( data_.getJy( currentDepth_, C ).max() ),
+				      std::abs( data_.getJy( currentDepth_, C ).min() ) ) );
+	}
+    else
+    {
+        size_ = fineGridOperator_.size();
+    }
 }
         
 Index PreCalculatedStencil::size() const

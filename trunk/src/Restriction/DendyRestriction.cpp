@@ -90,23 +90,23 @@ const NumericArray& DendyRestriction::getI(
 	else
 	{
 		NumericArray stencilL=NumericArray(9);
-
-		stencilL = stencil.getL_inSize(C,2*sx,2*sy+1,nx,ny,1);
+		t_.resize(9);
+		stencilL = stencil.getL_inSize(C,sx,sy+1,nx,ny,1);
 		t_[N] = -(stencilL[N] + stencilL[NW] + stencilL[NE]) / (stencilL[C] + stencilL[W] + stencilL[E]);
-		stencilL = stencil.getL_inSize(C,2*sx,2*sy-1,nx,ny,1);
+		stencilL = stencil.getL_inSize(C,sx,sy-1,nx,ny,1);
 		t_[S] = -(stencilL[S] + stencilL[SW] + stencilL[SE]) / (stencilL[C] + stencilL[W] + stencilL[E]);
-		stencilL = stencil.getL_inSize(C,2*sx+1,2*sy,nx,ny,1);
+		stencilL = stencil.getL_inSize(C,sx+1,sy,nx,ny,1);
 		t_[E] = -(stencilL[E] + stencilL[SE] + stencilL[NE]) / (stencilL[C] + stencilL[N] + stencilL[S]);
-		stencilL = stencil.getL_inSize(C,2*sx-1,2*sy,nx,ny,1);
+		stencilL = stencil.getL_inSize(C,sx-1,sy,nx,ny,1);
 		t_[W] = -(stencilL[W] + stencilL[SW] + stencilL[NW]) / (stencilL[C] + stencilL[N] + stencilL[S]);
 
-		stencilL = stencil.getL_inSize(C,2*sx-1,2*sy+1,nx,ny,1);			
+		stencilL = stencil.getL_inSize(C,sx-1,sy+1,nx,ny,1);			
 		t_[NW] = -(stencilL[NW] + t_[N] * stencilL[W] + t_[W] * stencilL[N]) / stencilL[C];
-		stencilL = stencil.getL_inSize(C,2*sx+1,2*sy+1,nx,ny,1);			
+		stencilL = stencil.getL_inSize(C,sx+1,sy+1,nx,ny,1);			
 		t_[NE] = -(stencilL[NE] + t_[N] * stencilL[E] + t_[E] * stencilL[N]) / stencilL[C];
-		stencilL = stencil.getL_inSize(C,2*sx-1,2*sy-1,nx,ny,1);			
+		stencilL = stencil.getL_inSize(C,sx-1,sy-1,nx,ny,1);			
 		t_[SW] = -(stencilL[SW] + t_[S] * stencilL[W] + t_[W] * stencilL[S]) / stencilL[C];
-		stencilL = stencil.getL_inSize(C,2*sx+1,2*sy-1,nx,ny,1);			
+		stencilL = stencil.getL_inSize(C,sx+1,sy-1,nx,ny,1);			
 		t_[SE] = -(stencilL[SE] + t_[S] * stencilL[E] + t_[E] * stencilL[S]) / stencilL[C];
 
 		t_[C]=4.0;

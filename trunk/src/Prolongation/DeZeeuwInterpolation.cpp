@@ -21,9 +21,9 @@ NumericArray DeZeeuwInterpolation::prolongate(
     register const Index nxNew=2*nx;
     register const Index nyNew=2*ny;
     NumericArray result((nxNew+1)*(nyNew+1));
-    PositionArray jx=stencil.getJx(C,nx,ny);
-    PositionArray jy=stencil.getJy(C,nx,ny);
-    NumericArray stencilL=stencil.getL(C,0,0,nx,ny);
+    PositionArray jx=stencil.getJx(C,nxNew,nyNew);
+    PositionArray jy=stencil.getJy(C,nxNew,nyNew);
+    NumericArray stencilL=stencil.getL(C,nx,ny,nxNew,nyNew);
     std::valarray<Index> position((Index)0, 9);
     NumericArray ms(9);
     NumericArray mt(9);
@@ -110,7 +110,7 @@ NumericArray DeZeeuwInterpolation::prolongate(
     for (Index sy=2; sy<=nyNew-2; sy+=2)
         for (Index sx=1; sx<=nxNew-1; sx+=2)
         {
-            stencilL=stencil.getL(C,sx,sy,nx,ny);
+            stencilL=stencil.getL(C,sx,sy,nxNew,nyNew);
             symsum=0;
             
             // Divide the stencil defined by stencilL und position into a
@@ -160,7 +160,7 @@ NumericArray DeZeeuwInterpolation::prolongate(
     for (Index sy=1; sy<=nyNew-1; sy+=2)
         for (Index sx=2; sx<=nxNew-2; sx+=2)
         {
-            stencilL=stencil.getL(C,sx,sy,nx,ny);
+            stencilL=stencil.getL(C,sx,sy,nxNew,nyNew);
             symsum=0;
             
             // Divide the stencil defined by stencilL und position into a
@@ -208,7 +208,7 @@ NumericArray DeZeeuwInterpolation::prolongate(
     for (Index sy=1; sy<=nyNew-1; sy+=2)
         for (Index sx=1; sx<=nxNew-1; sx+=2)
         {
-            stencilL=stencil.getL(C,sx,sy,nx,ny);
+            stencilL=stencil.getL(C,sx,sy,nxNew,nyNew);
             erg=0;
             scale=-stencilL[0];
             if (position[W]!=0)

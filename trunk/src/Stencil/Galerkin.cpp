@@ -354,8 +354,14 @@ Galerkin::~Galerkin() {}
 
 void Galerkin::update()
 {
-    prolongations_.pop_back();
-    restrictions_.pop_back();
+	if ( prolongations_.size() > 0 )
+	{
+		prolongations_.pop_back();
+	}
+	if ( restrictions_.size() > 0 )
+	{
+		restrictions_.pop_back();
+	}
 }
 
 void Galerkin::update(
