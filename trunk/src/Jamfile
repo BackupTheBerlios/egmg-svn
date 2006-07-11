@@ -1,0 +1,27 @@
+project-root ;
+
+template warnings : :
+	<vc-8_0><*><cxxflags>-W4
+	<gcc><*><cxxflags>-W
+	<gcc><*><cxxflags>-Wall
+	<gcc><*><cxxflags>-ansi
+	<gcc><*><cxxflags>-pedantic
+	<intel-linux><*><cxxflags>-ansi 
+	<intel-linux><*><cxxflags>-Wall 
+	<intel-linux><*><cxxflags>-w2 ;
+
+subinclude CycleType ;
+subinclude functions ;
+subinclude general ;
+subinclude Prolongation ;
+subinclude Relaxation ;
+subinclude Restriction ;
+subinclude Stencil ;
+
+exe main : <template>warnings
+		   <lib>Stencil/Stencil
+		   <lib>Relaxation/Relaxation
+		   <lib>Prolongation/Prolongation
+	   	   <lib>Restriction/Restriction
+		   <lib>functions/functions
+	   	   main.cpp ;

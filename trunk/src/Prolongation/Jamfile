@@ -1,0 +1,8 @@
+subproject Prolongation ;
+
+lib Prolongation : <template>../warnings
+				   BicubicInterpolation.cpp
+				   BilinearInterpolation.cpp
+				   DendyInterpolation.cpp
+				   DeZeeuwInterpolation.cpp
+				   SevenPointInterpolation.cpp ;

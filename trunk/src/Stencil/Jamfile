@@ -1,0 +1,6 @@
+subproject Stencil ;
+
+lib Stencil : <template>../warnings
+			  PreCalculatedStencil.cpp
+			  StencilBoard.cpp
+		      Galerkin.cpp ;

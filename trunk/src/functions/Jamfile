@@ -1,0 +1,14 @@
+subproject functions ;
+
+lib functions : <template>../warnings
+				cycle.cpp
+				directSolver.cpp
+				error.cpp
+	 			generatePositionArrays.cpp
+				maxResiduum.cpp
+				output.cpp
+				printStencil.cpp
+				putbval.cpp
+				putrhs.cpp
+				residuum.cpp
+				twonormResiduum.cpp ;

@@ -1,0 +1,12 @@
+subproject Relaxation ;
+
+lib Relaxation : <template>../warnings
+				 GSLexicographic.cpp
+				 GSRedBlack.cpp
+				 Jacobi.cpp
+				 LineGS.cpp
+				 LineJAC.cpp
+				 WHighJac.cpp
+				 ZebraLine.cpp
+				 ZebraLineGS.cpp
+				 LineRelaxation.cpp ;
