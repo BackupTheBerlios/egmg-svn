@@ -42,22 +42,22 @@ NumericArray DendyRestriction::restriction(
     for (Index sy=1; sy<=nyNew-1; sy++)
         for (Index sx=1; sx<=nxNew-1; sx++)
 		{
-			stencilL = stencil.getLinSize(C,2*sx,2*sy+1,nx,ny,1);
+			stencilL = stencil.getLInSize(C,2*sx,2*sy+1,nx,ny,1);
 			weightN = -(stencilL[N] + stencilL[NW] + stencilL[NE]) / (stencilL[C] + stencilL[W] + stencilL[E]);
-			stencilL = stencil.getLinSize(C,2*sx,2*sy-1,nx,ny,1);
+			stencilL = stencil.getLInSize(C,2*sx,2*sy-1,nx,ny,1);
 			weightS = -(stencilL[S] + stencilL[SW] + stencilL[SE]) / (stencilL[C] + stencilL[W] + stencilL[E]);
-			stencilL = stencil.getLinSize(C,2*sx+1,2*sy,nx,ny,1);
+			stencilL = stencil.getLInSize(C,2*sx+1,2*sy,nx,ny,1);
 			weightE = -(stencilL[E] + stencilL[SE] + stencilL[NE]) / (stencilL[C] + stencilL[N] + stencilL[S]);
-			stencilL = stencil.getLinSize(C,2*sx-1,2*sy,nx,ny,1);
+			stencilL = stencil.getLInSize(C,2*sx-1,2*sy,nx,ny,1);
 			weightW = -(stencilL[W] + stencilL[SW] + stencilL[NW]) / (stencilL[C] + stencilL[N] + stencilL[S]);
 
-			stencilL = stencil.getLinSize(C,2*sx-1,2*sy+1,nx,ny,1);		
+			stencilL = stencil.getLInSize(C,2*sx-1,2*sy+1,nx,ny,1);		
 			weightNW = -(stencilL[NW] + weightN * stencilL[W] + weightW * stencilL[N]) / stencilL[C];
-			stencilL = stencil.getLinSize(C,2*sx+1,2*sy+1,nx,ny,1);			
+			stencilL = stencil.getLInSize(C,2*sx+1,2*sy+1,nx,ny,1);			
 			weightNE = -(stencilL[NE] + weightN * stencilL[E] + weightE * stencilL[N]) / stencilL[C];
-			stencilL = stencil.getLinSize(C,2*sx-1,2*sy-1,nx,ny,1);			
+			stencilL = stencil.getLInSize(C,2*sx-1,2*sy-1,nx,ny,1);			
 			weightSW = -(stencilL[SW] + weightS * stencilL[W] + weightW * stencilL[S]) / stencilL[C];
-			stencilL = stencil.getLinSize(C,2*sx+1,2*sy-1,nx,ny,1);			
+			stencilL = stencil.getLInSize(C,2*sx+1,2*sy-1,nx,ny,1);			
 			weightSE = -(stencilL[SE] + weightS * stencilL[E] + weightE * stencilL[S]) / stencilL[C];
 
             result[sy*(nxNew+1)+sx]=weight_ * (u[2*sy*(nx+1)+2*sx] 
@@ -91,22 +91,22 @@ const NumericArray& DendyRestriction::getI(
 	{
 		NumericArray stencilL=NumericArray(9);
 		t_.resize(9);
-		stencilL = stencil.getLinSize(C,sx,sy+1,nx,ny,1);
+		stencilL = stencil.getLInSize(C,sx,sy+1,nx,ny,1);
 		t_[N] = -(stencilL[N] + stencilL[NW] + stencilL[NE]) / (stencilL[C] + stencilL[W] + stencilL[E]);
-		stencilL = stencil.getLinSize(C,sx,sy-1,nx,ny,1);
+		stencilL = stencil.getLInSize(C,sx,sy-1,nx,ny,1);
 		t_[S] = -(stencilL[S] + stencilL[SW] + stencilL[SE]) / (stencilL[C] + stencilL[W] + stencilL[E]);
-		stencilL = stencil.getLinSize(C,sx+1,sy,nx,ny,1);
+		stencilL = stencil.getLInSize(C,sx+1,sy,nx,ny,1);
 		t_[E] = -(stencilL[E] + stencilL[SE] + stencilL[NE]) / (stencilL[C] + stencilL[N] + stencilL[S]);
-		stencilL = stencil.getLinSize(C,sx-1,sy,nx,ny,1);
+		stencilL = stencil.getLInSize(C,sx-1,sy,nx,ny,1);
 		t_[W] = -(stencilL[W] + stencilL[SW] + stencilL[NW]) / (stencilL[C] + stencilL[N] + stencilL[S]);
 
-		stencilL = stencil.getLinSize(C,sx-1,sy+1,nx,ny,1);			
+		stencilL = stencil.getLInSize(C,sx-1,sy+1,nx,ny,1);			
 		t_[NW] = -(stencilL[NW] + t_[N] * stencilL[W] + t_[W] * stencilL[N]) / stencilL[C];
-		stencilL = stencil.getLinSize(C,sx+1,sy+1,nx,ny,1);			
+		stencilL = stencil.getLInSize(C,sx+1,sy+1,nx,ny,1);			
 		t_[NE] = -(stencilL[NE] + t_[N] * stencilL[E] + t_[E] * stencilL[N]) / stencilL[C];
-		stencilL = stencil.getLinSize(C,sx-1,sy-1,nx,ny,1);			
+		stencilL = stencil.getLInSize(C,sx-1,sy-1,nx,ny,1);			
 		t_[SW] = -(stencilL[SW] + t_[S] * stencilL[W] + t_[W] * stencilL[S]) / stencilL[C];
-		stencilL = stencil.getLinSize(C,sx+1,sy-1,nx,ny,1);			
+		stencilL = stencil.getLInSize(C,sx+1,sy-1,nx,ny,1);			
 		t_[SE] = -(stencilL[SE] + t_[S] * stencilL[E] + t_[E] * stencilL[S]) / stencilL[C];
 
 		t_[C]=4.0;

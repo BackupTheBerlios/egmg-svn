@@ -11,7 +11,7 @@ Stencil::Stencil() {}
 
 Stencil::~Stencil() {}
 
-NumericArray Stencil::getLinSize(
+NumericArray Stencil::getLInSize(
     const Position pos,
     const Index sx,
     const Index sy,

@@ -158,7 +158,7 @@ public:
 	 * \param[in] size		the desired size of the returned stencil
      * \return              the coefficients of stencil in the desired size
      */
-    NumericArray getLinSize(
+    NumericArray getLInSize(
         const Position pos,
         const Index sx,
         const Index sy,
