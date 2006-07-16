@@ -515,6 +515,10 @@
 			RelativePath=".\main.cpp"
 			>
 		</File>
+		<File
+			RelativePath=".\main.cpp.dist"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

@@ -23,20 +23,23 @@ void testInit()
     LevelCycle levelCycle(1,1,gammas);
     BicubicInterpolation bicubicInterpolation;
     BilinearInterpolation bilinearInterpolation;
+	DendyInterpolation dendyInterpolation;
+	DeZeeuwInterpolation deZeeuwInterpolation;
     SevenPointInterpolation sevenPointInterpolation;
     GSLexicographic gsLexicographic;
     GSRedBlack gsRedBlack;
     Jacobi jacobi;
     LineGS lineGS;
     LineJAC lineJAC;
+	WHighJac wHighJac;
     ZebraLine zebraLine;
     ZebraLineGS zebraLineGS;
-    SPAI spai;
+	DendyRestriction dendyRestriction;
     FullWeighting fullWeighting;
     HalfWeighting halfWeighting;
     Injection injection;
     SevenPointRestriction sevenPointRestriction;
-    TransposedProlongation transposedProlongation(HalfWeighting);
+	TransposedProlongation transposedProlongation(dendyInterpolation);
     Biharmonic2D2 biharmonic2D2;
     ConDiff2D1 conDiff2D1;
     ConDiff2Dkap conDiff2Dkap;
@@ -51,48 +54,48 @@ void testInit()
 int main()
 {
     testInit();   
-	const int k = 6;
-	const size_t nx =static_cast<size_t>(std::pow(2.,k));
-	const size_t ny = nx;
-	NumericArray u(0.0,(nx+1)*(ny+1));
-	NumericArray fv(0.0,(nx+1)*(ny+1));
-	putbval(u,nx,ny,g);
-	putrhs(fv,nx,ny,f);
-	const size_t itmax = 100;
-	size_t iterations = 0;
-	const Precision eps = 1e-30;
-	std::cout<<"Genauigkeit : "<<eps<<std::endl;
-	MSV2D4 lap;
-    Galerkin disc(lap);
+    const int k = 6;
+    const size_t nx =static_cast<size_t>(std::pow(2.,k));
+    const size_t ny = nx;
+    NumericArray u(0.0,(nx+1)*(ny+1));
+    NumericArray fv(0.0,(nx+1)*(ny+1));
+    putbval(u,nx,ny,g);
+    putrhs(fv,nx,ny,f);
+    const size_t itmax = 100;
+    size_t iterations = 0;
+    const Precision eps = 1e-30;
+    std::cout<<"Genauigkeit : "<<eps<<std::endl;
+	ConvectionDiffusion2D1 fineGridDisc;
+    Galerkin disc( fineGridDisc );
 	GSLexicographic relaxation;
-	Precision resnull = twonormResiduum(u,fv,disc,nx,ny);
-	Precision resnew = resnull;
-	Precision resold = resnull;
-	HalfWeighting restriction;
-	BilinearInterpolation prolongation;
+    Precision resnull = twonormResiduum(u,fv,disc,nx,ny);
+    Precision resnew = resnull;
+    Precision resold = resnull;
+	DendyInterpolation prolongation;
+	DendyRestriction restriction;
     VCycle vCycle(2,2,k-1);
-	//residues is used to store the intermediate residues, there are printed
-	//after the cycle iterations because writing to std out takes a long time
-	std::vector<Precision> residues;
-	residues.push_back(resnull);
-	while (iterations<itmax && resnew/resnull>eps)
-	{
-		resold=resnew;
-		cycle(vCycle,u,fv,disc,prolongation,restriction,relaxation,nx,ny);
-		resnew=twonormResiduum(u,fv,disc,nx,ny);
-		residues.push_back(resnew);
-		std::cout<<resnew<<std::endl;
-		if (resnew>resold && iterations>3)
-		{
-			std::cout<<"No convergence"<<std::endl;
-			break;	
-		}
-		iterations++;
-	}
-	//print out the defects history
+    //residues is used to store the intermediate residues, there are printed
+    //after the cycle iterations because writing to std out takes a long time
+    std::vector<Precision> residues;
+    residues.push_back(resnull);
+    while (iterations<itmax && resnew/resnull>eps)
+    {
+        resold=resnew;
+        cycle(vCycle,u,fv,disc,prolongation,restriction,relaxation,nx,ny);
+        resnew=twonormResiduum(u,fv,disc,nx,ny);
+        residues.push_back(resnew);
+        std::cout<<resnew<<std::endl;
+        if (resnew>resold && iterations>3)
+        {
+            std::cout<<"No convergence"<<std::endl;
+            break;  
+        }
+        iterations++;
+    }
+    //print out the defects history
     convergenceRates(residues,std::cout);
-	std::cout<<"Fehler = "<<error(u,nx,ny,g)<<" It = "<<iterations<<std::endl;
+    std::cout<<"Fehler = "<<error(u,nx,ny,g)<<" It = "<<iterations<<std::endl;
     //std::ofstream plotData("data.dat");
-	//gnuPlotDiscreteFunction(residuum(u,fv,disc,nx,ny),nx,ny,plotData);*/
-	return 0;
+    //gnuPlotDiscreteFunction(residuum(u,fv,disc,nx,ny),nx,ny,plotData);*/
+    return 0;
 }
