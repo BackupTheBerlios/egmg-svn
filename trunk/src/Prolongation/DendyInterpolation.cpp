@@ -18,10 +18,10 @@ NumericArray DendyInterpolation::prolongate(
     const Index nxNew=2*nx;
     const Index nyNew=2*ny;
     NumericArray result((nxNew+1)*(nyNew+1));
-    PositionArray jx=stencil.getJx(C,nx,ny);
-    PositionArray jy=stencil.getJy(C,nx,ny);
-    NumericArray stencilL=NumericArray();
-    std::valarray<Index> position((Index)0, 9);
+    PositionArray jx=stencil.getJx(C,nxNew,nyNew);
+    PositionArray jy=stencil.getJy(C,nxNew,nyNew);
+    NumericArray stencilL;
+    std::valarray<Index> position( static_cast<Index>( 0 ), 9);
 
 	for (Index j=0; j<jx.size(); ++j)
 	{
@@ -89,6 +89,7 @@ NumericArray DendyInterpolation::prolongate(
         for (Index sx=1; sx<=nx-1; sx++)
             result[2*sy*(nxNew+1)+2*sx]=u[sy*(nx+1)+sx];
     
+	stencilL.resize( stencil.getL(C,2,1,nxNew,nyNew).size() );
     //interpolation of fine grid points on coarse grid lines
     for (Index sy=2; sy<=nyNew-2; sy+=2)
         for (Index sx=1; sx<=nxNew-1; sx+=2)

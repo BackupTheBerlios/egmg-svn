@@ -21,7 +21,7 @@ NumericArray TransposedProlongation::restriction(
 
 	const Index nxNew=nx/2;
 	const Index nyNew=ny/2;
-	NumericArray I;
+
 	PositionArray Jx = prolongation_.getJx(C);
 	PositionArray Jy = prolongation_.getJy(C);
 	NumericArray result(0.0,(nxNew+1)*(nyNew+1));
@@ -37,24 +37,24 @@ NumericArray TransposedProlongation::restriction(
 		result[sx]=u[2*sx];
 	    result[nyNew*(nxNew+1)+sx]=u[ny*(nx+1)+2*sx];
 	}
-	for (Index sy=1; sy<nyNew+1; sy++)
-		for (Index sx=1; sx<nxNew+1; sx++)
+	for (Index sy=1; sy<nyNew; sy++)
+		for (Index sx=1; sx<nxNew; sx++)
 		{
 			Position pos = C;
 			if (sy == 1)
 			{
 				if (sx == 1)
                     pos = SW;
-				else if (sx == nx-1)
+				else if (sx == nxNew-1)
                     pos = SE;
 				else
                     pos = S;
 			}
-			else if (sy == ny-1)
+			else if (sy == nyNew-1)
 			{
 				if (sx == 1)
                     pos = NW;
-				else if (sx == nx-1)
+				else if (sx == nxNew-1)
                     pos = NE;
 				else
                     pos = N;
@@ -63,13 +63,13 @@ NumericArray TransposedProlongation::restriction(
 			{
 				if (sx == 1)
                     pos = W;
-				else if (sx == nx-1)
+				else if (sx == nxNew-1)
                     pos = E;
 				else
                     pos = C;
 			}
 			// Get the stencil of the adjoint prolongation
-			I = prolongation_.getI(pos, sx, sy, nx, ny, stencil);
+			NumericArray I = prolongation_.getI(pos, 2*sx, 2*sy, nx, ny, stencil);
 			scale = 0;
 
 			// Apply the stencil with regard to the Jx/Jy-vectors
