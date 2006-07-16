@@ -2,6 +2,12 @@
 
 namespace mg
 {
+
+PreCalculatedStencil::PreCalculatedStencil( const Stencil& fineGridOperator )
+	: fineGridOperator_( fineGridOperator ),
+      size_( fineGridOperator.size() ),
+      currentDepth_( 0 ) {}
+PreCalculatedStencil::~PreCalculatedStencil() {}
     
 Index PreCalculatedStencil::getLevel( const Index nx, const Index ny )const
 {
@@ -40,7 +46,7 @@ Precision PreCalculatedStencil::getCenter(
     return getL( position, sx, sy, nx, ny )[ 0 ];
 }
 
-const NumericArray& PreCalculatedStencil::getL(
+NumericArray PreCalculatedStencil::getL(
     const Position position,
     const Index sx,
     const Index sy,
@@ -54,7 +60,7 @@ const NumericArray& PreCalculatedStencil::getL(
     return data_.getL( level, position, sx, sy );
 }
 
-const PositionArray& PreCalculatedStencil::getJx(
+PositionArray PreCalculatedStencil::getJx(
     const Position p,
     const Index nx,
     const Index ny ) const
@@ -65,7 +71,7 @@ const PositionArray& PreCalculatedStencil::getJx(
     return data_.getJx( level, p );
 }
 
-const PositionArray& PreCalculatedStencil::getJy(
+PositionArray PreCalculatedStencil::getJy(
     const Position p,
     const Index nx,
     const Index ny ) const

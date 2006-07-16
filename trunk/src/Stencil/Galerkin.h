@@ -12,10 +12,12 @@ namespace mg
 {
 
 class Galerkin : public PreCalculatedStencil
-{
-private:
-    std::vector<const Prolongation*> prolongations_;
-    std::vector<const Restriction*> restrictions_;
+{  
+public:
+    Galerkin( const Stencil& fineGridOperator );
+    
+    virtual ~Galerkin();
+
     
 protected:
     virtual void update(
@@ -23,11 +25,11 @@ protected:
         const Prolongation& prolongation,
         const Index nx,
         const Index ny );
-    virtual void update();  
-public:
-    Galerkin( const Stencil& fineGridOperator );
-    
-    virtual ~Galerkin();
+    virtual void update();
+
+private:
+    std::vector<const Prolongation*> prolongations_;
+    std::vector<const Restriction*> restrictions_;
 };
 
 }

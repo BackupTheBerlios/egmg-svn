@@ -67,9 +67,12 @@ namespace mg
      * </tr>
      * </table>
      */
-    enum Position{C=0,W=1,N=2,E=3,S=4,NW=5,NE=6,SE=7,SW=8,
-				 WW=9,NWW=10,NNWW=11,NNW=12,NN=13,NNE=14,NNEE=15,NEE=16,
-				 EE=17,SEE=18,SSEE=19,SSE=20,SS=21,SSW=22,SSWW=23,SWW=24};
+	enum Position{C=0,W=1,N=2,E=3,S=4,NW=5,NE=6,SE=7,SW=8};
+				 
+
+	enum PositionExtension {WW=9,NWW=10,NNWW=11,NNW=12,
+		NN=13,NNE=14,NNEE=15,NEE=16,EE=17,SEE=18,
+		SSEE=19,SSE=20,SS=21,SSW=22,SSWW=23,SWW=24};
     
     /**
      * \enum mg::Direction

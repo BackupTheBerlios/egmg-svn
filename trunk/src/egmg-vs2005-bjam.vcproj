@@ -63,7 +63,15 @@
 			Name="Stencil"
 			>
 			<File
+				RelativePath=".\Stencil\Biharmonic2D2.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Stencil\Biharmonic2D2.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Stencil\ConDiff2D1.cpp"
 				>
 			</File>
 			<File
@@ -71,7 +79,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Stencil\ConDiff2Dkap.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Stencil\ConDiff2Dkap.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Stencil\ConvectionDiffusion2D1.cpp"
 				>
 			</File>
 			<File
@@ -87,6 +103,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Stencil\Helmholtz2D2.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Stencil\Helmholtz2D2.h"
 				>
 			</File>
@@ -95,11 +115,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Stencil\Laplacian2D2.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Stencil\Laplacian2D2.h"
 				>
 			</File>
 			<File
+				RelativePath=".\Stencil\Laplacian2D4.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Stencil\Laplacian2D4.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Stencil\MSV2D4.cpp"
 				>
 			</File>
 			<File
@@ -112,6 +144,10 @@
 			</File>
 			<File
 				RelativePath=".\Stencil\PreCalculatedStencil.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Stencil\Stencil.cpp"
 				>
 			</File>
 			<File

@@ -8,6 +8,8 @@
 #include <cmath>
 
 #include "Galerkin.h"
+#include "../Prolongation/Prolongation.h"
+#include "../Restriction/Restriction.h"
 #include "../functions/expansion.h"
 #include "../functions/generatePositionArrays.h"
 

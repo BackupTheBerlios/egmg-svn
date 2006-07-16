@@ -1,6 +1,15 @@
 subproject Stencil ;
 
 lib Stencil : <template>../warnings
+			  Stencil.cpp
+			  Biharmonic2D2.cpp
+			  ConDiff2D1.cpp
+			  ConDiff2Dkap.cpp
+			  ConvectionDiffusion2D1.cpp
+			  Helmholtz2D2.cpp
+			  MSV2D4.cpp
+			  Laplacian2D2.cpp
+			  Laplacian2D4.cpp
 			  PreCalculatedStencil.cpp
 			  StencilBoard.cpp
 		      Galerkin.cpp ;
