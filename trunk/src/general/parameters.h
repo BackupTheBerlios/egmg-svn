@@ -7,6 +7,7 @@
 
 #include <valarray>
 #include <cassert>
+#include <cmath>
 
 /**
  * \brief the namespace mg is for everything in this library
@@ -19,6 +20,8 @@ namespace mg
      * \brief the Precision to do the calculations with
      */
     typedef double Precision;
+
+    const Precision Pi=4*std::atan(static_cast<Precision>(1.0));
     
     /**
      * \brief the index
