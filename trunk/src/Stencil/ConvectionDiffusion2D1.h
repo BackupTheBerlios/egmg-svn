@@ -44,7 +44,7 @@ private:
         const Index nx,
         const Index ny) const;
 public:
-	enum Mode { A, B };
+	enum Mode { A, B, C, D };
     /**
      * \brief The constructor of a ConvectionDiffusion2D1 object
      * 

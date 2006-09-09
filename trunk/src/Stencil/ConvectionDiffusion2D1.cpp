@@ -32,10 +32,12 @@ Precision ConvectionDiffusion2D1::a_(
     {
     case A:
         return (2.0*sy/ny-1)*(1-(sx*sx)/(nx*nx));
-		break;
     case B:
         return 4.0*sx/nx*(sx/nx-1)*(1-2.0*sy/ny);
-		break;
+    case C:
+        return -std::sin(Pi*sx/nx)*std::cos(Pi*sy/ny);
+    case D:
+        return std::cos(15.0/180.0*Pi);
     default: 
         return 1;
     }
@@ -49,10 +51,14 @@ Precision ConvectionDiffusion2D1::b_(
 {
     switch(mode_)
     {
-    case 0:
+    case A:
         return (2.0*sx*sy/(nx*ny))*(sy/ny-1);
-    case 1:
+    case B:
         return -4.0*sy/ny*(sy/ny-1)*(1-2.0*sx/nx);
+    case C:
+        return std::sin(Pi*sy/ny)*std::cos(Pi*sx/nx);
+    case D:
+        return std::sin(15.0/180.0*Pi);
     default:
         return 1;
     }       
@@ -118,15 +124,15 @@ NumericArray ConvectionDiffusion2D1::getL(
     result[1]=
          -1.0*epsilon_*nx*nx
         +(-a_(sx,sy,nx,ny)-fabs(a_(sx,sy,nx,ny)))*nx/2;
+    result[2]=
+         -1.0*epsilon_*ny*ny
+        +(b_(sx,sy,nx,ny)-fabs(b_(sx,sy,nx,ny)))*ny/2;
     result[3]=
          -1.0*epsilon_*nx*nx
         +(a_(sx,sy,nx,ny)-fabs(a_(sx,sy,nx,ny)))*nx/2;
-    result[2]=
-         -1.0*epsilon_*ny*ny
-        +(-b_(sx,sy,nx,ny)-fabs(b_(sx,sy,nx,ny)))*ny/2;
     result[4]=
          -1.0*epsilon_*ny*ny
-        +(b_(sx,sy,nx,ny)-fabs(b_(sx,sy,nx,ny)))*ny/2;
+        +(-b_(sx,sy,nx,ny)-fabs(b_(sx,sy,nx,ny)))*ny/2;
     return result; 
 }
 
