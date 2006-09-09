@@ -8,6 +8,7 @@
 #include "DeZeeuwInterpolation.h"
 #include "../Stencil/Stencil.h"
 #include <algorithm>
+#include <iostream>
 
 namespace mg
 {
@@ -144,12 +145,12 @@ NumericArray DeZeeuwInterpolation::prolongate(
             d_s=std::max(std::fabs(ms[SW]+ms[S]+ms[SE]),
                          std::max(std::fabs(ms[SW]),
                                   std::fabs(ms[SE])));
-            sigma1=0.5*std::min(1.0, std::fabs(1-symsum/stencilL[0]));
+            sigma1=0.5*std::min(std::fabs(1-symsum/stencilL[0]),static_cast<Precision>(1.0));
             c_1=mt[SE]+mt[E]+mt[NE]-mt[SW]-mt[W]-mt[NW];
             w_w=sigma1*(1+(d_w-d_e)/(d_w+d_e)+c_1/(d_w+d_e+d_n+d_s));
             w_e=2*sigma1-w_w;
-            weight1=std::min(2*sigma1, std::max(w_w, 0.0));
-            weight2=std::min(2*sigma1, std::max(w_e, 0.0));
+            weight1=std::min(2*sigma1, std::max(w_w, static_cast<Precision>(0.0)));
+            weight2=std::min(2*sigma1, std::max(w_e, static_cast<Precision>(0.0)));
             result[sy*(nxNew+1)+sx]=
                  weight1*result[sy*(nxNew+1)+sx-1]
                 +weight2*result[sy*(nxNew+1)+sx+1];
@@ -193,12 +194,12 @@ NumericArray DeZeeuwInterpolation::prolongate(
             d_s=std::max(std::fabs(ms[SW]+ms[S]+ms[SE]),
                          std::max(std::fabs(ms[SW]),
                                   std::fabs(ms[SE])));
-            sigma2=0.5*std::min(1.0, std::fabs(1-symsum/stencilL[0]));
+            sigma2=0.5*std::min(static_cast<Precision>(1.0), std::fabs(1-symsum/stencilL[0]));
             c_2=mt[NW]+mt[N]+mt[NE]-mt[SW]-mt[S]-mt[SE];
             w_n=sigma2*(1+(d_s-d_n)/(d_s+d_n)+c_2/(d_w+d_e+d_n+d_s));
             w_s=2*sigma2-w_n;
-            weight1=std::min(2*sigma2, std::max(w_s, 0.0));
-            weight2=std::min(2*sigma2, std::max(w_n, 0.0));
+            weight1=std::min(2*sigma2, std::max(w_s, static_cast<Precision>(0.0)));
+            weight2=std::min(2*sigma2, std::max(w_n, static_cast<Precision>(0.0)));
             result[sy*(nxNew+1)+sx]=
                  weight1*result[(sy-1)*(nxNew+1)+sx]
                 +weight2*result[(sy+1)*(nxNew+1)+sx];
@@ -331,11 +332,11 @@ const NumericArray& DeZeeuwInterpolation::getI(
 		d_s=std::max(std::fabs(ms[SW]+ms[S]+ms[SE]),
 					 std::max(std::fabs(ms[SW]),
 							  std::fabs(ms[SE])));
-		sigma1=0.5*std::min(1.0, std::fabs(1-symsum/stencilL[0]));
+		sigma1=0.5*std::min(static_cast<Precision>(1.0), std::fabs(1-symsum/stencilL[0]));
 		c_1=mt[SE]+mt[E]+mt[NE]-mt[SW]-mt[W]-mt[NW];
 		w_w=sigma1*(1+(d_w-d_e)/(d_w+d_e)+c_1/(d_w+d_e+d_n+d_s));
 		w_e=2*sigma1-w_w;
-		weight2=std::min(2*sigma1, std::max(w_e, 0.0));
+		weight2=std::min(2*sigma1, std::max(w_e, static_cast<Precision>(0.0)));
 		t_[1]=weight2; 
 
 		// N
@@ -371,12 +372,12 @@ const NumericArray& DeZeeuwInterpolation::getI(
 		d_s=std::max(std::fabs(ms[SW]+ms[S]+ms[SE]),
 					 std::max(std::fabs(ms[SW]),
 							  std::fabs(ms[SE])));
-		sigma2=0.5*std::min(1.0, std::fabs(1-symsum/stencilL[0]));
+		sigma2=0.5*std::min(static_cast<Precision>(1.0), std::fabs(1-symsum/stencilL[0]));
 		c_2=mt[NW]+mt[N]+mt[NE]-mt[SW]-mt[S]-mt[SE];
 		w_n=sigma2*(1+(d_s-d_n)/(d_s+d_n)+c_2/(d_w+d_e+d_n+d_s));
 		w_s=2*sigma2-w_n;
-		weight1=std::min(2*sigma2, std::max(w_s, 0.0));
-		weight2=std::min(2*sigma2, std::max(w_n, 0.0));
+		weight1=std::min(2*sigma2, std::max(w_s, static_cast<Precision>(0.0)));
+		weight2=std::min(2*sigma2, std::max(w_n, static_cast<Precision>(0.0)));
 		t_[2]=weight1;
 
 		// E
@@ -413,11 +414,11 @@ const NumericArray& DeZeeuwInterpolation::getI(
 		d_s=std::max(std::fabs(ms[SW]+ms[S]+ms[SE]),
 					 std::max(std::fabs(ms[SW]),
 							  std::fabs(ms[SE])));
-		sigma1=0.5*std::min(1.0, std::fabs(1-symsum/stencilL[0]));
+		sigma1=0.5*std::min(static_cast<Precision>(1.0), std::fabs(1-symsum/stencilL[0]));
 		c_1=mt[SE]+mt[E]+mt[NE]-mt[SW]-mt[W]-mt[NW];
 		w_w=sigma1*(1+(d_w-d_e)/(d_w+d_e)+c_1/(d_w+d_e+d_n+d_s));
 		w_e=2*sigma1-w_w;
-		weight1=std::min(2*sigma1, std::max(w_w, 0.0));
+		weight1=std::min(2*sigma1, std::max(w_w, static_cast<Precision>(0.0)));
 		t_[3]=weight1; 
 
 		// S
@@ -453,11 +454,11 @@ const NumericArray& DeZeeuwInterpolation::getI(
 		d_s=std::max(std::fabs(ms[SW]+ms[S]+ms[SE]),
 					 std::max(std::fabs(ms[SW]),
 							  std::fabs(ms[SE])));
-		sigma2=0.5*std::min(1.0, std::fabs(1-symsum/stencilL[0]));
+		sigma2=0.5*std::min(static_cast<Precision>(1.0), std::fabs(1-symsum/stencilL[0]));
 		c_2=mt[NW]+mt[N]+mt[NE]-mt[SW]-mt[S]-mt[SE];
 		w_n=sigma2*(1+(d_s-d_n)/(d_s+d_n)+c_2/(d_w+d_e+d_n+d_s));
 		w_s=2*sigma2-w_n;
-		weight2=std::min(2*sigma2, std::max(w_n, 0.0));
+		weight2=std::min(2*sigma2, std::max(w_n, static_cast<Precision>(0.0)));
 		t_[4]=weight2;
 
 		// NW
@@ -508,12 +509,18 @@ const NumericArray& DeZeeuwInterpolation::getI(
 			erg+=stencilL[position[NE]];
 		t_[8]=erg/scale;
 
+        for (Index i=0; i<9; ++i)
+            std::cout<<t_[i]<<" ";
+        std::cout<<std::endl;
 	}
-    const Precision t[] = {
-    1.0,   1.0/2, 1.0/2,
-    1.0/2, 1.0/2, 1.0/4,
-    1.0/4, 1.0/4, 1.0/4};
-    t_ = NumericArray(t,9);
+    else
+    {
+        const Precision t[] = {
+        1.0,   1.0/2, 1.0/2,
+        1.0/2, 1.0/2, 1.0/4,
+        1.0/4, 1.0/4, 1.0/4};
+        t_ = NumericArray(t,9);
+    }
     return t_;
 }
 
