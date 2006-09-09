@@ -9,6 +9,8 @@
 #include "cycle.h"
 #include "residuum.h"
 #include "directSolver.h"
+#include <iostream>
+#include "printStencil.h"
 
 namespace mg
 {
@@ -25,7 +27,8 @@ void cycle(
     const Index ny)
 {
     cycleType.incrementGridLevel();
-    if ( cycleType.solve() || std::min(nx,ny)<=6 || nx%2!=0 || ny%2!=0 )
+
+    if ( cycleType.solve())
     {
         directSolver(u,f,stencil,nx,ny);
     }
@@ -48,6 +51,7 @@ void cycle(
             NumericArray coarsGridCor
                     (0.0,(nxNew+1)*(nyNew+1));
             //do a multigrid cycle on the coars grid
+
             cycle(
                 cycleType,
                 coarsGridCor,
@@ -57,6 +61,7 @@ void cycle(
                 restriction,
                 relaxation,
                 nxNew,nyNew);
+
             //prolongate the coars grid correction to the fine grid
             //approximation
             u+=prolongation.prolongate(coarsGridCor,stencil,nxNew,nyNew);
@@ -69,6 +74,7 @@ void cycle(
             cycleType.accelerate(u,f,stencil,nx,ny);
         }
     }
+
     cycleType.decrementGridLevel();
 }
 }
