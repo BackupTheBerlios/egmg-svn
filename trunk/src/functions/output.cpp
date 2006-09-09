@@ -18,7 +18,7 @@ void convergenceRates(const std::vector<Precision>& vec, std::ostream& out)
 {
     Precision resNull=vec.at(0);
     Precision resFive=-1; //temp variable for residuen after 5th cycle
-    if (vec.size() >=5 )
+    if (vec.size() > 5 )
         resFive=vec.at(5);
 
     // go through the history of residues and calculate convergence rates for 
