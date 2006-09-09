@@ -19,31 +19,27 @@ class ZebraLine : public mg::LineRelaxation
 private:
     const Precision omega_;
     const GSRedBlack gsRedBlack_;
-    void ninepointxzebra(
+    void ninePointX(
         NumericArray &u,
         const NumericArray &f, 
-        NumericArray resid,
         const Stencil &stencil,
         const Index nx, 
         const Index ny) const;
-    void ninepointyzebra(
+    void ninePointY(
         NumericArray &u,
         const NumericArray &f, 
-        NumericArray resid,
         const Stencil &stencil,
         const Index nx, 
         const Index ny) const;
-    void xzebra(
+    void fullX(
         NumericArray &u,
         const NumericArray &f, 
-        NumericArray resid,
         const Stencil &stencil,
         const Index nx, 
         const Index ny) const;
-    void yzebra(
+    void fullY(
         NumericArray &u,
         const NumericArray &f, 
-        NumericArray resid,
         const Stencil &stencil,
         const Index nx, 
         const Index ny) const;
@@ -63,26 +59,6 @@ public:
         : LineRelaxation(direction),
           omega_(omega),gsRedBlack_() {}
     virtual ~ZebraLine() {}
-    
-    /**
-      * \brief relax() executes one relaxation step on the input vector
-      * 
-      * relax() exectues one zebra line relaxation step on the input
-      * vector on a rectangular 2D gird with lexicographic ordering and the
-      * discretazation Stencil for a pde
-      * 
-     * \param u     the vector representation of the 2D grid to perform the
-     *              relaxation on this vector will be changed
-     * \param f     the right hand side of the pde
-     * \param nx    number of steps in x direction
-     * \param ny    number of steps in y direction
-     */
-    void relax(
-        NumericArray &u,
-        const NumericArray &f, 
-        const Stencil &stencil,
-        const Index nx,
-        const Index ny) const;
 };
 }
 #endif /* ZEBRALINE_H_ */

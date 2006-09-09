@@ -19,31 +19,27 @@ class LineGS : public mg::LineRelaxation
 {
 private:
     const GSLexicographic gsLexicographic_;
-    void ninepointxline(
+    void ninePointX(
         NumericArray &u,
         const NumericArray &f, 
-        NumericArray &rhs,
         const Stencil &stencil,
         const Index nx, 
         const Index ny) const;
-    void ninepointyline(
+    void ninePointY(
         NumericArray &u,
         const NumericArray &f, 
-        NumericArray &rhs,
         const Stencil &stencil,
         const Index nx, 
         const Index ny) const;
-    void xline(
+    void fullX(
         NumericArray &u,
         const NumericArray &f, 
-        NumericArray &rhs,
         const Stencil &stencil,
         const Index nx, 
         const Index ny) const;
-    void yline(
+    void fullY(
         NumericArray &u,
         const NumericArray &f, 
-        NumericArray &rhs,
         const Stencil &stencil,
         const Index nx, 
         const Index ny) const;
@@ -63,27 +59,6 @@ public:
         : LineRelaxation(direction),
           gsLexicographic_() {}
     virtual ~LineGS() {}
-
-    /**
-     * \brief relax() executes one relaxation step on the input vector
-     * 
-     * relax() exectues one Gauss Seidel line relaxation step on the 
-     * input vector on a rectangular 2D gird with lexicographic ordering and the
-     * discretazation Stencil for a pde
-     * 
-     * \param[in,out] u     the vector representation of the 2D grid to perform
-     *                      the relaxation on
-     * \param[in] f         the right hand side of the pde
-     * \param[in] stencil   the stencil rep. of the pde
-     * \param[in] nx        number of steps in x direction
-     * \param[in] ny        number of steps in y direction
-     */
-    void relax(
-        NumericArray &u,
-        const NumericArray &f, 
-        const Stencil &stencil,
-        const Index nx,
-        const Index ny) const;
 };
 
 }

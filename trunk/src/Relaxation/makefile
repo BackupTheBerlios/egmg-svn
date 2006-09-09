@@ -4,12 +4,11 @@ Objects = LineRelaxation.o Jacobi.o GSLexicographic.o GSRedBlack.o ZebraLineGS.o
 	$(CXX) $(CXXFLAGS) -c $*.cpp
 	
 Jacobi.h GSLexicographic.h GSRedBlack.h LineRelaxation.h: Relaxation.h 
-LineGS.h: GSLexicographic.h
-ZebraLineGS.h ZebraLine.h: GSRedBlack.h
-LineJAC.h LineGS.h ZebraLineGS.h ZebraLine.h: LineRelaxation.h
+ZebraLineGS.h LineGS.h ZebraLine.h LineJAC.h: LineRelaxation.h
 LineJAC.h: Jacobi.h
+LineGS.h: GSLexicographic.h
+ZebraLine.h ZebraLineGS.h: GSRedBlack.h
 WHighJac.h: ../functions/WHighJacScalarProduct.h
-LineJAC.cpp ZebraLine.h: ../functions/residuum.h
 Relaxation.h: ../general/parameters.h ../Stencil/Stencil.h
 
 all: $(Objects)

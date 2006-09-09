@@ -6,684 +6,116 @@
  * \todo clean up ninepointxzebra, ninepointyzebra, xzebra and yzebra by
  *       doing redudant things in seperate functions
  */
+#include <iostream>
 #include "ZebraLine.h"
-#include<iostream>
-#include "../functions/residuum.h"
-
 
 namespace mg
-{           
-void ZebraLine::relax(
-    NumericArray &u,
-    const NumericArray &f, 
-    const Stencil &stencil,
-    const Index nx,
-    const Index ny) const
 {
-    // valarray needed for LR-decomposition of a tridiagonal matrix
-    NumericArray resid=residuum(u,f,stencil,nx,ny);
-    switch (stencil.size())
-    {
-    case 1:  // stencil of size 1
-        switch (direction_)
-        {
-        case ALTDIR:
-            ninepointxzebra(u,f,resid,stencil,nx,ny);
-            resid=residuum(u,f,stencil,nx,ny);
-            ninepointyzebra(u,f,resid,stencil,nx,ny);
-            break;
-        case XDIR:
-            ninepointxzebra(u,f,resid,stencil,nx,ny);
-            break;
-        case YDIR:
-            ninepointyzebra(u,f,resid,stencil,nx,ny);
-            break;
-        default:
-            std::cerr<<"Error in direction of the line relaxation!\n";
-            break;
-        }
-        break;          
-    case 2:  // stencil of size 2
-        switch (direction_)
-        {
-        case ALTDIR:
-            xzebra(u,f,resid,stencil,nx,ny);
-            resid=residuum(u,f,stencil,nx,ny);
-            yzebra(u,f,resid,stencil,nx,ny);
-            break;
-        case XDIR:
-            xzebra(u,f,resid,stencil,nx,ny);
-            break;
-        case YDIR:
-            yzebra(u,f,resid,stencil,nx,ny);
-            break;
-        default:
-            std::cerr<<"Error in direction of the line relaxation!\n";
-            break;
-        }
-        break;
-    default:
-        std::cerr << "Stencil is too big (size>2)!" << std::endl;
-        break;
-    }
-}
-void ZebraLine::ninepointxzebra(
+void ZebraLine::ninePointX(
     NumericArray &u,
     const NumericArray &f, 
-    NumericArray resid,
     const Stencil &stencil,
     const Index nx, 
     const Index ny) const
 { 
-    NumericArray rhs(0.0,u.size());
-    NumericArray temp(0.0,(nx+1)*(ny+1));
-    //valarrays needed for saving the tridiagonal matrix A of linear system A u = rhs
-    NumericArray diagR(nx-1);
-    NumericArray ndiagR(nx-2);
-    NumericArray ndiagL(nx-2);
-    if(stencil.isConstant())
+    if (nx > 2)
     {
-        // get const operator L
-        const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
-        const PositionArray jX=stencil.getJx(C,nx,ny);
-        const PositionArray jY=stencil.getJy(C,nx,ny);
-        // for each line: correction of the rhs given by 
-        // rhs = fv - [L[n]  0  L[s]]^t * u and elimination of the 
-        // boundary condition in first and last inner point
-        for(Index sy=1; sy<ny ; sy+=2) 
+        NumericArray temp(u);
+
+        solveNinePointXLine(u, f, temp, stencil, nx, ny, 1, 1, SW, S, SE);
+
+        for(Index sy=3; sy<ny-1 ; sy+=2)
         {
-            for(Index sx=0; sx<nx-1; sx++)  
-            {
-                rhs[sy*(nx+1)+sx+1]=resid[sy*(nx+1)+sx+1];
-            }                       
-            // set tridiagonalmatrix for solving A u = rhs
-            // A[i][i] = L[c]; A[i-1][i] = L[w]; A[i+1][i] = L[e]
-            diagR=operatorL[C];
-            ndiagR=operatorL[E];
-            ndiagL=operatorL[W];
-            xLRSolver(temp,sy,nx,rhs,ndiagL,diagR,ndiagR);
+            solveNinePointXLine(u, f, temp, stencil, nx, ny, 1, sy, W, C, E);
         }
-        u+=omega_*temp;
-        resid=residuum(u,f,stencil,nx,ny);
-        temp=0.0;
-        // same for even lines 
-        for(Index sy=2; sy<ny ; sy+=2)
-        {
-            for(Index sx=0; sx<nx-1; sx++)  
-            {
-                rhs[sy*(nx+1)+sx+1] = resid[sy*(nx+1)+sx+1];
-            }   
-            diagR=operatorL[C];
-            ndiagR=operatorL[E];
-            ndiagL=operatorL[W];
-            xLRSolver(temp,sy,nx,rhs,ndiagL,diagR,ndiagR);
+
+        solveNinePointXLine(u, f, temp, stencil, nx, ny, 1, ny-1, NW, N, NE);
+
+        u = (1 - omega_) * u + omega_ * temp;
+
+        for(Index sy=2; sy<ny ; sy+=2) 
+        {                   
+            solveNinePointXLine(u, f, temp, stencil, nx, ny, 1, sy, W, C, E);
+
+            for (Index sx=1; sx<=nx; ++sx)
+                u[sy*(ny+1)+sx] =
+                         (1 - omega_) * u[sy*(ny+1)+sx] 
+                        + omega_ * temp[sy*(ny+1)+sx];
         }
-        u+=omega_*temp;
+
+    }       
+    else
+    {
+        gsRedBlack_.relax(u,f,stencil,nx,ny);
     }
-    else // Stencil is not constant
-    {
-        //Stencil ist not constant, so L needs to be evaluated in each grid
-        //point no other change in the algorithm  
-        NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
-        PositionArray jX=stencil.getJx(C,nx,ny);
-        PositionArray jY=stencil.getJy(C,nx,ny);
-        if(nx > 2)
-        {
-            operatorL=stencil.getL(SW,1,1,nx,ny);
-			rhs=resid;
-            diagR[0]=operatorL[C];
-            ndiagR[0]=operatorL[E];
-            for(Index sx=2; sx<nx-1; sx++)
-            {
-                operatorL=stencil.getL(S,sx,1,nx,ny);
-                diagR[sx-1]=operatorL[C];
-                ndiagR[sx-1]=operatorL[E];
-                ndiagL[sx-2]=operatorL[W];
-            }
-            operatorL=stencil.getL(SE,nx-1,1,nx,ny);
-            diagR[nx-2]=operatorL[C];
-            ndiagL[nx-3]=operatorL[W];
-            xLRSolver(temp,1,nx,rhs,ndiagL,diagR,ndiagR);
-            for(Index sy=3; sy<ny-1 ; sy+=2)
-            {
-                operatorL=stencil.getL(W,1,sy,nx,ny);
-                diagR[0]=operatorL[C];
-                ndiagR[0]=operatorL[E];
-                for(Index sx=2; sx<nx-1; sx++)
-                {
-                    operatorL=stencil.getL(C,sx,sy,nx,ny);
-                    diagR[sx-1]=operatorL[C];
-                    ndiagR[sx-1]=operatorL[E];
-                    ndiagL[sx-2]=operatorL[W];
-                }
-                operatorL=stencil.getL(E,nx-1,sy,nx,ny);
-                diagR[nx-2]=operatorL[C];
-                ndiagL[nx-3]=operatorL[W];
-                xLRSolver(temp,sy,nx,rhs,ndiagL,diagR,ndiagR);
-            }
-            operatorL=stencil.getL(NW,1,ny-1,nx,ny);
-            diagR[0]=operatorL[C];
-            ndiagR[0]=operatorL[E];
-            for(Index sx=2; sx<nx-1; sx++)
-            {
-                operatorL=stencil.getL(N,sx,ny-1,nx,ny);
-                diagR[sx-1]=operatorL[C];
-                ndiagR[sx-1]=operatorL[E];
-                ndiagL[sx-2]=operatorL[W];
-            }
-            operatorL=stencil.getL(NE,nx-1,ny-1,nx,ny);
-            diagR[nx-2]=operatorL[C];
-            ndiagL[nx-3]=operatorL[W];
-            xLRSolver(temp,ny-1,nx,rhs,ndiagL,diagR,ndiagR);
-            u += omega_ * temp;
-            resid = residuum(u,f,stencil,nx,ny);
-            temp = 0.0;
-            //even lines
-            for(Index sy=2; sy<ny ; sy+=2) 
-            {                   
-                operatorL=stencil.getL(W,1,sy,nx,ny);
-                diagR[0]=operatorL[C];
-                ndiagR[0]=operatorL[E];
-                // operatorL in the center Point (sx,sy)
-                for(Index sx=2; sx<nx-1; sx++)  
-                {
-                    operatorL=stencil.getL(C,sx,sy,nx,ny);
-                    diagR[sx-1]=operatorL[C];
-                    ndiagR[sx-1]=operatorL[E];
-                    ndiagL[sx-2]=operatorL[W];
-                }
-                operatorL=stencil.getL(E,nx-1,sy,nx,ny);
-                diagR[nx-2]=operatorL[C];
-                ndiagL[nx-3]=operatorL[W];
-                xLRSolver(temp,sy,nx,rhs,ndiagL,diagR,ndiagR);
-            }
-            u += omega_ * temp;
-        }       
-        else // nx,ny too small
-        {
-            gsRedBlack_.relax(u,f,stencil,nx,ny);
-        }
-    }                       
 }
-void ZebraLine::ninepointyzebra(
+
+void ZebraLine::ninePointY(
     NumericArray &u,
     const NumericArray &f, 
-    NumericArray resid,
     const Stencil &stencil,
     const Index nx, 
     const Index ny) const
 { 
-    NumericArray rhs(0.0,u.size());
-    NumericArray temp(0.0,(nx+1)*(ny+1));
-    //valarrays needed for saving the tridiagonal matrix A of linear system A u = rhs
-    NumericArray diagR(ny-1);
-    NumericArray ndiagR(ny-2);
-    NumericArray ndiagL(ny-2);
-    if(stencil.isConstant())
+    if(ny > 2)
     {
-        // get const operator L
-        const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
-        const PositionArray jX=stencil.getJx(C,nx,ny);
-        const PositionArray jY=stencil.getJy(C,nx,ny);
-        // for each line: correction of the rhs given by
-        // rhs = fv - [L[w]  0  L[e]] * u and elimination of the 
-        // boundary condition in first and last inner point
-        for(Index sx=1; sx<nx ; sx+=2) 
+        NumericArray temp(u);
+
+        solveNinePointYLine(u, f, temp, stencil, nx, ny, 1, 1, SW, W, NW);
+
+        for(Index sx=3; sx<nx-1 ; sx+=2)
         {
-            for(Index sy=0; sy<ny-1; sy++)  
-            {
-                rhs[(sy+1)*(nx+1)+sx] = resid[(sy+1)*(nx+1)+sx];
-            }
-            // set tridiagonalmatrix for solving A u = rhs
-            // A[i][i] = L[c]; A[i-1][i] = L[s]; A[i+1][i] = L[n]
-            diagR=operatorL[C];
-            ndiagR=operatorL[N];
-            ndiagL=operatorL[S];
-            yLRSolver(temp,sx,nx,ny,rhs,ndiagL,diagR,ndiagR);
+            solveNinePointYLine(u, f, temp, stencil, nx, ny, sx, 1, S, C, N);
         }
-        u+=omega_*temp;
-        resid=residuum(u,f,stencil,nx,ny);
-        temp=0.0;
-        // same for each even line
-        for(Index sx=2; sx<nx ; sx+=2) 
+
+        solveNinePointYLine(u, f, temp, stencil, nx, ny, nx-1, 1, SE, E, NE);
+
+        u = (1 - omega_) * u + omega_ * temp;
+
+        for(Index sx=2; sx<nx-1 ; sx+=2)
         {
-            for(Index sy=0; sy<ny-1; sy++)  
-            {
-                rhs[(sy+1)*(nx+1)+sx]=resid[(sy+1)*(nx+1)+sx];
-            }
-            // set tridiagonalmatrix for solving A u = rhs
-            // A[i][i] = L[c]; A[i-1][i] = L[s]; A[i+1][i] = L[n]
-            diagR=operatorL[C];
-            ndiagR=operatorL[N];
-            ndiagL=operatorL[S];
-            yLRSolver(temp,sx,nx,ny,rhs,ndiagL,diagR,ndiagR);
+            solveNinePointYLine(u, f, temp, stencil, nx, ny, sx, 1, S, C, N);
+
+            for (Index sy=1; sy<=ny; ++sy)
+                u[sy*(ny+1)+sx] =
+                         (1 - omega_) * u[sy*(ny+1)+sx] 
+                        + omega_ * temp[sy*(ny+1)+sx];
         }
-        u+=omega_*temp;
     }
-    else // Stencil is not constant
+    else
     {
-        //Stencil ist not constant, so L needs to be evaluated in each grid
-        //point no other change in the algorithm  
-        NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
-        PositionArray jX=stencil.getJx(C,nx,ny);
-        PositionArray jY=stencil.getJy(C,nx,ny);
-        if(ny > 2)
-        {
-            operatorL=stencil.getL(SW,1,1,nx,ny);
-            diagR[0]=operatorL[C];
-            ndiagR[0]=operatorL[N]; 
-			rhs=resid;
-            for(Index sy=2; sy<ny-1; sy++) 
-            {
-                operatorL=stencil.getL(W,1,sy,nx,ny);
-                diagR[sy-1]=operatorL[C];
-                ndiagR[sy-1]=operatorL[N];
-                ndiagL[sy-2]=operatorL[S];                  
-            }
-            operatorL=stencil.getL(NW,1,ny-1,nx,ny);
-            diagR[ny-2]=operatorL[C];
-            ndiagL[ny-3]=operatorL[S];
-            yLRSolver(temp,1,nx,ny,rhs,ndiagL,diagR,ndiagR);
-            for(Index sx=3; sx<nx-1 ; sx+=2)
-            {
-                operatorL=stencil.getL(S,sx,1,nx,ny);
-                diagR[0]=operatorL[C];
-                ndiagR[0]=operatorL[N];
-                for(Index sy=2; sy<ny-1; sy++) 
-                {
-                    operatorL=stencil.getL(C,sx,sy,nx,ny);
-                    diagR[sy-1]=operatorL[C];
-                    ndiagR[sy-1]=operatorL[N];
-                    ndiagL[sy-2]=operatorL[S];
-                }
-                operatorL=stencil.getL(N,sx,ny-1,nx,ny);
-                diagR[ny-2]=operatorL[C];
-                ndiagL[ny-3]=operatorL[S];
-                yLRSolver(temp,sx,nx,ny,rhs,ndiagL,diagR,ndiagR);
-            }
-            operatorL=stencil.getL(SE,nx-1,1,nx,ny);
-            diagR[0]=operatorL[C];
-            ndiagR[0]=operatorL[N];
-            for(Index sy=2; sy<ny-1; sy++) 
-            {
-                operatorL=stencil.getL(E,nx-1,sy,nx,ny);
-                diagR[sy-1]=operatorL[C];
-                ndiagR[sy-1]=operatorL[N];
-                ndiagL[sy-2]=operatorL[S];                    
-            }                   
-            operatorL=stencil.getL(NE,nx-1,ny-1,nx,ny);
-            diagR[ny-2]=operatorL[C];
-            ndiagL[ny-3]=operatorL[S];
-            yLRSolver(temp,nx-1,nx,ny,rhs,ndiagL,diagR,ndiagR);
-            u+=omega_*temp;
-            resid=residuum(u,f,stencil,nx,ny);
-            temp=0.0;
-            for(Index sx=2; sx<nx-1 ; sx+=2)
-            {
-                operatorL=stencil.getL(S,sx,1,nx,ny);
-                diagR[0]=operatorL[C];
-                ndiagR[0]=operatorL[N];
-                for(Index sy=2; sy<ny-1; sy++) 
-                {
-                    operatorL=stencil.getL(C,sx,sy,nx,ny);
-                    diagR[sy-1]=operatorL[C];
-                    ndiagR[sy-1]=operatorL[N];
-                    ndiagL[sy-2]=operatorL[S];
-                }
-                operatorL=stencil.getL(N,sx,ny-1,nx,ny);
-                diagR[ny-2]=operatorL[C];
-                ndiagL[ny-3]=operatorL[S];
-                yLRSolver(temp,sx,nx,ny,rhs,ndiagL,diagR,ndiagR);
-            }
-            u+=omega_*temp;
-        }
-        else // if Nx and Ny are too small do one GS_lex step
-        {
-            gsRedBlack_.relax(u,f,stencil,nx,ny);
-        }
-    }                       
+        gsRedBlack_.relax(u,f,stencil,nx,ny);
+    }
 }
-void ZebraLine::xzebra(
+
+void ZebraLine::fullX(
     NumericArray &u,
     const NumericArray &f, 
-    NumericArray resid,
     const Stencil &stencil, 
     const Index nx, 
     const Index ny) const
 {
     if((ny > 4) && (nx > 4))
     {   
-        NumericArray rhs(0.0,u.size());
-        NumericArray temp(0.0,(nx+1)*(ny+1));
-        NumericArray diagR(0.0,nx-1);
-        NumericArray ndiagR1(0.0,nx-2);
-        NumericArray ndiagL1(0.0,nx-2);
-        NumericArray ndiagR2(0.0,nx-3);
-        NumericArray ndiagL2(0.0,nx-3);
-        if(stencil.isConstant())
+        NumericArray temp(u);
+
+        solveFullXLine(u, f, temp, stencil, nx, ny, 1, 1, SW, S, SE);
+
+        for(Index sy=3; sy<ny-2; sy+=2)
+            solveFullXLine(u, f, temp, stencil, nx, ny, 1, sy, W, C, E);
+        
+        solveFullXLine(u, f, temp, stencil, nx, ny, 1, ny-1, NW, N, NE);
+
+        u = (1 - omega_) * u + omega_ * temp;
+
+        for(Index sy=2; sy<ny-1; sy+=2)
         {
-            // get const operator L
-            const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
-            const PositionArray jX=stencil.getJx(C,nx,ny);
-            const PositionArray jY=stencil.getJy(C,nx,ny);
-            NumericArray operatorLB=stencil.getL(S,2,1,nx,ny);
-            PositionArray jXB=stencil.getJx(S,nx,ny);
-            PositionArray jYB=stencil.getJy(S,nx,ny);
-            NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
-            PositionArray jXC=stencil.getJx(SW,nx,ny);
-            PositionArray jYC=stencil.getJy(SW,nx,ny);
-            // set rhs for line 1
-			rhs=resid;
-            diagR[0]=operatorLC[C];
-            ndiagR1[0]=operatorLC[E];
-            ndiagR2[0]=operatorLC[NE];         
-            rhs[0]=resid[nx+1+1];
-            ndiagL1[0]=operatorLB[W];
-            diagR[1]=operatorLB[C];
-            ndiagR1[1]=operatorLB[E];                    
-            ndiagR2[1]=operatorLB[SE];
-            rhs[1]=resid[nx+1+2];
-            for(Index sx=3; sx<nx-2; sx++)  
-            {
-                ndiagL2[sx-3]=operatorLB[NW];
-                ndiagL1[sx-2]=operatorLB[W];
-                diagR[sx-1]=operatorLB[C];
-                ndiagR1[sx-1]=operatorLB[E];                  
-                ndiagR2[sx-1]=operatorLB[SE];
-                rhs[sx-1]=resid[nx+1+sx];
-            }
-            ndiagL2[nx-5]=operatorLB[NW];
-            ndiagL1[nx-4]=operatorLB[W];
-            diagR[nx-3]=operatorLB[C];
-            ndiagR1[nx-3]=operatorLB[E];
-            rhs[nx-3]=resid[nx+1+nx-2];
-            operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
-            jXC=stencil.getJx(SE,nx,ny);
-            jYC=stencil.getJy(SE,nx,ny);
-            ndiagL2[nx-4]=operatorLC[NW];
-            ndiagL1[nx-3]=operatorLC[W];
-            diagR[nx-2]=operatorLC[C];
-            rhs[nx-2]=resid[nx+1+nx-1];
-            xLRSolver(temp,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
-           // process odd inner lines
-            for(Index sy=3; sy<ny-2; sy+=2)
-            {
-                // set rhs
-                operatorLB=stencil.getL(W,1,sy,nx,ny);
-                jXB=stencil.getJx(W,nx,ny);
-                jYB=stencil.getJy(W,nx,ny);
-                diagR[0]=operatorLB[C];
-                ndiagR1[0]=operatorLB[E];
-                ndiagR2[0]=operatorLB[NE];     
-                rhs[0]=resid[sy*(nx+1)+1];             
-                ndiagL1[0]=operatorL[W];
-                diagR[1]=operatorL[C];
-                ndiagR1[1]=operatorL[E];                  
-                ndiagR2[1]=operatorL[SE];
-                rhs[1]=resid[sy*(nx+1)+2];
-                for(Index sx=3; sx<nx-2; sx++)  
-                {
-                    ndiagL2[sx-3]=operatorL[NW];
-                    ndiagL1[sx-2]=operatorL[W];
-                    diagR[sx-1]=operatorL[C];
-                    ndiagR1[sx-1]=operatorL[E];                    
-                    ndiagR2[sx-1]=operatorL[SE];
-                    rhs[sx-1]=resid[sy*(nx+1)+sx];
-                }
-                ndiagL2[nx-5]=operatorL[NW];
-                ndiagL1[nx-4]=operatorL[W];
-                diagR[nx-3]=operatorL[C];
-                ndiagR1[nx-3]=operatorL[E];
-                rhs[nx-3]=resid[sy*(nx+1)+nx-2];
-                operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
-                jXB=stencil.getJx(E,nx,ny);
-                jYB=stencil.getJy(E,nx,ny);
-                ndiagL2[nx-4]=operatorLB[NW];
-                ndiagL1[nx-3]=operatorLB[W];
-                diagR[nx-2]=operatorLB[C];
-                rhs[nx-2]=resid[sy*(nx+1)+nx-1];
-                xLRSolver(temp,sy,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
-            }
-            //relax top line
-            // set rhs in top line
-            operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
-            jXC=stencil.getJx(NW,nx,ny);
-            jYC=stencil.getJy(NW,nx,ny);
-            diagR[0]=operatorLC[C];
-            ndiagR1[0]=operatorLC[E];
-            ndiagR2[0]=operatorLC[NW];         
-            rhs[0]=resid[(ny-1)*(nx+1)+1];
-            operatorLB=stencil.getL(N,2,ny-1,nx,ny);
-            jXB=stencil.getJx(N,nx,ny);
-            jYB=stencil.getJy(N,nx,ny);
-            ndiagL1[0]=operatorLB[W];
-            diagR[1]=operatorLB[C];
-            ndiagR1[1]=operatorLB[E];                    
-            ndiagR2[1]=operatorLB[NE];
-            rhs[1]=resid[(ny-1)*(nx+1)+2];
-            for(Index sx=3; sx<nx-2; sx++)  
-            {
-                ndiagL2[sx-3]=operatorLB[NW];
-                ndiagL1[sx-2]=operatorLB[W];
-                diagR[sx-1]=operatorLB[C];
-                ndiagR1[sx-1]=operatorLB[E];                  
-                ndiagR2[sx-1]=operatorLB[NE];
-                rhs[sx-1]=resid[(ny-1)*(nx+1)+sx];
-            }
-            ndiagL2[nx-5]=operatorLB[NW];
-            ndiagL1[nx-4]=operatorLB[W];
-            diagR[nx-3]=operatorLB[C];
-            ndiagR1[nx-3]=operatorLB[E];
-            rhs[nx-3]=resid[(ny-1)*(nx+1)+nx-2];
-            operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
-            jXC=stencil.getJx(NE,nx,ny);
-            jYC=stencil.getJy(NE,nx,ny);
-            ndiagL2[nx-4]=operatorLC[NW];
-            ndiagL1[nx-3]=operatorLC[W];
-            diagR[nx-2]=operatorLC[C];
-            rhs[nx-2]=resid[(ny-1)*(nx+1)+nx-1];
-            xLRSolver(temp,ny-1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
-            u+=omega_*temp;
-            resid=residuum(u,f,stencil,nx,ny);
-            temp=0.0;
-            // relax even inner lines
-            for(Index sy=2; sy<ny-1; sy+=2)
-            {
-                // set rhs
-                operatorLB=stencil.getL(W,1,sy,nx,ny);
-                jXB=stencil.getJx(W,nx,ny);
-                jYB=stencil.getJy(W,nx,ny);
-                diagR[0]=operatorLB[C];
-                ndiagR1[0]=operatorLB[E];
-                ndiagR2[0]=operatorLB[NE];     
-                rhs[0]=resid[sy*(nx+1)+1];             
-                ndiagL1[0]=operatorL[W];
-                diagR[1]=operatorL[C];
-                ndiagR1[1]=operatorL[E];                  
-                ndiagR2[1]=operatorL[SE];
-                rhs[1]=resid[sy*(nx+1)+2];
-                for(Index sx=3; sx<nx-2; sx++)  
-                {
-                    ndiagL2[sx-3]=operatorL[NW];
-                    ndiagL1[sx-2]=operatorL[W];
-                    diagR[sx-1]=operatorL[C];
-                    ndiagR1[sx-1]=operatorL[E];                    
-                    ndiagR2[sx-1]=operatorL[SE];
-                    rhs[sx-1]=resid[sy*(nx+1)+sx];
-                }
-                ndiagL2[nx-5]=operatorL[NW];
-                ndiagL1[nx-4]=operatorL[W];
-                diagR[nx-3]=operatorL[C];
-                ndiagR1[nx-3]=operatorL[E];
-                rhs[nx-3]=resid[sy*(nx+1)+nx-2];
-                operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
-                jXB=stencil.getJx(E,nx,ny);
-                jYB=stencil.getJy(E,nx,ny);
-                ndiagL2[nx-4]=operatorLB[NW];
-                ndiagL1[nx-3]=operatorLB[W];
-                diagR[nx-2]=operatorLB[C];
-                rhs[nx-2]=resid[sy*(nx+1)+nx-1];
-                xLRSolver(temp,sy,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
-            }
-            u+=omega_*temp;
-        }
-        else // stencil not constant
-        {
-            NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
-            PositionArray jX=stencil.getJx(C,nx,ny);
-            PositionArray jY=stencil.getJy(C,nx,ny);
-            NumericArray operatorLB=stencil.getL(S,2,1,nx,ny);
-            PositionArray jXB=stencil.getJx(S,nx,ny);
-            PositionArray jYB=stencil.getJy(S,nx,ny);
-            NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
-            PositionArray jXC=stencil.getJx(SW,nx,ny);
-            PositionArray jYC=stencil.getJy(SW,nx,ny);
-			rhs=resid;
-            diagR[0]=operatorLC[C];
-            ndiagR1[0]=operatorLC[E];
-            ndiagR2[0]=operatorLC[NE];
-            operatorLB=stencil.getL(S,2,1,nx,ny);
-            jXB=stencil.getJx(S,nx,ny);
-            jYB=stencil.getJy(S,nx,ny);
-            ndiagL1[0]=operatorLB[W];
-            diagR[1]=operatorLB[C];
-            ndiagR1[1]=operatorLB[E];                    
-            ndiagR2[1]=operatorLB[SE];
-            for(Index sx=3; sx<nx-2; sx++)  
-            {
-                operatorLB=stencil.getL(S,sx,1,nx,ny);
-                ndiagL2[sx-3]=operatorLB[NW];
-                ndiagL1[sx-2]=operatorLB[W];
-                diagR[sx-1]=operatorLB[C];
-                ndiagR1[sx-1]=operatorLB[E];                  
-                ndiagR2[sx-1]=operatorLB[SE];
-            }
-            operatorLB=stencil.getL(S,nx-2,1,nx,ny);
-            ndiagL2[nx-5]=operatorLB[NW];
-            ndiagL1[nx-4]=operatorLB[W];
-            diagR[nx-3]=operatorLB[C];
-            ndiagR1[nx-3]=operatorLB[E];
-            operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
-            jXC=stencil.getJx(SE,nx,ny);
-            jYC=stencil.getJy(SE,nx,ny);
-            ndiagL2[nx-4]=operatorLC[NW];
-            ndiagL1[nx-3]=operatorLC[W];
-            diagR[nx-2]=operatorLC[C];
-            xLRSolver(temp,1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
-            // process odd inner lines
-            for(Index sy=3; sy<ny-2; sy+=2)
-            {
-                // setze rechte Seite                   
-                operatorLB=stencil.getL(W,1,sy,nx,ny);
-                jXB=stencil.getJx(W,nx,ny);
-                jYB=stencil.getJy(W,nx,ny);
-                diagR[0]=operatorLB[C];
-                ndiagR1[0]=operatorLB[E];
-                ndiagR2[0]=operatorLB[NE];
-                operatorL=stencil.getL(C,2,sy,nx,ny);
-                ndiagL1[0]=operatorL[W];
-                diagR[1]=operatorL[C];
-                ndiagR1[1]=operatorL[E];                  
-                ndiagR2[1]=operatorL[SE];
-                for(Index sx=3; sx<nx-2; sx++)  
-                {
-                    operatorL=stencil.getL(C,sx,sy,nx,ny);
-                    ndiagL2[sx-3]=operatorL[NW];
-                    ndiagL1[sx-2]=operatorL[W];
-                    diagR[sx-1]=operatorL[C];
-                    ndiagR1[sx-1]=operatorL[E];                    
-                    ndiagR2[sx-1]=operatorL[SE];
-                }
-                operatorL=stencil.getL(C,nx-2,sy,nx,ny);
-                ndiagL2[nx-5]=operatorL[NW];
-                ndiagL1[nx-4]=operatorL[W];
-                diagR[nx-3]=operatorL[C];
-                ndiagR1[nx-3]=operatorL[E];
-                operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
-                jXB=stencil.getJx(E,nx,ny);
-                jYB=stencil.getJy(E,nx,ny);
-                ndiagL2[nx-4]=operatorLB[NW];
-                ndiagL1[nx-3]=operatorLB[W];
-                diagR[nx-2]=operatorLB[C];
-                xLRSolver(temp,sy,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
-            }
-            //relax top line
-            // set rhs in top line
-            operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
-            jXC=stencil.getJx(NW,nx,ny);
-            jYC=stencil.getJy(NW,nx,ny);
-            diagR[0]=operatorLC[C];
-            ndiagR1[0]=operatorLC[E];
-            ndiagR2[0]=operatorLC[NW];
-            operatorLB=stencil.getL(N,2,ny-1,nx,ny);
-            jXB=stencil.getJx(N,nx,ny);
-            jYB=stencil.getJy(N,nx,ny);
-            ndiagL1[0]=operatorLB[W];
-            diagR[1]=operatorLB[C];
-            ndiagR1[1]=operatorLB[E];                    
-            ndiagR2[1]=operatorLB[NE];
-            for(Index sx=3; sx<nx-2; sx++)  
-            {
-                operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
-                ndiagL2[sx-3]=operatorLB[NW];
-                ndiagL1[sx-2]=operatorLB[W];
-                diagR[sx-1]=operatorLB[C];
-                ndiagR1[sx-1]=operatorLB[E];                  
-                ndiagR2[sx-1]=operatorLB[NE];
-            }
-            operatorLB=stencil.getL(N,nx-2,ny-1,nx,ny);
-            ndiagL2[nx-5]=operatorLB[NW];
-            ndiagL1[nx-4]=operatorLB[W];
-            diagR[nx-3]=operatorLB[C];
-            ndiagR1[nx-3]=operatorLB[E];
-            operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
-            jXC=stencil.getJx(NE,nx,ny);
-            jYC=stencil.getJy(NE,nx,ny);
-            ndiagL2[nx-4]=operatorLC[NW];
-            ndiagL1[nx-3]=operatorLC[W];
-            diagR[nx-2]=operatorLC[C];
-            xLRSolver(temp,ny-1,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
-            u += omega_ * temp;
-            resid=residuum(u,f,stencil,nx,ny);
-            temp=0.0;
-            // relax even inner lines
-            for(Index sy=2; sy<ny-1; sy+=2)
-            {
-                // set rhs
-                operatorLB=stencil.getL(W,1,sy,nx,ny);
-                jXB=stencil.getJx(W,nx,ny);
-                jYB=stencil.getJy(W,nx,ny);
-                diagR[0]=operatorLB[C];
-                ndiagR1[0]=operatorLB[E];
-                ndiagR2[0]=operatorLB[NE];
-                operatorL=stencil.getL(C,2,sy,nx,ny);
-                ndiagL1[0]=operatorL[W];
-                diagR[1]=operatorL[C];
-                ndiagR1[1]=operatorL[E];                  
-                ndiagR2[1]=operatorL[SE];
-                for(Index sx=3; sx<nx-2; sx++)  
-                { 
-                    operatorL=stencil.getL(C,sx,sy,nx,ny);
-                    ndiagL2[sx-3]=operatorL[NW];
-                    ndiagL1[sx-2]=operatorL[W];
-                    diagR[sx-1]=operatorL[C];
-                    ndiagR1[sx-1]=operatorL[E];                    
-                    ndiagR2[sx-1]=operatorL[SE];
-                }
-                operatorL=stencil.getL(C,nx-2,sy,nx,ny);
-                ndiagL2[nx-5]=operatorL[NW];
-                ndiagL1[nx-4]=operatorL[W];
-                diagR[nx-3]=operatorL[C];
-                ndiagR1[nx-3]=operatorL[E];
-                operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
-                jXB=stencil.getJx(E,nx,ny);
-                jYB=stencil.getJy(E,nx,ny);
-                ndiagL2[nx-4]=operatorLB[NW];
-                ndiagL1[nx-3]=operatorLB[W];
-                diagR[nx-2]=operatorLB[C];
-                xLRSolver(temp,sy,nx,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
-            }
-            u+=omega_*temp;
+            solveFullXLine(u, f, temp, stencil, nx, ny, 1, sy, W, C, E);
+
+            for (Index sx=1; sx<=nx; ++sx)
+                u[sy*(ny+1)+sx] =
+                         (1 - omega_) * u[sy*(ny+1)+sx] 
+                        + omega_ * temp[sy*(ny+1)+sx];
         }
      }
      else 
@@ -694,348 +126,38 @@ void ZebraLine::xzebra(
         }
     }
 }
-void ZebraLine::yzebra(
+
+void ZebraLine::fullY(
     NumericArray &u,
     const NumericArray &f, 
-    NumericArray resid,
     const Stencil &stencil,
     const Index nx, 
     const Index ny) const
 {
     if((ny > 4) && (nx > 4))
     {
-        NumericArray rhs(0.0,u.size());
-        NumericArray temp(0.0,(nx+1)*(ny+1));
-        NumericArray diagR(0.0,ny-1);
-        NumericArray ndiagR1(0.0,ny-2);
-        NumericArray ndiagL1(0.0,ny-2);
-        NumericArray ndiagR2(0.0,ny-3);
-        NumericArray ndiagL2(0.0,ny-3);
-        if(stencil.isConstant())
+        NumericArray temp(u);
+
+        solveFullYLine(u, f, temp, stencil, nx, ny, 1, 1, SW, W, NW);
+
+        for(Index sx=3; sx<nx-2; sx+=2)
+            solveFullYLine(u, f, temp, stencil, nx, ny, sx, 1, S, C, N);
+
+        solveFullYLine(u, f, temp, stencil, nx, ny, nx-1, 1, SE, E, NE);
+
+        u = (1 - omega_) * u + omega_ * temp;
+
+        for(Index sx=2; sx<nx-1; sx+=2)
         {
-            // get const operator L
-            const NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
-            const PositionArray jX=stencil.getJx(C,nx,ny);
-            const PositionArray jY=stencil.getJy(C,nx,ny);
-            NumericArray operatorLB=stencil.getL(W,1,2,nx,ny);
-            PositionArray jXB=stencil.getJx(W,nx,ny);
-            PositionArray jYB=stencil.getJy(W,nx,ny);
-            NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
-            PositionArray jXC=stencil.getJx(SW,nx,ny);
-            PositionArray jYC=stencil.getJy(SW,nx,ny);
-			rhs=resid;
-            diagR[0]=operatorLC[C];
-            ndiagR1[0]=operatorLC[N];
-            ndiagR2[0]=operatorLC[NW];
-            operatorLB=stencil.getL(W,1,2,nx,ny);
-            jXB=stencil.getJx(W,nx,ny);
-            jYB=stencil.getJy(W,nx,ny);
-            ndiagL1[0]=operatorLB[S];
-            diagR[1]=operatorLB[C];
-            ndiagR1[1]=operatorLB[N];                    
-            ndiagR2[1]=operatorLB[NW];
-            for(Index sy=3; sy<ny-2; sy++)  
-            {
-                ndiagL2[sy-3]=operatorLB[SE];
-                ndiagL1[sy-2]=operatorLB[S];
-                diagR[sy-1]=operatorLB[C];
-                ndiagR1[sy-1]=operatorLB[N];                  
-                ndiagR2[sy-1]=operatorLB[NW];
-            }
-            ndiagL2[ny-5]=operatorLB[SE];
-            ndiagL1[ny-4]=operatorLB[S];
-            diagR[ny-3]=operatorLB[C];
-            ndiagR1[ny-3]=operatorLB[N];
-            operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
-            jXC=stencil.getJx(NW,nx,ny);
-            jYC=stencil.getJy(NW,nx,ny);
-            ndiagL2[ny-4]=operatorLC[NE];
-            ndiagL1[ny-3]=operatorLC[S];
-            diagR[ny-2]=operatorLC[C];
-            yLRSolver(temp,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
-////////////////////////////////////////////////////////////////////////////////
-            // process inner columns
-            for(Index sx=3; sx<nx-2; sx+=2)
-            {
-                // set rhs
-                operatorLB=stencil.getL(S,sx,1,nx,ny);
-                jXB=stencil.getJx(S,nx,ny);
-                jYB=stencil.getJy(S,nx,ny);
-                diagR[0]=operatorLB[C];
-                ndiagR1[0]=operatorLB[N];
-                ndiagR2[0]=operatorLB[NE];
-                ndiagL1[0]=operatorL[S];
-                diagR[1]=operatorL[C];
-                ndiagR1[1]=operatorL[N];                  
-                ndiagR2[1]=operatorL[NE];                    
-                for(Index sy=3; sy<ny-2; sy++)
-                {
-                   ndiagL2[sy-3]=operatorL[SW];
-                   ndiagL1[sy-2]=operatorL[S];
-                   diagR[sy-1]=operatorL[C];
-                   ndiagR1[sy-1]=operatorL[N];
-                   ndiagR2[sy-1]=operatorL[NE];                       
-                }       
-                ndiagL2[nx-5]=operatorL[SW];
-                ndiagL1[nx-4]=operatorL[S];
-                diagR[nx-3]=operatorL[C];
-                ndiagR1[nx-3]=operatorL[N];
-                operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
-                jXB=stencil.getJx(N,nx,ny);
-                jYB=stencil.getJy(N,nx,ny);
-                ndiagL2[nx-4]=operatorLB[SW];
-                ndiagL1[nx-3]=operatorLB[S];
-                diagR[nx-2]=operatorLB[C];
-                yLRSolver(temp,sx,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
-            }
-////////////////last column//////////////////
-            operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
-            jXC=stencil.getJx(SE,nx,ny);
-            jYC=stencil.getJy(SE,nx,ny);
-            operatorLB=stencil.getL(E,nx-1,2,nx,ny);
-            jXB=stencil.getJx(E,nx,ny);
-            jYB=stencil.getJy(E,nx,ny);
-            ndiagL1[0]=operatorLB[S];
-            diagR[1]=operatorLB[C];
-            ndiagR1[1]=operatorLB[N];                    
-            ndiagR2[1]=operatorLB[NE];
-            for(Index sy=3; sy<ny-2; sy++)  
-            {
-                ndiagL2[sy-3]=operatorLB[SE];
-                ndiagL1[sy-2]=operatorLB[S];
-                diagR[sy-1]=operatorLB[C];
-                ndiagR1[sy-1]=operatorLB[N];                  
-                ndiagR2[sy-1]=operatorLB[NE];
-            }
-            ndiagL2[ny-5]=operatorLB[SE];
-            ndiagL1[ny-4]=operatorLB[S];
-            diagR[ny-3]=operatorLB[C];
-            ndiagR1[ny-3]=operatorLB[N];
-            operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
-            jXC=stencil.getJx(NE,nx,ny);
-            jYC=stencil.getJy(NE,nx,ny);
-            ndiagL2[ny-4]=operatorLC[NE];
-            ndiagL1[ny-3]=operatorLC[S];
-            diagR[ny-2]=operatorLC[C];
-            yLRSolver(
-                temp,
-                nx-1,nx,ny,
-                rhs,
-                ndiagL1,ndiagL2,
-                diagR,ndiagR1,ndiagR2);
-            u += omega_ * temp;
-            resid=residuum(u,f,stencil,nx,ny);
-            temp=0.0;
-            // process inner columns
-            for(Index sx=2; sx<nx-1; sx+=2)
-            {
-                // setze rechte Seite                   
-                operatorLB=stencil.getL(S,sx,1,nx,ny);
-                jXB=stencil.getJx(S,nx,ny);
-                jYB=stencil.getJy(S,nx,ny);
-                diagR[0]=operatorLB[C];
-                ndiagR1[0]=operatorLB[N];
-                ndiagR2[0]=operatorLB[NE];
-                ndiagL1[0]=operatorL[S];
-                diagR[1]=operatorL[C];
-                ndiagR1[1]=operatorL[N];                  
-                ndiagR2[1]=operatorL[NE];                    
-                for(Index sy=3; sy<ny-2; sy++)
-                {
-                   ndiagL2[sy-3]=operatorL[SW];
-                   ndiagL1[sy-2]=operatorL[S];
-                   diagR[sy-1]=operatorL[C];
-                   ndiagR1[sy-1]=operatorL[N];
-                   ndiagR2[sy-1]=operatorL[NE];                       
-                }       
-                ndiagL2[nx-5]=operatorL[SW];
-                ndiagL1[nx-4]=operatorL[S];
-                diagR[nx-3]=operatorL[C];
-                ndiagR1[nx-3]=operatorL[N];
-                operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
-                jXB=stencil.getJx(N,nx,ny);
-                jYB=stencil.getJy(N,nx,ny);
-                ndiagL2[nx-4]=operatorLB[SW];
-                ndiagL1[nx-3]=operatorLB[S];
-                diagR[nx-2]=operatorLB[C];
-                yLRSolver(
-                    temp,
-                    sx,nx,ny,
-                    rhs,
-                    ndiagL1,ndiagL2,
-                    diagR,ndiagR1,ndiagR2);
-            }
-            u+=omega_*temp;
-        }
-        else // stencil not constant
-        {
-            NumericArray operatorL=stencil.getL(C,2,2,nx,ny);
-            PositionArray jX=stencil.getJx(C,nx,ny);
-            PositionArray jY=stencil.getJy(C,nx,ny);
-            NumericArray operatorLB=stencil.getL(W,1,2,nx,ny);
-            PositionArray jXB=stencil.getJx(W,nx,ny);
-            PositionArray jYB=stencil.getJy(W,nx,ny);
-            NumericArray operatorLC=stencil.getL(SW,1,1,nx,ny);
-            PositionArray jXC=stencil.getJx(SW,nx,ny);
-            PositionArray jYC=stencil.getJy(SW,nx,ny);
-			rhs=resid;
-            diagR[0]=operatorLC[C];
-            ndiagR1[0]=operatorLC[N];
-            ndiagR2[0]=operatorLC[NW];
-            ndiagL1[0]=operatorLB[S];
-            diagR[1]=operatorLB[C];
-            ndiagR1[1]=operatorLB[N];                    
-            ndiagR2[1]=operatorLB[NW];
-            for(Index sy=3; sy<ny-2; sy++)  
-            {
-                operatorLB=stencil.getL(W,1,sy,nx,ny);
-                ndiagL2[sy-3]=operatorLB[SE];
-                ndiagL1[sy-2]=operatorLB[S];
-                diagR[sy-1]=operatorLB[C];
-                ndiagR1[sy-1]=operatorLB[N];                  
-                ndiagR2[sy-1]=operatorLB[NW];
-            }
-            operatorLB=stencil.getL(W,1,ny-2,nx,ny);
-            ndiagL2[ny-5]=operatorLB[SE];
-            ndiagL1[ny-4]=operatorLB[S];
-            diagR[ny-3]=operatorLB[C];
-            ndiagR1[ny-3]=operatorLB[N];
-            operatorLC=stencil.getL(NW,1,ny-1,nx,ny);
-            jXC=stencil.getJx(NW,nx,ny);
-            jYC=stencil.getJy(NW,nx,ny);
-            ndiagL2[ny-4]=operatorLC[NE];
-            ndiagL1[ny-3]=operatorLC[S];
-            diagR[ny-2]=operatorLC[C];
-            yLRSolver(temp,1,nx,ny,rhs,ndiagL1,ndiagL2,diagR,ndiagR1,ndiagR2);
-////////////////////////////////////////////////////////////////////////////////
-            // process inner columns
-            for(Index sx=3; sx<nx-2; sx+=2)
-            {
-                // set rhs
-                operatorLB=stencil.getL(S,sx,1,nx,ny);
-                jXB=stencil.getJx(S,nx,ny);
-                jYB=stencil.getJy(S,nx,ny);
-                diagR[0]=operatorLB[C];
-                ndiagR1[0]=operatorLB[N];
-                ndiagR2[0]=operatorLB[NE];
-                operatorL=stencil.getL(C,sx,2,nx,ny);
-                ndiagL1[0]=operatorL[S];
-                diagR[1]=operatorL[C];
-                ndiagR1[1]=operatorL[N];                  
-                ndiagR2[1]=operatorL[NE];  
-                for(Index sy=3; sy<ny-2; sy++)
-                {
-                   operatorL=stencil.getL(C,sx,sy,nx,ny);
-                   ndiagL2[sy-3]=operatorL[SW];
-                   ndiagL1[sy-2]=operatorL[S];
-                   diagR[sy-1]=operatorL[C];
-                   ndiagR1[sy-1]=operatorL[N];
-                   ndiagR2[sy-1]=operatorL[NE];
-                }       
-                operatorL=stencil.getL(C,sx,ny-2,nx,ny);
-                ndiagL2[nx-5]=operatorL[SW];
-                ndiagL1[nx-4]=operatorL[S];
-                diagR[nx-3]=operatorL[C];
-                ndiagR1[nx-3]=operatorL[N];
-                operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
-                jXB=stencil.getJx(N,nx,ny);
-                jYB=stencil.getJy(N,nx,ny);
-                ndiagL2[nx-4]=operatorLB[SW];
-                ndiagL1[nx-3]=operatorLB[S];
-                diagR[nx-2]=operatorLB[C];
-                yLRSolver(
-                    temp,
-                    sx,nx,ny,
-                    rhs,
-                    ndiagL1,ndiagL2,
-                    diagR,ndiagR1,ndiagR2);
-            }
-////////////////last column//////////////////
-            operatorLC=stencil.getL(SE,nx-1,1,nx,ny);
-            jXC=stencil.getJx(SE,nx,ny);
-            jYC=stencil.getJy(SE,nx,ny);
-            operatorLB=stencil.getL(E,nx-1,2,nx,ny);
-            jXB=stencil.getJx(E,nx,ny);
-            jYB=stencil.getJy(E,nx,ny);
-            ndiagL1[0]=operatorLB[S];
-            diagR[1]=operatorLB[C];
-            ndiagR1[1]=operatorLB[N];                    
-            ndiagR2[1]=operatorLB[NE];
-            for(Index sy=3; sy<ny-2; sy++)  
-            {
-                operatorLB=stencil.getL(E,nx-1,sy,nx,ny);
-                ndiagL2[sy-3]=operatorLB[SE];
-                ndiagL1[sy-2]=operatorLB[S];
-                diagR[sy-1]=operatorLB[C];
-                ndiagR1[sy-1]=operatorLB[N];                  
-                ndiagR2[sy-1]=operatorLB[NE];
-            }
-            operatorLB=stencil.getL(E,nx-1,ny-2,nx,ny);
-            ndiagL2[ny-5]=operatorLB[SE];
-            ndiagL1[ny-4]=operatorLB[S];
-            diagR[ny-3]=operatorLB[C];
-            ndiagR1[ny-3]=operatorLB[N];
-            operatorLC=stencil.getL(NE,nx-1,ny-1,nx,ny);
-            jXC=stencil.getJx(NE,nx,ny);
-            jYC=stencil.getJy(NE,nx,ny);
-            ndiagL2[ny-4]=operatorLC[NE];
-            ndiagL1[ny-3]=operatorLC[S];
-            diagR[ny-2]=operatorLC[C];
-            yLRSolver(
-                temp,
-                nx-1,nx,ny,
-                rhs,
-                ndiagL1,ndiagL2,
-                diagR,ndiagR1,ndiagR2);
-            u+=omega_*temp;
-            resid=residuum(u,f,stencil,nx,ny);
-            temp=0.0;
-            // process inner columns
-            for(Index sx=2; sx<nx-1; sx+=2)
-            {
-                // set rhs
-                operatorLB=stencil.getL(S,sx,1,nx,ny);
-                jXB=stencil.getJx(S,nx,ny);
-                jYB=stencil.getJy(S,nx,ny);
-                diagR[0]=operatorLB[C];
-                ndiagR1[0]=operatorLB[N];
-                ndiagR2[0]=operatorLB[NE];
-                operatorL=stencil.getL(C,sx,2,nx,ny);
-                ndiagL1[0]=operatorL[S];
-                diagR[1]=operatorL[C];
-                ndiagR1[1]=operatorL[N];                  
-                ndiagR2[1]=operatorL[NE];
-                for(Index sy=3; sy<ny-2; sy++)
-                {
-                   operatorL=stencil.getL(C,sx,sy,nx,ny);
-                   ndiagL2[sy-3]=operatorL[SW];
-                   ndiagL1[sy-2]=operatorL[S];
-                   diagR[sy-1]=operatorL[C];
-                   ndiagR1[sy-1]=operatorL[N];
-                   ndiagR2[sy-1]=operatorL[NE];
-                }       
-                operatorL=stencil.getL(C,sx,ny-2,nx,ny);
-                ndiagL2[nx-5]=operatorL[SW];
-                ndiagL1[nx-4]=operatorL[S];
-                diagR[nx-3]=operatorL[C];
-                ndiagR1[nx-3]=operatorL[N];
-                operatorLB=stencil.getL(N,sx,ny-1,nx,ny);
-                jXB=stencil.getJx(N,nx,ny);
-                jYB=stencil.getJy(N,nx,ny);
-                ndiagL2[nx-4]=operatorLB[SW];
-                ndiagL1[nx-3]=operatorLB[S];
-                diagR[nx-2]=operatorLB[C];
-                yLRSolver(
-                    temp,
-                    sx,nx,ny,
-                    rhs,
-                    ndiagL1,ndiagL2,
-                    diagR,ndiagR1,ndiagR2);
-            }
-            u+=omega_*temp;
+            solveFullYLine(u, f, temp, stencil, nx, ny, sx, 1, S, C, N);
+
+            for (Index sy=1; sy<=ny; ++sy)
+                u[sy*(ny+1)+sx] =
+                         (1 - omega_) * u[sy*(ny+1)+sx] 
+                        + omega_ * temp[sy*(ny+1)+sx];
         }
     }
-    else //nx,ny too small
+    else
     {
         for(int k=0; k<2; k++)
         {

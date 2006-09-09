@@ -20,31 +20,27 @@ class ZebraLineGS : public mg::LineRelaxation
 {
 private:
     const GSRedBlack gsRedBlack_;
-    void ninepointxzebra(
+    void ninePointX(
         NumericArray &u,
         const NumericArray &f, 
-        NumericArray &rhs,
         const Stencil &stencil,
         const Index nx, 
         const Index ny) const;
-    void ninepointyzebra(
+    void ninePointY(
         NumericArray &u,
         const NumericArray &f, 
-        NumericArray &rhs,
         const Stencil &stencil,
         const Index nx, 
         const Index ny) const;
-    void xzebra(
+    void fullX(
         NumericArray &u,
         const NumericArray &f, 
-        NumericArray &rhs,
         const Stencil &stencil,
         const Index nx, 
         const Index ny) const;
-    void yzebra(
+    void fullY(
         NumericArray &u,
         const NumericArray &f, 
-        NumericArray &rhs,
         const Stencil &stencil,
         const Index nx, 
         const Index ny) const;
@@ -64,27 +60,6 @@ public:
         : LineRelaxation(direction),
           gsRedBlack_() {}
     virtual ~ZebraLineGS() {}
-
-    /**
-     * \brief relax() executes one relaxation step on the input vector
-     * 
-     * relax() exectues one Gauss Seidel zebra line relaxation step on the 
-     * input vector on a rectangular 2D gird with lexicographic ordering and the
-     * discretazation Stencil for a pde
-     * 
-     * \param[in,out] u     the vector representation of the 2D grid to perform
-     *                      the relaxation on
-     * \param[in] f         the right hand side of the pde
-     * \param[in] stencil   the stencil rep. of the pde
-     * \param[in] nx        number of steps in x direction
-     * \param[in] ny        number of steps in y direction
-     */
-    void relax(
-        NumericArray &u,
-        const NumericArray &f, 
-        const Stencil &stencil,
-        const Index nx,
-        const Index ny) const;  
 };
 }
 #endif /*ZEBRALINEGS_H_*/
