@@ -9,6 +9,7 @@
 
 #include <vector>
 #include "CycleType.h"
+#include <iostream>
 
 namespace mg
 {
@@ -76,7 +77,10 @@ public:
     virtual bool repeat()
     {
         ++repeats_[currentDepth_];
-        return repeats_[currentDepth_]<=gamma_[currentDepth_];
+        if (currentDepth_==1)
+            return repeats_[currentDepth_]<=1;
+        else
+            return repeats_[currentDepth_]<=gamma_[currentDepth_];
     }
     
     /**
