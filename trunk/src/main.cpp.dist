@@ -48,6 +48,7 @@ void testInit()
     Laplacian2D2 laplacian2D2;
     Laplacian2D4 laplacian2D4;
     MSV2D4 mSV2D4;
+    JumpingCoefficients jumpingCoefficients;
     Galerkin galerkin(laplacian2D2);
 }
 
@@ -65,15 +66,14 @@ int main()
     size_t iterations = 0;
     const Precision eps = 1e-30;
     std::cout<<"Genauigkeit : "<<eps<<std::endl;
-	ConvectionDiffusion2D1 fineGridDisc;
-    Galerkin disc( fineGridDisc );
+	Laplacian2D2 stencil;
 	GSLexicographic relaxation;
-    Precision resnull = twonormResiduum(u,fv,disc,nx,ny);
+    Precision resnull = twonormResiduum(u,fv,stencil,nx,ny);
     Precision resnew = resnull;
     Precision resold = resnull;
-	DendyInterpolation prolongation;
-	DendyRestriction restriction;
-    VCycle vCycle(2,2,k-1);
+	BilinearInterpolation prolongation;
+	FullWeighting restriction;
+    VCycle vCycle(2,2,k);
     //residues is used to store the intermediate residues, there are printed
     //after the cycle iterations because writing to std out takes a long time
     std::vector<Precision> residues;
@@ -81,8 +81,8 @@ int main()
     while (iterations<itmax && resnew/resnull>eps)
     {
         resold=resnew;
-        cycle(vCycle,u,fv,disc,prolongation,restriction,relaxation,nx,ny);
-        resnew=twonormResiduum(u,fv,disc,nx,ny);
+        cycle(vCycle,u,fv,stencil,prolongation,restriction,relaxation,nx,ny);
+        resnew=twonormResiduum(u,fv,stencil,nx,ny);
         residues.push_back(resnew);
         std::cout<<resnew<<std::endl;
         if (resnew>resold && iterations>3)
@@ -96,6 +96,6 @@ int main()
     convergenceRates(residues,std::cout);
     std::cout<<"Fehler = "<<error(u,nx,ny,g)<<" It = "<<iterations<<std::endl;
     //std::ofstream plotData("data.dat");
-    //gnuPlotDiscreteFunction(residuum(u,fv,disc,nx,ny),nx,ny,plotData);*/
+    //gnuPlotDiscreteFunction(residuum(u,fv,stencil,nx,ny),nx,ny,plotData);*/
     return 0;
 }
