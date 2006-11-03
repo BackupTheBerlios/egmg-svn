@@ -75,7 +75,7 @@ namespace mg
 
 	enum PositionExtension {WW=9,NWW=10,NNWW=11,NNW=12,
 		NN=13,NNE=14,NNEE=15,NEE=16,EE=17,SEE=18,
-		SSEE=19,SSE=20,SS=21,SSW=22,SSWW=23,SWW=24};
+		SSEE=19,SSE=20,SS=21,SSW=22,SSWW=23,SWW=24,NamedPositions=25};
     
     /**
      * \enum mg::Direction
