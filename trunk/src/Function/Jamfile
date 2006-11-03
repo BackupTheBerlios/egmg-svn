@@ -1,0 +1,4 @@
+subproject Function ;
+
+lib Function : <template>../warnings
+				Function.cpp ;
