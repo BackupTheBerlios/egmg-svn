@@ -7,6 +7,7 @@
 
 
 #include "../general/parameters.h"
+#include "../Function/Function.h"
 
 namespace mg
 {
@@ -23,7 +24,7 @@ namespace mg
         NumericArray& u,
         const Index nx,
         const Index ny,
-        const function2D g);
+        const Function& g);
 }
 
 #endif /*PUTBVAL_H_*/

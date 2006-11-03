@@ -7,6 +7,7 @@
 
 
 #include "../general/parameters.h"
+#include "../Function/Function.h"
 
 namespace mg
 {
@@ -22,7 +23,7 @@ namespace mg
         NumericArray& fv,
         const Index nx,
         const Index ny,
-        const function2D f);
+        const Function& f);
 }
 
 #endif /*PUTRHS_H_*/

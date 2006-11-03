@@ -7,6 +7,7 @@
 
 
 #include "../general/parameters.h"
+#include "../Function/Function.h"
 
 namespace mg
 {
@@ -27,7 +28,7 @@ namespace mg
         const NumericArray& u,
         const Index nx,
         const Index ny,
-        const function2D solution);
+        const Function& solution);
 }
 
 #endif /*ERROR_H_*/

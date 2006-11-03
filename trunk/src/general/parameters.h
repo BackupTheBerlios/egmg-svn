@@ -94,12 +94,5 @@ namespace mg
      */
     enum Direction{ALTDIR=0,XDIR=1,YDIR=2};
     
-    /**
-     * \brief a function pointer to a function \f$ f: K^2 \rightarrow K \f$
-     */
-    typedef Precision (*function2D) (
-        const Precision x,
-        const Precision y);
-    
 }
 #endif /*PARAMETERS_H_*/

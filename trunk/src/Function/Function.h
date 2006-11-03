@@ -8,9 +8,11 @@ namespace mg
 
 class Function
 {
-	Precision operator() (Precision x, Precision y) const;
 protected:
 	virtual Precision apply(Precision x, Precision y) const =0;
+public:
+	Precision operator() (Precision x, Precision y) const;
+    virtual ~Function() =0;
 };
 
 }

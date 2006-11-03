@@ -11,6 +11,7 @@
 #include "./functions/functionsIncludes.h"
 #include "./CycleType/CycleTypeIncludes.h"
 #include "./general/parameters.h"
+#include "./Function/FunctionIncludes.h"
 
 using namespace mg;
 
@@ -21,11 +22,13 @@ void testInit()
     WCycle wCycle(1,1,3,2);
     std::vector<Index> gammas(3,2); //Equivalent to a WCycle
     LevelCycle levelCycle(1,1,gammas);
+
     BicubicInterpolation bicubicInterpolation;
     BilinearInterpolation bilinearInterpolation;
 	DendyInterpolation dendyInterpolation;
 	DeZeeuwInterpolation deZeeuwInterpolation;
     SevenPointInterpolation sevenPointInterpolation;
+
     GSLexicographic gsLexicographic;
     GSRedBlack gsRedBlack;
     Jacobi jacobi;
@@ -34,12 +37,14 @@ void testInit()
 	WHighJac wHighJac;
     ZebraLine zebraLine;
     ZebraLineGS zebraLineGS;
+
 	DendyRestriction dendyRestriction;
     FullWeighting fullWeighting;
     HalfWeighting halfWeighting;
     Injection injection;
     SevenPointRestriction sevenPointRestriction;
 	TransposedProlongation transposedProlongation(dendyInterpolation);
+
     Biharmonic2D2 biharmonic2D2;
     ConDiff2D1 conDiff2D1;
     ConDiff2Dkap conDiff2Dkap;
@@ -50,6 +55,11 @@ void testInit()
     MSV2D4 mSV2D4;
     JumpingCoefficients jumpingCoefficients;
     Galerkin galerkin(laplacian2D2);
+
+    Zero zero;
+    Constant constant(42);
+    TestFunction1 testFunction1;
+    TestRightSide1 testRightSide1;
 }
 
 int main()
@@ -60,8 +70,8 @@ int main()
     const size_t ny = nx;
     NumericArray u(0.0,(nx+1)*(ny+1));
     NumericArray fv(0.0,(nx+1)*(ny+1));
-    putbval(u,nx,ny,g);
-    putrhs(fv,nx,ny,f);
+    putbval(u,nx,ny,TestRightSide1());
+    putrhs(fv,nx,ny,TestFunction1());
     const size_t itmax = 100;
     size_t iterations = 0;
     const Precision eps = 1e-30;
@@ -94,7 +104,7 @@ int main()
     }
     //print out the defects history
     convergenceRates(residues,std::cout);
-    std::cout<<"Fehler = "<<error(u,nx,ny,g)<<" It = "<<iterations<<std::endl;
+    std::cout<<"Fehler = "<<error(u,nx,ny,TestRightSide1())<<" It = "<<iterations<<std::endl;
     //std::ofstream plotData("data.dat");
     //gnuPlotDiscreteFunction(residuum(u,fv,stencil,nx,ny),nx,ny,plotData);*/
     return 0;

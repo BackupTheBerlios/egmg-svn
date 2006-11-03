@@ -13,7 +13,7 @@ namespace mg
         const NumericArray& u,
         const Index nx,
         const Index ny,
-        const function2D solution)
+        const Function& solution)
     {
         Precision result=0.0;
         const Precision hx=1.0/nx;

@@ -10,7 +10,7 @@ namespace mg
         NumericArray& fv,
         const Index nx,
         const Index ny,
-        const function2D f)
+        const Function& f)
     {
         const Precision hx=1.0/nx;
         const Precision hy=1.0/ny;
