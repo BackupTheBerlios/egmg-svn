@@ -19,7 +19,7 @@ NumericArray HalfWeighting::restriction(
     const Index nxNew=nx/2;
     const Index nyNew=ny/2;
     NumericArray result(0.0,(nxNew+1)*(nyNew+1));
-    //do injection on the boarders
+    //do injection on the borders
     for (Index sy=0;sy<=nyNew;sy++)
     {
         result[sy*(nxNew+1)]=u[2*sy*(nx+1)];

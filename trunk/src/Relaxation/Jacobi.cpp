@@ -42,7 +42,7 @@ void Jacobi::relax(
         factor = 1.0/stencil.getCenter(NE,(nx-1),(nx-1),nx,ny);
         result[(nx-1)*(nx+1)+(nx-1)]+=factor*(f[(nx-1)*(nx+1)+(nx-1)]
             -stencil.apply(u,NE,(nx-1),(ny-1),nx,ny));
-        //boarders
+        //borders
         for (Index sx=2;sx<(nx-1);sx++)
         {
             factor = 1.0/stencil.getCenter(S,sx,1,nx,ny);

@@ -26,7 +26,7 @@ NumericArray TransposedProlongation::restriction(
 	PositionArray Jy = prolongation_.getJy(C);
 	NumericArray result(0.0,(nxNew+1)*(nyNew+1));
 	Precision scale = 0;
-	//do injection on the boarders
+	//do injection on the borders
 	for (Index sy=0; sy<=nyNew; sy++)
 	{
 		result[sy*(nxNew+1)]=u[2*sy*(nx+1)];

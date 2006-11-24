@@ -39,25 +39,25 @@ namespace mg
                     f[(nx-1)*(nx+1)+(nx-1)]
                     -stencil.apply(u,NE,nx-1,ny-1,nx,ny);
             result+=temp_res*temp_res;
-            //south boarder
+            //south border
             for (Index sx=2; sx<nx-1; sx++)
             {
                 temp_res=f[1*(nx+1)+sx]-stencil.apply(u,S,sx,1,nx,ny);
                 result+=temp_res*temp_res;
             }
-            //north boarder
+            //north border
             for (Index sx=2; sx<nx-1; sx++)
             {
                 temp_res=f[(nx-1)*(nx+1)+sx]-stencil.apply(u,N,sx,ny-1,nx,ny);
                 result+=temp_res*temp_res;
             }
-            //west boarder
+            //west border
             for (Index sy=2; sy<ny-1; sy++)
             {
                 temp_res=f[sy*(nx+1)+1]-stencil.apply(u,W,1,sy,nx,ny);
                 result+=temp_res*temp_res;
             }
-            //east boarder
+            //east border
             for (Index sy=2; sy<ny-1; sy++)
             {
                 temp_res=f[sy*(nx+1)+(nx-1)]-stencil.apply(u,E,nx-1,sy,nx,ny);

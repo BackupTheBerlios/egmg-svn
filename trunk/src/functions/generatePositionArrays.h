@@ -22,7 +22,7 @@ namespace mg
  * \param[in] pos           the relative position of the center element
  * \param[in] size          the size of the stencil expansion(jX,jY) will
  *                          return this (\see expansion).
- * \param[in] sizeToBorder  the number of points to the closest boarder
+ * \param[in] sizeToBorder  the number of points to the closest border
  * \return  the expansion of the stencil
  */
 void generatePositionArrays(
