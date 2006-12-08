@@ -12,6 +12,7 @@
 #include "../Restriction/Restriction.h"
 #include "../functions/expansion.h"
 #include "../functions/generatePositionArrays.h"
+#include "../functions/printStencil.h"
 
 namespace mg
 {
@@ -469,6 +470,52 @@ void Galerkin::update(
     data_.insert( currentDepth_, SW, jX, jY );
     data_.insert( currentDepth_, SW, 1, 1, operatorL );
     currentDepth_ = prolongations_.size();
+}
+
+
+bool CheckSymmetry(const Restriction& restriction, Galerkin& stencil, const Prolongation& prolongation, const Index nx, const Index ny, std::ostream& out )
+{
+    Precision totalDiff = 0.0;
+    const Precision eps = 1e-6;
+    for ( Index grids = 0; grids < 1; ++grids )
+        stencil.pushTransferOperators( restriction, prolongation, nx, ny );
+    NumericArray coefficients( stencil.getL( C, 5, 5, nx, ny ) );
+    NumericArray tempCoefficients( coefficients );
+    PositionArray jX( stencil.getJx( C, nx, ny ) );
+    PositionArray jY( stencil.getJy( C, nx, ny ) );
+    for ( Index sy = 5; sy < ny - 5; ++sy )
+    {
+        for ( Index sx = 5; sx < nx - 5; ++sx )
+        {
+            coefficients = stencil.getL(C, sx, sy ,nx, ny );
+            for ( Index i = 0; i < coefficients.size(); ++i )
+            {
+                tempCoefficients = stencil.getL(C, sx + jX[i], sy + jY[i], nx, ny);
+                Index j = 0;
+                for ( ; j < jX.size(); ++j )
+                {
+                    if ( jX[i] == -jX[j] && jY[i] == -jY[j] )
+                        break;
+                }
+                Precision diff = coefficients[i] - tempCoefficients[j];
+                if ( diff > eps )
+                {
+                    out << sx << " " << sy << ": ";
+                    out << "iX " <<jX[i] << " iY "<<jY[i]<<" :"<<std::endl;
+                    printStencil(coefficients,jX,jY,out);
+
+                    out << sx +jX[i]<< " " << sy+jY[i] << ": ";
+                    out << "jX " <<jX[j] << " jY "<<jY[j]<<" : " << std::endl;
+                    printStencil(tempCoefficients,jX,jY,out);
+                    out << diff << std::endl;
+                    out<<"========================="<<std::endl;
+                }
+                totalDiff += diff;
+            }
+        }
+    }
+    out << "Total Diff " << totalDiff <<std::endl;
+    return totalDiff < eps;
 }
 
 }

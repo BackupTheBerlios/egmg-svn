@@ -7,6 +7,7 @@
 
 #include "PreCalculatedStencil.h"
 #include <vector>
+#include <ostream>
 
 namespace mg
 {
@@ -31,6 +32,8 @@ private:
     std::vector<const Prolongation*> prolongations_;
     std::vector<const Restriction*> restrictions_;
 };
+
+bool CheckSymmetry(const Restriction& restriction, Galerkin& stencil, const Prolongation& prolongation, const Index nx, const Index ny, std::ostream& out );
 
 }
 
