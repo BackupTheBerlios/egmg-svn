@@ -29,6 +29,15 @@ void printStencil(
     const PositionArray& jY,
     std::ostream& out);
 
+class Stencil;
+
+void printAllStencils(
+    const Stencil& stencil,
+    const Index nx,
+    const Index ny,
+    std::ostream& out,
+    Precision scale=0);
 }
+
 
 #endif /*PRINTSTENCIL_H_*/

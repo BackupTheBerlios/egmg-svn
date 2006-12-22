@@ -4,6 +4,7 @@
  */
 #include "printStencil.h"
 #include <iomanip>
+#include "../Stencil/Stencil.h"
 
 namespace mg
 {
@@ -53,4 +54,24 @@ void printStencil(
     }
 }
 
+void printAllStencils(
+    const Stencil& stencil,
+    const Index nx,
+    const Index ny,
+    std::ostream& out,
+    Precision scale)
+{
+    if (scale==0)
+        scale=nx*ny;
+    for (Index sx = 1; sx<nx; ++sx)
+        for (Index sy = 1; sy<ny; ++sy)
+        {
+            out<<sx<<" "<<sy<<std::endl;
+            printStencil(   
+                    stencil.getL(C,sx,sy,nx,ny)/scale,
+                    stencil.getJx(C,nx,ny),
+                    stencil.getJy(C,nx,ny),
+                    out);
+        }
+}
 }
