@@ -12,6 +12,8 @@
 #include "./CycleType/CycleTypeIncludes.h"
 #include "./general/parameters.h"
 #include "./Function/FunctionIncludes.h"
+#include "./functions/krylov.h"
+
 
 using namespace mg;
 
@@ -88,9 +90,17 @@ int main()
     //after the cycle iterations because writing to std out takes a long time
     std::vector<Precision> residues;
     residues.push_back(resnull);
+	//Needed for Krylov
+	const int size = (int) (nx+1)*(ny+1);
+	size_t KrylovDim=5;
+	size_t counter = 1;
+	NumericArray DefectHistory(0.0,(KrylovDim*size));
+	NumericArray UHistory(0.0, KrylovDim*size);
     while (iterations<itmax && resnew/resnull>eps)
     {
-        resold=resnew;
+        //-- Slice needed for Krylov
+		std::slice KR((counter-1)*size,size,1);
+		resold=resnew;
         cycle(vCycle,u,fv,stencil,prolongation,restriction,relaxation,nx,ny);
         resnew=twonormResiduum(u,fv,stencil,nx,ny);
         residues.push_back(resnew);
@@ -100,6 +110,26 @@ int main()
             std::cout<<"No convergence"<<std::endl;
             break;  
         }
+		//-- Store defect & u history
+		DefectHistory[KR]=residuum(u,fv,stencil,nx,ny);
+		UHistory[KR]=u;
+		//-- Make use of Krylov acceleration
+		if (counter==KrylovDim)
+		{
+			//-- create copy of most recent solution
+			NumericArray unew(u);
+			NumericArray Koef = krylov(KrylovDim,DefectHistory,nx,ny);
+			KrylovUpdate(unew, UHistory, Koef, size, KrylovDim-1);
+			Precision resu=twonormResiduum(u,fv,stencil,nx,ny);
+			Precision resunew=twonormResiduum(unew,fv,stencil,nx,ny);
+			//-- check if Krylov acceleration is really an acceleration
+			if (resu>resunew)
+				u=unew;
+			u=unew;
+			counter=0;
+			DefectHistory=0.0;
+		}
+		counter++;
         iterations++;
     }
     //print out the defects history
