@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="iso8859-15" ?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML v4.2//EN"
+	"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<article>
+<sect1><title>Namensgebung</title>
+<para>
+Die Projektsprache im Quelltext ist Englisch.
+</para>
+<sect2><title>Allgemein</title>
+<para>
+Wir verwenden die Buchstaben groß I (i), groß O (o) und klein l (L) nicht
+alleine für Bezeichner, da diese zu leicht mit 0 und 1 verwechselt
+werden können.
+</para>
+</sect2>
+<sect2><title>Dateien</title>
+<para>
+Dateinnamen enthalten nur kleinbuchstaben und hei?en wie die Klasse bzw.
+Funktion die sie enthalten. Für jede Klasse und jede Funktion wird eine
+Headerdatei <filename class="headerfile">*.h</filename> mit dem Deklaration
+und inline Implementierungen, sowie eine Implementierungsdatei
+<filename>*.cpp</filename>.
+</para>
+</sect2>
+<sect2><title>Namespace</title>
+<para>
+Wir benutzen den Namespace mg, d.h. alles was wir implementierun steht in
+<programlisting>
+<![CDATA[
+namespace mg
+{
+}
+]]>
+</programlisting>
+</para>
+</sect2>
+<sect2><title>#define</title>
+<para>
+In einem <symbol>#define</symbol> verwenden wir nur
+GROSSBUCHSTABEN_MIT_UNTERSTRICHEN.
+</para>
+<sect3><title>Headerdatei include guard</title>
+<para>
+Eine Headerdatei wird umramt von
+<programlisting>
+<![CDATA[
+#ifndef NAMEDERHEADERDATEI_H_
+#define NAMEDERHEADERDATEI_H_
+...
+#endif //NAMEDERHEADERDATEI_H_
+]]>
+</programlisting>
+</para>
+</sect3>
+</sect2>
+<sect2><title>Variablen</title>
+<para>
+Variablen beginnen mit einem kleinbuchstaben und enthalten kein &quot;_&quot;,
+falls ein neues Wort beginnt, verwenden wir die sogenannte CamelCaseNotation.
+<programlisting>
+<![CDATA[
+std::valarray<Precision> coarsGridCorrection;
+]]>
+</programlisting>
+</para>
+</sect2>
+<sect2><title>Klassen</title>
+<para>
+Klassennamen beginen mit einem Großbuchstaben und verwenden wie Variablen die
+CamelCaseNotation.
+</para>
+</sect2>
+<sect2><title>typedefs</title>
+<para>
+Wir behandeln Typedefs wie Klassennamen.
+</para>
+</sect2>
+<sect2><title>Membervariablen</title>
+<para>
+Membervariablen werden wie Variablen behandelt und enden mit einem Unterstrich.
+<programlisting>
+int omega_;
+</programlisting>
+</para>
+</sect2>
+<sect2><title>Funktionen / Memberfunktionen</title>
+<para>
+Funktionen werden wie Variablen benannt.
+</para>
+</sect2>
+<sect2><title>Namenskonventionen</title>
+<para>
+Die folgenden Namen sollten einheitlich verwendet werden.
+</para>
+<table>
+<title>Typen Namen</title>
+<tgroup cols="2">
+<thead><row><entry>Type</entry><entry>Verwendung</entry></row></thead>
+<tbody>
+<row><entry>Precision</entry><entry>Für reelle Zahlen</entry></row>
+<row><entry>Index</entry><entry>Für das zugreifen auf Elemente von Vektoren</entry></row>
+<row><entry>NumericArray</entry><entry>reeller Vektor</entry></row>
+<row><entry>PositionArray</entry><entry>Ganzzahliger Vektor</entry></row>
+</tbody>
+</tgroup>
+</table>
+<table>
+<title>Allgemeine Namen</title>
+<tgroup cols="3">
+<thead><row><entry>Name</entry><entry>Type</entry><entry>Bedeutung</entry></row></thead>
+<tbody>
+<row><entry>nx</entry><entry>size_t</entry><entry>Anzahl (number) der Gitterpunkte in X-Richtung</entry></row>
+<row><entry>ny</entry><entry>size_t</entry><entry>Anzahl (number) der Gitterpunkte in Y-Richtung</entry></row>
+<row><entry>hx</entry><entry>Precision</entry><entry>Schrittweite in X-Richtung</entry></row>
+<row><entry>hy</entry><entry>Precision</entry><entry>Schrittweite in Y-Richtung</entry></row>
+<row><entry>sx</entry><entry>size_t</entry><entry>Schritte (Step) in X-Richtung</entry></row>
+<row><entry>sy</entry><entry>size_t</entry><entry>Schritte (Step) in Y-Richtung</entry></row>
+<row><entry>x</entry><entry>Precision</entry><entry>X-Koordinate x=sx*hx</entry></row>
+<row><entry>y</entry><entry>Precision</entry><entry>Y-Koordinate y=sy*hy</entry></row>
+<row><entry>f</entry><entry>std::valarray&lt;Precision&gt;</entry><entry>Rechte Seite der PDGL</entry></row>
+<row><entry>u</entry><entry>std::valarray&lt;Precision&gt;</entry><entry>Unbekannte der PDGL</entry></row>
+</tbody>
+</tgroup>
+</table>
+
+</sect2>
+</sect1>
+<sect1><title>Formatierung</title>
+<sect2><title>Klammern</title>
+<para>
+Geschweifte Klammern gehören untereinander und in eine eigene Zeile. Falls ein
+Codeblock nur eine Anweisung enthält lassen wir die geschweiften Klammern weg.
+Runde Klammern verwenden wir sowenig wie möglich.
+<programlisting>
+<![CDATA[
+if (a<3 && c+d<7)
+]]>
+</programlisting>
+</para>
+</sect2>
+<sect2><title>Einrücken</title>
+<para>
+Codeblöcke werden mit 4 Leerzeichen eingerückt, wir verwenden keine Tabulatoren.
+Die geschweiften Klammern werden nicht mit eingerückt. Als Ausnahme gilt: den
+Codeblock von Namespaces rücken wir nicht ein.
+<programlisting>
+<![CDATA[
+for (size_t i=0; i<u.size(); ++i)
+{
+    u[i]+=i;
+    u[i]-=i;
+}
+]]>
+</programlisting>
+</para>
+</sect2>
+<sect2><title>Whitspaces</title>
+<para>
+In jeder Zeile steht nur eine Anweisung.
+</para>
+<para>
+Wir verwenden keine Tabulatoren.
+</para>
+<para>
+Um Operatoren werden keine Leerzeichen gesetzt au?er um logisches und
+(&amp;&amp;) und um logisches oder (||).
+</para>
+</sect2>
+<sect2><title>Zeilenlänge</title>
+<para>
+Zeilen haben eine maximale Länge von 80 Zeichen.
+</para>
+</sect2>
+<sect2><title>Kommentare</title>
+<para>
+Grundsätzlich gilt: Der Quelltext eklärt sich ohne Kommentare selbst, ansonsten 
+muss er umgeschrieben werden. Für die
+Dokumentation der API benutzen wir Doxygen. D.h. Falls Doxygen ?ber einen
+fehlenden Komentar Warnungen ausgibt müssen diese noch eingefügt werden.
+</para>
+</sect2>
+<sect2><title>Funktionsdeklarationen/-definitionen</title>
+<para>
+Hier verwenden wir pro Parameter eine eigene Zeile. Als Ausnahme gilt:
+Falls der gesammte Funktionskopf inklusive Einrückung in eine Zeile (80 Zeichen)
+passt, so schreiben wir ihn in eine Zeile. 
+<programlisting>
+<![CDATA[
+void cycle(
+    std::valarray<Precision>& u,
+    const std::valarray<Precision>& f,
+    Stencil& stencil,
+    const Prolongation& prolongation,
+    const Restriction& restriction,
+    Relaxation& relaxation,
+    const size_t nx,
+    const size_t ny)
+{
+    //\todo impelment this	
+}
+]]>
+</programlisting>
+</para>
+</sect2>
+</sect1>
+<sect1><title>Formulierung</title>
+<sect2><title>Standart Header</title>
+<para>
+Die in einer Headerdatei benötigten Standart Header binden wir alle als erstes
+ein, auch wenn diese schon von einem anderen Header eingebunden werden.
+</para>
+</sect2>
+<sect2><title>Deklaration von Variablen</title>
+<para>
+Variablen müssen an der Stelle ihrer Deklaration initialisiert werden.
+</para>
+</sect2>
+<sect2><title>Oparatoren</title>
+<para>
+Ist noch zu klären.
+</para>
+</sect2>
+<sect2><title>Keine public member Variablen</title>
+<para>
+Stattdessen verwenden wir getter und setter.
+</para>
+</sect2>
+</sect1>
+</article>

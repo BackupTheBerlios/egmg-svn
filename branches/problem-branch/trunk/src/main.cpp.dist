@@ -1,0 +1,141 @@
+#include <valarray>
+#include <vector>
+#include <cmath>
+#include <iostream>
+#include <ostream>
+#include <fstream>
+#include "./egmg/Stencil/StencilIncludes.h"
+#include "./egmg/Restriction/RestrictionIncludes.h"
+#include "./egmg/Relaxation/RelaxationIncludes.h"
+#include "./egmg/Prolongation/ProlongationIncludes.h"
+#include "./egmg/functions/functionsIncludes.h"
+#include "./egmg/CycleType/CycleTypeIncludes.h"
+#include "./egmg/general/parameters.h"
+#include "./egmg/Function/FunctionIncludes.h"
+#include "./egmg/functions/krylov.h"
+
+
+using namespace mg;
+
+void testInit()
+{
+    FCycle fCycle(1,1,3);
+    VCycle vCycle(1,1,3);
+    WCycle wCycle(1,1,3,2);
+    std::vector<Index> gammas(3,2); //Equivalent to a WCycle
+    LevelCycle levelCycle(1,1,gammas);
+
+    BicubicInterpolation bicubicInterpolation;
+    BilinearInterpolation bilinearInterpolation;
+	DendyInterpolation dendyInterpolation;
+	DeZeeuwInterpolation deZeeuwInterpolation;
+    SevenPointInterpolation sevenPointInterpolation;
+
+    GSLexicographic gsLexicographic;
+    GSRedBlack gsRedBlack;
+    Jacobi jacobi;
+    LineGS lineGS;
+    LineJAC lineJAC;
+	WHighJac wHighJac;
+    ZebraLine zebraLine;
+    ZebraLineGS zebraLineGS;
+
+	DendyRestriction dendyRestriction;
+    FullWeighting fullWeighting;
+    HalfWeighting halfWeighting;
+    Injection injection;
+    SevenPointRestriction sevenPointRestriction;
+	TransposedProlongation transposedProlongation(dendyInterpolation);
+
+    Biharmonic2D2 biharmonic2D2;
+    ConDiff2D1 conDiff2D1;
+    ConDiff2Dkap conDiff2Dkap;
+    ConvectionDiffusion2D1 convectionDiffusion2D1;
+    Helmholtz2D2 helmholtz2D2;
+    Laplacian2D2 laplacian2D2;
+    Laplacian2D4 laplacian2D4;
+    MSV2D4 mSV2D4;
+    JumpingCoefficients jumpingCoefficients;
+    Galerkin galerkin(laplacian2D2);
+
+    Zero zero;
+    Constant constant(42);
+    TestFunction1 testFunction1;
+    TestRightSide1 testRightSide1;
+}
+
+int main()
+{
+    testInit();   
+    const int k = 6;
+    const size_t nx =static_cast<size_t>(std::pow(2.,k));
+    const size_t ny = nx;
+    NumericArray u(0.0,(nx+1)*(ny+1));
+    NumericArray fv(0.0,(nx+1)*(ny+1));
+    putbval(u,nx,ny,TestRightSide1());
+    putrhs(fv,nx,ny,TestFunction1());
+    const size_t itmax = 100;
+    size_t iterations = 0;
+    const Precision eps = 1e-30;
+    std::cout<<"Genauigkeit : "<<eps<<std::endl;
+	Laplacian2D2 stencil;
+	GSLexicographic relaxation;
+    Precision resnull = twonormResiduum(u,fv,stencil,nx,ny);
+    Precision resnew = resnull;
+    Precision resold = resnull;
+	BilinearInterpolation prolongation;
+	FullWeighting restriction;
+    VCycle vCycle(2,2,k);
+    //residues is used to store the intermediate residues, there are printed
+    //after the cycle iterations because writing to std out takes a long time
+    std::vector<Precision> residues;
+    residues.push_back(resnull);
+	//Needed for Krylov
+	const int size = (int) (nx+1)*(ny+1);
+	size_t KrylovDim=5;
+	size_t counter = 1;
+	NumericArray DefectHistory(0.0,(KrylovDim*size));
+	NumericArray UHistory(0.0, KrylovDim*size);
+    while (iterations<itmax && resnew/resnull>eps)
+    {
+        //-- Slice needed for Krylov
+		std::slice KR((counter-1)*size,size,1);
+		resold=resnew;
+        cycle(vCycle,u,fv,stencil,prolongation,restriction,relaxation,nx,ny);
+        resnew=twonormResiduum(u,fv,stencil,nx,ny);
+        residues.push_back(resnew);
+        std::cout<<resnew<<std::endl;
+        if (resnew>resold && iterations>3)
+        {
+            std::cout<<"No convergence"<<std::endl;
+            break;  
+        }
+		//-- Store defect & u history
+		DefectHistory[KR]=residuum(u,fv,stencil,nx,ny);
+		UHistory[KR]=u;
+		//-- Make use of Krylov acceleration
+		if (counter==KrylovDim)
+		{
+			//-- create copy of most recent solution
+			NumericArray unew(u);
+			NumericArray Koef = krylov(KrylovDim,DefectHistory,nx,ny);
+			KrylovUpdate(unew, UHistory, Koef, size, KrylovDim-1);
+			Precision resu=twonormResiduum(u,fv,stencil,nx,ny);
+			Precision resunew=twonormResiduum(unew,fv,stencil,nx,ny);
+			//-- check if Krylov acceleration is really an acceleration
+			if (resu>resunew)
+				u=unew;
+			u=unew;
+			counter=0;
+			DefectHistory=0.0;
+		}
+		counter++;
+        iterations++;
+    }
+    //print out the defects history
+    convergenceRates(residues,std::cout);
+    std::cout<<"Fehler = "<<error(u,nx,ny,TestRightSide1())<<" It = "<<iterations<<std::endl;
+    //std::ofstream plotData("data.dat");
+    //gnuPlotDiscreteFunction(residuum(u,fv,stencil,nx,ny),nx,ny,plotData);*/
+    return 0;
+}

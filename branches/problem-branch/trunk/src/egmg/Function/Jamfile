@@ -1,0 +1,8 @@
+subproject egmg/Function ;
+
+lib Function : <template>../../warnings
+				Function.cpp 
+                Zero.cpp
+                Constant.cpp
+                TestFunction1.cpp
+                TestRightSide1.cpp ;
