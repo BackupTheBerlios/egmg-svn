@@ -4,15 +4,15 @@ export CXXFLAGS = -g -O3 -W -Wall -ansi -pedantic #-O3 -W -Wall -ansi -pedantic
 LDFLAGS = $(CXXFLAGS)
 
 Objects = main.o
-Obj = ./functions/*.o ./Prolongation/*.o ./Relaxation/*.o ./Restriction/*.o ./Stencil/*.o ./Function/*.o
+Obj = ./egmg/functions/*.o ./egmg/Prolongation/*.o ./egmg/Relaxation/*.o ./egmg/Restriction/*.o ./egmg/Stencil/*.o ./egmg/Function/*.o
 Exe = ./main.exe
 
 all: TARGET = all
-all: CycleType functions Prolongation Relaxation Restriction Stencil Function $(Objects)
+all: egmg $(Objects)
 	$(LD) $(LDFLAGS) $(Objects) $(Obj) -o $(Exe)
 	
 clean: TARGET = clean
-clean: CycleType functions Prolongation Relaxation Restriction Stencil Function
+clean: egmg
 	$(RM) $(Exe) $(Objects) doxygen.log
 
 run: all
@@ -31,28 +31,10 @@ profile: all
 doc:
 	doxygen Multigrid.Doxyfile
 
-.PHONY: CycleType
-CycleType:
-	$(MAKE) -C CycleType $(TARGET)
-.PHONY: functions
-functions:
-	$(MAKE) -C functions $(TARGET)
-.PHONY: Prolongation
-Prolongation:
-	$(MAKE) -C Prolongation $(TARGET)
-.PHONY: Relaxation
-Relaxation:
-	$(MAKE) -C Relaxation $(TARGET)
-.PHONY: Restriction
-Restriction:
-	$(MAKE) -C Restriction $(TARGET)
-.PHONY: Stencil
-Stencil:
-	$(MAKE) -C Stencil $(TARGET)
-.PHONY: Function
-Function:
-	$(MAKE) -C Function $(TARGET)
+.PHONY: egmg
+egmg:
+	$(MAKE) -C egmg $(TARGET)
 
 #always build main to keep dependency simple while testing
-main.o: main.cpp CycleType functions Prolongation Relaxation Restriction Stencil Function
+main.o: main.cpp egmg
 	$(CXX) $(CXXFLAGS) -c main.cpp

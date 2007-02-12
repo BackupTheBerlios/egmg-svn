@@ -1,6 +1,6 @@
-subproject Restriction ;
+subproject egmg/Restriction ;
 
-lib Restriction : <template>../warnings
+lib Restriction : <template>../../warnings
 			      DendyRestriction.cpp
 			  	  FullWeighting.cpp
 			  	  HalfWeighting.cpp

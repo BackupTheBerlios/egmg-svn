@@ -10,18 +10,22 @@ template warnings : :
 	<intel-linux><*><cxxflags>-Wall 
 	<intel-linux><*><cxxflags>-w2 ;
 
-subinclude CycleType ;
-subinclude functions ;
-subinclude general ;
-subinclude Prolongation ;
-subinclude Relaxation ;
-subinclude Restriction ;
-subinclude Stencil ;
+subinclude egmg/CycleType ;
+subinclude egmg/functions ;
+subinclude egmg/general ;
+subinclude egmg/Prolongation ;
+subinclude egmg/Relaxation ;
+subinclude egmg/Restriction ;
+subinclude egmg/Stencil ;
+subinclude egmg/Function ;
 
 exe main : <template>warnings
-		   <lib>Stencil/Stencil
-		   <lib>Relaxation/Relaxation
-		   <lib>Prolongation/Prolongation
-	   	   <lib>Restriction/Restriction
-		   <lib>functions/functions
+		   <lib>egmg/Stencil/Stencil
+		   <lib>egmg/Relaxation/Relaxation
+		   <lib>egmg/Prolongation/Prolongation
+	   	   <lib>egmg/Restriction/Restriction
+		   <lib>egmg/functions/functions
+		   <lib>egmg/Function/Function
 	   	   main.cpp ;
+	   	   
+stage $(DOT) : <exe>main : : ;

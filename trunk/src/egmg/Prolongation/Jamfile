@@ -1,6 +1,6 @@
-subproject Prolongation ;
+subproject egmg/Prolongation ;
 
-lib Prolongation : <template>../warnings
+lib Prolongation : <template>../../warnings
 				   BicubicInterpolation.cpp
 				   BilinearInterpolation.cpp
 				   DendyInterpolation.cpp

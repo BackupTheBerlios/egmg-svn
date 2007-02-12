@@ -4,15 +4,15 @@
 #include <iostream>
 #include <ostream>
 #include <fstream>
-#include "./Stencil/StencilIncludes.h"
-#include "./Restriction/RestrictionIncludes.h"
-#include "./Relaxation/RelaxationIncludes.h"
-#include "./Prolongation/ProlongationIncludes.h"
-#include "./functions/functionsIncludes.h"
-#include "./CycleType/CycleTypeIncludes.h"
-#include "./general/parameters.h"
-#include "./Function/FunctionIncludes.h"
-#include "./functions/krylov.h"
+#include "./egmg/Stencil/StencilIncludes.h"
+#include "./egmg/Restriction/RestrictionIncludes.h"
+#include "./egmg/Relaxation/RelaxationIncludes.h"
+#include "./egmg/Prolongation/ProlongationIncludes.h"
+#include "./egmg/functions/functionsIncludes.h"
+#include "./egmg/CycleType/CycleTypeIncludes.h"
+#include "./egmg/general/parameters.h"
+#include "./egmg/Function/FunctionIncludes.h"
+#include "./egmg/functions/krylov.h"
 
 
 using namespace mg;

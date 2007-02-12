@@ -1,6 +1,6 @@
-subproject functions ;
+subproject egmg/functions ;
 
-lib functions : <template>../warnings
+lib functions : <template>../../warnings
 				cycle.cpp
 				directSolver.cpp
 				error.cpp
@@ -11,4 +11,5 @@ lib functions : <template>../warnings
 				putbval.cpp
 				putrhs.cpp
 				residuum.cpp
-				twonormResiduum.cpp ;
+				twonormResiduum.cpp
+				krylov.cpp ;

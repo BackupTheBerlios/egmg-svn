@@ -1,6 +1,6 @@
-subproject Relaxation ;
+subproject egmg/Relaxation ;
 
-lib Relaxation : <template>../warnings
+lib Relaxation : <template>../../warnings
 				 GSLexicographic.cpp
 				 GSRedBlack.cpp
 				 Jacobi.cpp

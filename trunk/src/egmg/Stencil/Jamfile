@@ -1,4 +1,4 @@
-subproject Stencil ;
+subproject egmg/Stencil ;
 
 lib Stencil : <template>../warnings
 			  Stencil.cpp
@@ -12,4 +12,5 @@ lib Stencil : <template>../warnings
 			  Laplacian2D4.cpp
 			  PreCalculatedStencil.cpp
 			  StencilBoard.cpp
-		      Galerkin.cpp ;
+		      Galerkin.cpp
+		      JumpingCoefficients.cpp ;
