@@ -1,3 +1,0 @@
-project egmg ;
-path-global BOOST_ROOT : ../boost ;
-project boost : $(BOOST_ROOT) ;

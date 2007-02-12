@@ -1,4 +1,0 @@
-Configuration:
-copy main.cpp.dist to main.cpp.
-
-Use gmake or Visual Studio

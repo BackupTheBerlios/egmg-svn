@@ -1,9 +1,0 @@
-subproject egmg/Restriction ;
-
-lib Restriction : <template>../../warnings
-			      DendyRestriction.cpp
-			  	  FullWeighting.cpp
-			  	  HalfWeighting.cpp
-			  	  Injection.cpp
-			   	  SevenPointRestriction.cpp
-			      TransposedProlongation.cpp ;
