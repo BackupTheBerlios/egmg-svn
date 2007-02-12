@@ -6,8 +6,7 @@
 #define RELAXATION_H_
 
 
-#include "../general/parameters.h"
-#include "../Stencil/Stencil.h"
+#include "../Problem/Problem.h"
 
 namespace mg
 {
@@ -32,11 +31,7 @@ public:
      * \param[in] ny            number of steps in y direction
      */
     virtual void relax(
-        NumericArray& u,
-        const NumericArray& f,
-        const Stencil& stencil,
-        const Index nx,
-        const Index ny) const=0;
+        Problem& problem) const=0;
 };
 
 }

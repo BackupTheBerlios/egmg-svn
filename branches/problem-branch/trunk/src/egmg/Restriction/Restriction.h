@@ -5,10 +5,8 @@
 #ifndef RESTRICTION_H_
 #define RESTRICTION_H_
 
+#include "../Problem/Problem.h"
 #include "../general/TransferOperator.h"
-#include "../general/parameters.h"
-#include "../Prolongation/Prolongation.h"
-#include "../Stencil/Stencil.h"
 
 namespace mg
 {
@@ -38,10 +36,7 @@ public:
      *                              grid
      */
     virtual NumericArray restriction(
-        const NumericArray& u,
-        const Stencil& stencil,
-        const Index nx,
-        const Index ny) const =0;
+        const Problem& problem) const =0;
 };
 
 }

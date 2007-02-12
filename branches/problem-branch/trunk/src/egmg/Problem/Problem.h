@@ -17,16 +17,23 @@ public:
     virtual Stencil& getStencil();
     virtual void setRightHandSide( const Function& rightHandSide );
     virtual void setRightHandSide( const NumericArray& rightHandSide );
-    virtual const NumericArray& NumericArray getRightHandSide();
+    virtual const NumericArray& getRightHandSide();
     virtual void setBoundaryConstraint( const Function& boundaryConstraint ) =0;
     virtual void applyBoundaryConstraint() =0;
+    virtual void applyBoundaryConstraint( NumericArray& array ) const =0;
     virtual NumericArray& getSolution() =0;
+    virtual const NumericArray& getSolution() const =0;
     virtual NumericArray residuum() =0;
+    virtual Point getLowerLeftCorner() const =0;
+    virtual Point getUpperRightCorner() const =0;
+    virtual Point getFirstPoint() const =0;
+    virtual Point getLastPoint() const =0;
+    Index getNx() const;
+    Index getNy() const;
     
 protected:
     const Index nx_;
     const Index ny_;
-private:
     Stencil& stencil_;
     NumericArray rightHandSide_;
 };

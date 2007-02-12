@@ -94,5 +94,12 @@ namespace mg
      */
     enum Direction{ALTDIR=0,XDIR=1,YDIR=2};
     
+    struct Point
+    {
+        Point(Index sx, Index sy): sx(sx), sy(sy){};
+        Index sx;
+        Index sy;
+    };
+    
 }
 #endif /*PARAMETERS_H_*/

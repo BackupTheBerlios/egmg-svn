@@ -14,7 +14,14 @@ public:
     
     virtual void setBoundaryConstraint( const Function& boundaryConstraint );
     virtual void applyBoundaryConstraint();
+    virtual void applyBoundaryConstraint( NumericArray& array ) const;
     virtual NumericArray residuum();
+    virtual NumericArray& getSolution();
+    virtual const NumericArray& getSolution() const;
+    virtual Point getLowerLeftCorner() const;
+    virtual Point getUpperRightCorner() const;
+    virtual Point getFirstPoint() const;
+    virtual Point getLastPoint() const;
     
 private:
     NumericArray solution_;

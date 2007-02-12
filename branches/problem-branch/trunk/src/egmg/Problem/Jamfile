@@ -1,8 +1,5 @@
 subproject egmg/Problem ;
 
 lib Problem : <template>../../warnings
-				Function.cpp 
-                Zero.cpp
-                Constant.cpp
-                TestFunction1.cpp
-                TestRightSide1.cpp ;
+				DirichletProblem.cpp
+				Problem.cpp ;

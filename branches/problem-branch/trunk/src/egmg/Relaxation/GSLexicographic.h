@@ -38,11 +38,7 @@ public:
      * \param[in] ny        number of steps in y direction
      */
     void relax(
-        NumericArray& u,
-        const NumericArray& f,
-        const Stencil& stencil,
-        const Index nx,
-        const Index ny) const;
+        Problem& problem) const;
 };
 
 }

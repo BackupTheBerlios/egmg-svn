@@ -76,9 +76,7 @@ public:
      *                              grid
      */
     NumericArray restriction(
-        const NumericArray& u,
-        const Stencil& stencil,
-        const Index nx, const Index ny) const;
+        const Problem& problem) const;
         
     const NumericArray& getI(
         const Position,

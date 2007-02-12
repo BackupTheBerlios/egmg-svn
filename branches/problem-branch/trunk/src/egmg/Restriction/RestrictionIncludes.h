@@ -6,10 +6,5 @@
 #define RESTRICTIONINCLUDES_H_
 
 #include "FullWeighting.h"
-#include "HalfWeighting.h"
-#include "Injection.h"
-#include "SevenPointRestriction.h"
-#include "TransposedProlongation.h"
-#include "DendyRestriction.h"
 
 #endif /*RESTRICTIONINCLUDES_H_*/
