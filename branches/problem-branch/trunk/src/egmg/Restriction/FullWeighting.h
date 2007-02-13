@@ -78,6 +78,9 @@ public:
     NumericArray restriction(
         const Problem& problem) const;
         
+    virtual NumericArray restriction(
+        const Problem& problem, const NumericArray& u) const;
+        
     const NumericArray& getI(
         const Position,
         const Index,

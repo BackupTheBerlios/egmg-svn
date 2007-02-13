@@ -12,6 +12,7 @@
 #include "../Restriction/Restriction.h"
 #include "../CycleType/CycleType.h"
 #include "../Stencil/Stencil.h"
+#include "../Problem/Problem.h"
 
 namespace mg
 {
@@ -39,14 +40,10 @@ namespace mg
  */
 void cycle(
     CycleType& cycleType,
-    NumericArray& u,
-    const NumericArray& f,
-    Stencil& stencil,
+    Problem& problem,
     const Prolongation& prolongation,
     const Restriction& restriction,
-    const Relaxation& relaxation,
-    const Index nx,
-    const Index ny);
+    const Relaxation& relaxation);
 }
 
 #endif /*CYCLE_H_*/

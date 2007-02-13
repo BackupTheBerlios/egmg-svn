@@ -17,61 +17,65 @@ namespace mg
 
 void cycle(
     CycleType& cycleType,
-    NumericArray& u,
-    const NumericArray& f,
-    Stencil& stencil,
+    Problem& problem,
     const Prolongation& prolongation,
     const Restriction& restriction,
-    const Relaxation& relaxation,
-    const Index nx,
-    const Index ny)
+    const Relaxation& relaxation)
 {
     cycleType.incrementGridLevel();
-
+    
+    NumericArray& u = problem.getSolution();
+    const NumericArray& f = problem.getRightHandSide();
+    Stencil& stencil = problem.getStencil();
+    const Index nx = problem.getNx();
+    const Index ny = problem.getNy();
+    
     if ( cycleType.solve())
     {
-        directSolver(u,f,stencil,nx,ny);
+        for(int i=0; i<4; ++i)
+                relaxation.relax(problem);
+        //directSolver(u,f,stencil,nx,ny);
     }
     else
     {
         while(cycleType.repeat())
         {
             for(int i=0; i<cycleType.getPreSmoothingSteps(); ++i)
-                relaxation.relax(u,f,stencil,nx,ny);
+                relaxation.relax(problem);
             //calculate the residuum
-            NumericArray residv=residuum(u,f,stencil,nx,ny);
+            NumericArray residv=problem.residuum();
             //restrict the residuum to the coars grid
             NumericArray coarsResiduum=restriction.restriction
-                    (residv,stencil,nx,ny);
+                    (problem,residv);
             const Index nxNew = nx/2;
             const Index nyNew = ny/2;
             //we going to a coarser grid so Galerkin Operator needs to know
             //the transfer operators
             stencil.pushTransferOperators(restriction,prolongation,nxNew,nyNew);
-            NumericArray coarsGridCor
-                    (0.0,(nxNew+1)*(nyNew+1));
+            Problem* coarsGridProblem = problem.getCoarsGridProblem(nxNew,nyNew);
+            coarsGridProblem->setRightHandSide( coarsResiduum );
             //do a multigrid cycle on the coars grid
 
             cycle(
                 cycleType,
-                coarsGridCor,
-                coarsResiduum,
-                stencil,
+                *coarsGridProblem,
                 prolongation,
                 restriction,
-                relaxation,
-                nxNew,nyNew);
+                relaxation);
 
             //prolongate the coars grid correction to the fine grid
             //approximation
-            u+=prolongation.prolongate(coarsGridCor,stencil,nxNew,nyNew);
+            u+=prolongation.prolongate(*coarsGridProblem);
+            
             //we are going to a smaler grid so remove transfer operators
             stencil.popTransferOperators();
 
             for(int i=0; i<cycleType.getPostSmoothingSteps(); ++i)
-                relaxation.relax(u,f,stencil,nx,ny);
+                relaxation.relax(problem);
 
-            cycleType.accelerate(u,f,stencil,nx,ny);
+            cycleType.accelerate(problem);
+            
+            delete coarsGridProblem;
         }
     }
 

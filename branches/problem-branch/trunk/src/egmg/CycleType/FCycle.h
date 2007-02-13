@@ -94,11 +94,7 @@ public:
      * does nothing for FCycle
      */
     virtual void accelerate(
-        NumericArray&,
-        const NumericArray&,
-        const Stencil&,
-        const Index,
-        const Index)
+        Problem&)
     {}
 };
 }

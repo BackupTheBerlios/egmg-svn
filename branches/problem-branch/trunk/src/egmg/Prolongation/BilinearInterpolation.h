@@ -71,10 +71,7 @@ public:
      *                      size 2*(nx+1)*2*(ny+1)
      */
     NumericArray prolongate(
-        const NumericArray& u,
-        const Stencil&,
-        const Index nx,
-        const Index ny) const;
+        const Problem& problem) const;
 
     const NumericArray& getI(
         const Position,

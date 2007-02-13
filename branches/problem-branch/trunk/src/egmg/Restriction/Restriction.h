@@ -37,6 +37,9 @@ public:
      */
     virtual NumericArray restriction(
         const Problem& problem) const =0;
+    
+    virtual NumericArray restriction(
+        const Problem& problem, const NumericArray& u) const =0;
 };
 
 }

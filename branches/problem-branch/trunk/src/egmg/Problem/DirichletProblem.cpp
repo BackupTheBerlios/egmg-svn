@@ -128,4 +128,11 @@ Point DirichletProblem::getLastPoint() const
     return Point(nx_-1,ny_-1);
 }
 
+DirichletProblem* DirichletProblem::getCoarsGridProblem(
+    Index nxNew,
+    Index nyNew) const
+{
+    return new DirichletProblem(stencil_,nxNew,nyNew);
+}
+
 }

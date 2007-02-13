@@ -8,13 +8,13 @@ namespace mg
 {
     
 NumericArray BilinearInterpolation::prolongate(
-    const NumericArray& u,
-    const Stencil&,
-    const Index nx,
-    const Index ny) const
+    const Problem& problem) const
 {
+    const Index nx = problem.getNx();
+    const Index ny = problem.getNy();
     const Index nxNew = 2*nx;
     const Index nyNew = 2*ny;
+    const NumericArray& u = problem.getSolution();
     NumericArray result(0.0,(nxNew+1)*(nxNew+1));
 
     //"interpolation" of coarse grid points
@@ -34,6 +34,7 @@ NumericArray BilinearInterpolation::prolongate(
             result[sy*(nxNew+1)+sx]=
                 1./2*(result[(sy-1)*(nxNew+1)+sx]
                      +result[(sy+1)*(nxNew+1)+sx]);
+    problem.applyBoundaryConstraint(result);
     return result;
 }
 

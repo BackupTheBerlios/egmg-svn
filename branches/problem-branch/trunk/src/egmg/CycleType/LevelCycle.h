@@ -89,11 +89,7 @@ public:
      * does nothing for LevelCycle
      */
     virtual void accelerate(
-        NumericArray&,
-        const NumericArray&,
-        const Stencil&,
-        const Index,
-        const Index)
+        Problem&)
     {}
 };
 

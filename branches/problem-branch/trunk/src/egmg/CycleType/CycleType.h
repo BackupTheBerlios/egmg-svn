@@ -9,6 +9,7 @@
 
 #include "../general/parameters.h"
 #include "../Stencil/Stencil.h"
+#include "../Problem/Problem.h"
 
 namespace mg
 {
@@ -113,11 +114,7 @@ public:
      * \param[in] ny        number of steps in y direction
      */
     virtual void accelerate(
-        NumericArray& u,
-        const NumericArray& f,
-        const Stencil& stencil,
-        const Index nx,
-        const Index ny) =0;
+        Problem& problem) =0;
 };
 
 }

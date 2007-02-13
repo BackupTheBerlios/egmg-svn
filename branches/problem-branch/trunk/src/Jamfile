@@ -26,6 +26,7 @@ exe main : <template>warnings
 	   	   <lib>egmg/Restriction/Restriction
 		   <lib>egmg/functions/functions
 		   <lib>egmg/Function/Function
+		   <lib>egmg/Problem/Problem
 	   	   main.cpp ;
 	   	   
 stage $(DOT) : <exe>main : : ;

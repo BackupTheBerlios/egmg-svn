@@ -25,16 +25,16 @@ public:
     virtual const NumericArray& getSolution() const =0;
     virtual NumericArray residuum() =0;
     virtual Point getLowerLeftCorner() const =0;
-    virtual Point getUpperRightCorner() const =0;
+    virtual Problem* getCoarsGridProblem(Index nx, Index ny) const =0;
     virtual Point getFirstPoint() const =0;
     virtual Point getLastPoint() const =0;
     Index getNx() const;
     Index getNy() const;
     
 protected:
+    Stencil& stencil_;
     const Index nx_;
     const Index ny_;
-    Stencil& stencil_;
     NumericArray rightHandSide_;
 };
 

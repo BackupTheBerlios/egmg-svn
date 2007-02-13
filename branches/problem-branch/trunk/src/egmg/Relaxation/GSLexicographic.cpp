@@ -28,7 +28,7 @@ void GSLexicographic::relax(
             {
                 factor = 1.0/stencil.getCenter(C,llc.sx+sx,llc.sy+sy,nx,ny);
                 u[sy*(nx+1)+sx]+=factor*(f[sy*(nx+1)+sx]
-                        -stencil.apply(u,C,sx,sy,nx,ny));
+                        -stencil.apply(u,C,llc.sx+sx,llc.sy+sy,nx,ny));
             }
     }
     else

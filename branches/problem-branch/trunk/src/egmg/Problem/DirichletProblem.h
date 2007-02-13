@@ -22,6 +22,7 @@ public:
     virtual Point getUpperRightCorner() const;
     virtual Point getFirstPoint() const;
     virtual Point getLastPoint() const;
+    virtual DirichletProblem* getCoarsGridProblem(Index nx, Index ny) const;
     
 private:
     NumericArray solution_;

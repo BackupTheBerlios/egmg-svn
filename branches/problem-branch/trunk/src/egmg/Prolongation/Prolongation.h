@@ -8,7 +8,7 @@
 
 #include "../general/parameters.h"
 #include "../general/TransferOperator.h"
-#include "../Stencil/Stencil.h"
+#include "../Problem/Problem.h"
 
 namespace mg
 {
@@ -32,10 +32,7 @@ public:
      * \return              a vector representing the prolongated rectangel
      */
     virtual NumericArray prolongate(
-        const NumericArray& u,
-        const Stencil& stencil,
-        const Index nx,
-        const Index ny) const =0;
+        const Problem& problem) const =0;
 };
 
 }
