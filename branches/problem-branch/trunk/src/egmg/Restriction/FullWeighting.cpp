@@ -30,7 +30,7 @@ DiscreteFunction FullWeighting::restriction(
         //if ( lp.sx < nx )
             result(nxNew,sy)=u(nx,2*sy);
     }
-    for (Index sx=1;sx<=nxNew-1;sx++)
+    for (Index sx=0;sx<=nxNew;sx++)
     {
         //if ( fp.sy > 0 )
             result(sx,0)=u(2*sx,0);
@@ -44,24 +44,22 @@ DiscreteFunction FullWeighting::restriction(
     nlpsy-=lp.sy;
     Point nlp(nxNew - nlpsx,nyNew - nlpsy);
 
-    //for (Index sy=fp.sy;sy<=nlp.sy;sy++)
-    for (Index sy=1;sy<=nyNew-1;sy++)
+    for (Index sy=fp.sy;sy<=nlp.sy;sy++)
     {
-        //for(Index sx=fp.sx;sx<=nlp.sx;sx++)
-        for(Index sx=1;sx<=nxNew-1;sx++)
+        for(Index sx=fp.sx;sx<=nlp.sx;sx++)
             result(sx,sy)=
-                weight_*(4*u(sx,sy)
-                        +2*u(sx-1,sy)
-                        +2*u(sx+1,sy)
-                        +2*u(sx,sy-1)
-                        +2*u(sx,sy+1)
-                          +u(sx-1,sy-1)
-                          +u(sx-1,sy+1)
-                          +u(sx+1,sy-1)
-                          +u(sx+1,sy-1)
+                weight_*(4*u(2*sx,2*sy)
+                        +2*u(2*sx-1,2*sy)
+                        +2*u(2*sx+1,2*sy)
+                        +2*u(2*sx,2*sy-1)
+                        +2*u(2*sx,2*sy+1)
+                          +u(2*sx-1,2*sy-1)
+                          +u(2*sx-1,2*sy+1)
+                          +u(2*sx+1,2*sy-1)
+                          +u(2*sx+1,2*sy-1)
                         )/16.0;
     }
-    //problem.applyBoundaryConstraint( result );
+    problem.applyBoundaryConstraint( result );
     return result;
 }
 

@@ -1,6 +1,7 @@
 #include "DiscreteFunction.h"
 #include <cassert>
 #include <iomanip>
+#include <cmath>
 
 namespace mg
 {
@@ -64,6 +65,18 @@ void DiscreteFunction::write(std::ostream& out) const
                <<std::setw(10)<<std::left<<operator[](calculateIndex(sx,sy))
                <<std::endl;
     out<<"#end points"<<std::endl;
+}
+
+Precision DiscreteFunction::twoNorm() const
+{
+    Precision result = 0.0;
+    for (Index sy=1; sy<ny_; ++sy)
+        for (Index sx=1; sx<nx_; ++sx)
+        {
+            Precision temp = operator[](calculateIndex(sx,sy));
+            result+=temp*temp;
+        }
+    return std::sqrt(result);
 }
 
 std::ostream& operator<<(std::ostream& stream, const DiscreteFunction& function)

@@ -31,7 +31,7 @@ void cycle(
     
     if ( cycleType.solve())
     {
-        for(int i=0; i<4; ++i)
+        for(int i=0; i<16; ++i)
                 relaxation.relax(problem);
         //directSolver(u,f,stencil,nx,ny);
     }

@@ -21,13 +21,13 @@ void DirichletProblem::setBoundaryConstraint( const Function& boundaryConstraint
     const Precision hy = 1.0/ny_;
     for (Index sx=0; sx<=nx_; sx++)
     {
-        solution_(sx,0)=boundaryConstraint(sx*hx,0.0);            //top border
+        solution_(sx,0)=boundaryConstraint(sx*hx,0.0);       //top border
         solution_(sx,ny_)=boundaryConstraint(sx*hx,1.0);     //bottom border
     }
     for (Index sy=1; sy<ny_; sy++)
     {
-        solution_(0,sy)=boundaryConstraint(0.0,sy*hy);            //left border
-        solution_(nx_,sy)=boundaryConstraint(1.0,sy*hy);        //right border
+        solution_(0,sy)=boundaryConstraint(0.0,sy*hy);        //left border
+        solution_(nx_,sy)=boundaryConstraint(1.0,sy*hy);      //right border
     }
 }
 

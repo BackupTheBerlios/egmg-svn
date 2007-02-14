@@ -17,6 +17,7 @@ public:
     Precision& operator()(Integer sx, Integer sy);
     const Precision& operator()(Integer sx, Integer sy) const;
     void write(std::ostream& out) const;
+    Precision twoNorm() const;
 private:
     Index calculateIndex(Integer sx, Integer sy) const;
     Index nx_;
