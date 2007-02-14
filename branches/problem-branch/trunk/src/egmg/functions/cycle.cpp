@@ -9,8 +9,8 @@
 #include "cycle.h"
 #include "residuum.h"
 #include "directSolver.h"
-#include <iostream>
 #include "printStencil.h"
+#include "../general/DiscreteFunction.h"
 
 namespace mg
 {
@@ -24,8 +24,7 @@ void cycle(
 {
     cycleType.incrementGridLevel();
     
-    NumericArray& u = problem.getSolution();
-    const NumericArray& f = problem.getRightHandSide();
+    DiscreteFunction& u = problem.getSolution();
     Stencil& stencil = problem.getStencil();
     const Index nx = problem.getNx();
     const Index ny = problem.getNy();
@@ -43,9 +42,9 @@ void cycle(
             for(int i=0; i<cycleType.getPreSmoothingSteps(); ++i)
                 relaxation.relax(problem);
             //calculate the residuum
-            NumericArray residv=problem.residuum();
+            DiscreteFunction residv=problem.residuum();
             //restrict the residuum to the coars grid
-            NumericArray coarsResiduum=restriction.restriction
+            DiscreteFunction coarsResiduum=restriction.restriction
                     (problem,residv);
             const Index nxNew = nx/2;
             const Index nyNew = ny/2;

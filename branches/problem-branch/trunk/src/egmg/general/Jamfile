@@ -1,4 +1,4 @@
 subproject egmg/general ;
 
 lib general : <template>../../warnings
-			  NumericArray.cpp ;
+			  DiscreteFunction.cpp ;

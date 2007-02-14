@@ -6,6 +6,7 @@
 #define Helmholtz2D2_H_
 
 #include "Stencil.h"
+#include "../general/DiscreteFunction.h"
 
 namespace mg
 {
@@ -40,7 +41,7 @@ public:
     virtual ~Helmholtz2D2();
 
     Precision apply(
-        const NumericArray& u,
+        const DiscreteFunction& u,
         const Position,
         const Index sx,
         const Index sy,

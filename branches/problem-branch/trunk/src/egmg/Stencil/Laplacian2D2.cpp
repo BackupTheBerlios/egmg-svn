@@ -28,7 +28,7 @@ Laplacian2D2::Laplacian2D2(
 Laplacian2D2::~Laplacian2D2() {}
 
 Precision Laplacian2D2::apply(
-    const NumericArray& u,
+    const DiscreteFunction& u,
     const Position,
     const Index sx,
     const Index sy,
@@ -36,11 +36,11 @@ Precision Laplacian2D2::apply(
     const Index ny) const
 {
     return 
-         (2.0*ax_*nx*nx+2.0*ay_*ny*ny)*u[sy*(nx+1)+sx]
-        -1.0*ax_*nx*nx*u[sy*(nx+1)+sx-1]
-        -1.0*ax_*nx*nx*u[sy*(nx+1)+sx+1]
-        -1.0*ay_*ny*ny*u[(sy-1)*(nx+1)+sx]
-        -1.0*ay_*ny*ny*u[(sy+1)*(nx+1)+sx];
+         (2.0*ax_*nx*nx+2.0*ay_*ny*ny)*u(sx,sy)
+        -1.0*ax_*nx*nx*u(sx-1,sy)
+        -1.0*ax_*nx*nx*u(sx+1,sy)
+        -1.0*ay_*ny*ny*u(sx,sy-1)
+        -1.0*ay_*ny*ny*u(sx,sy+1);
 }
 
 Precision Laplacian2D2::getCenter(

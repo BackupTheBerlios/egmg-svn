@@ -8,7 +8,9 @@ Problem::Problem(Stencil& stencil,
                  Index ny)
     : stencil_(stencil),
       nx_(nx),
-      ny_(ny)
+      ny_(ny),
+      rightHandSide_(0.0,nx,ny),
+      solution_(0.0,nx,ny)
 {
 }
 
@@ -23,23 +25,31 @@ Stencil& Problem::getStencil()
 
 void Problem::setRightHandSide( const Function& rightHandSide )
 {
-    rightHandSide_.resize((nx_+1)*(ny_+1));
     const Precision hx=1.0/nx_;
     const Precision hy=1.0/ny_;
     for (Index sy=0; sy<=ny_; sy++)
         for (Index sx=0; sx<=nx_; sx++)
-            rightHandSide_[sy*(nx_+1)+sx]=rightHandSide(sx*hx,sy*hy);
+            rightHandSide_(sx,sy)=rightHandSide(sx*hx,sy*hy);
 }
 
-void Problem::setRightHandSide( const NumericArray& rightHandSide )
+void Problem::setRightHandSide( const DiscreteFunction& rightHandSide )
 {
-    rightHandSide_.resize(rightHandSide.size());
     rightHandSide_ = rightHandSide;
 }
 
-const NumericArray& Problem::getRightHandSide()
+const DiscreteFunction& Problem::getRightHandSide()
 {
     return rightHandSide_;
+}
+
+DiscreteFunction& Problem::getSolution()
+{
+    return solution_;
+}
+
+const DiscreteFunction& Problem::getSolution() const
+{
+    return solution_;
 }
 
 Index Problem::getNx() const

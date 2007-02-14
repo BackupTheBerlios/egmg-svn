@@ -12,6 +12,7 @@ namespace mg
     
 class Prolongation;
 class Restriction;
+class DiscreteFunction;
 
 /**
  * \brief   Stencil is the interface of represents a discrete differential operator.
@@ -43,7 +44,7 @@ public:
      * \return              the value of \f$ L_h u_h \f$
      */
     virtual Precision apply(
-        const NumericArray& u,
+        const DiscreteFunction& u,
         const Position pos,
         const Index sx,
         const Index sy,

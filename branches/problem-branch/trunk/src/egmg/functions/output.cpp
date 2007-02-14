@@ -45,25 +45,4 @@ void convergenceRates(const std::vector<Precision>& vec, std::ostream& out)
     }
 }
 
-void gnuPlotDiscreteFunction(
-    const NumericArray& u,
-    Index nx,
-    Index ny,
-    std::ostream& out)
-{
-    if ((nx+1)*(ny+1)!=u.size())
-        throw std::domain_error("u");
-    out<<"#begin points"<<std::endl;
-    out<<std::setw(10)<<std::left<<"#x"<<" "
-       <<std::setw(10)<<std::left<<"y"<<" "
-       <<std::setw(10)<<std::left<<"value"<<std::endl;
-    Precision hx=1.0/nx;
-    Precision hy=1.0/ny;
-    for (Index sy=0; sy<=ny; ++sy)
-        for (Index sx=0; sx<=nx; ++sx)
-            out<<std::setw(10)<<std::left<<sx*hx<<" "
-               <<std::setw(10)<<std::left<<sy*hy<<" "
-               <<std::setw(10)<<std::left<<u[sy*(nx+1)+sx]<<std::endl;
-    out<<"#end points"<<std::endl;
-}
 }

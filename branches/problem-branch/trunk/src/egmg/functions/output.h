@@ -38,12 +38,11 @@ void convergenceRates(const std::vector<Precision>& vec, std::ostream& out);
  * \param[in] ny    number of steps in y direction
  * \param[out] out  the ostream to write the output to
  */
-void gnuPlotDiscreteFunction(
+/*void gnuPlotDiscreteFunction(
     const NumericArray& u,
     const Index nx,
     const Index ny,
-    std::ostream& out);
-
+    std::ostream& out);*/
 }
 
 #endif /*OUTPUT_H_*/

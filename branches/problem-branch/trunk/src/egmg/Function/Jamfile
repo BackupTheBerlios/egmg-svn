@@ -5,4 +5,5 @@ lib Function : <template>../../warnings
                 Zero.cpp
                 Constant.cpp
                 TestFunction1.cpp
+                TestFunction2.cpp
                 TestRightSide1.cpp ;

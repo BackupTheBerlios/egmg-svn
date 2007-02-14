@@ -9,6 +9,7 @@
 #include "../general/parameters.h"
 #include "../general/TransferOperator.h"
 #include "../Problem/Problem.h"
+#include "../general/DiscreteFunction.h"
 
 namespace mg
 {
@@ -31,7 +32,7 @@ public:
      * \param[in] ny        Number of steps in y direction
      * \return              a vector representing the prolongated rectangel
      */
-    virtual NumericArray prolongate(
+    virtual DiscreteFunction prolongate(
         const Problem& problem) const =0;
 };
 

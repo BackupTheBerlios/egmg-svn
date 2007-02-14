@@ -74,12 +74,9 @@ public:
      * \throw std::domain_error     if nx or ny is not divedable by 2
      * \return                      a vector with the values on the restricted
      *                              grid
-     */
-    NumericArray restriction(
-        const Problem& problem) const;
-        
-    virtual NumericArray restriction(
-        const Problem& problem, const NumericArray& u) const;
+     */ 
+    virtual DiscreteFunction restriction(
+        const Problem& problem, const DiscreteFunction& u) const;
         
     const NumericArray& getI(
         const Position,

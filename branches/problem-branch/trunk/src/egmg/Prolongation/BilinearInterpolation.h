@@ -70,7 +70,7 @@ public:
      * \return              a vector representing the prolongated rectangel of 
      *                      size 2*(nx+1)*2*(ny+1)
      */
-    NumericArray prolongate(
+    DiscreteFunction prolongate(
         const Problem& problem) const;
 
     const NumericArray& getI(

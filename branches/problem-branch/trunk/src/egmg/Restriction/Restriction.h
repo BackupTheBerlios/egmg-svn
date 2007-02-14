@@ -7,6 +7,7 @@
 
 #include "../Problem/Problem.h"
 #include "../general/TransferOperator.h"
+#include "../general/DiscreteFunction.h"
 
 namespace mg
 {
@@ -34,12 +35,9 @@ public:
      * \throw std::domain_error     if nx or ny is not divedable by 2
      * \return                      a vector with the values on the restricted
      *                              grid
-     */
-    virtual NumericArray restriction(
-        const Problem& problem) const =0;
-    
-    virtual NumericArray restriction(
-        const Problem& problem, const NumericArray& u) const =0;
+     */    
+    virtual DiscreteFunction restriction(
+        const Problem& problem, const DiscreteFunction& u) const =0;
 };
 
 }

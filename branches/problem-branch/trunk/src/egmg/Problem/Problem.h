@@ -5,6 +5,7 @@
 #include "../general/parameters.h"
 #include "../Function/Function.h"
 #include "../Stencil/Stencil.h"
+#include "../general/DiscreteFunction.h"
 
 namespace mg
 {
@@ -14,17 +15,16 @@ class Problem
 public:
     Problem(Stencil& stencil, Index nx, Index ny);
 	virtual ~Problem();
-    virtual Stencil& getStencil();
-    virtual void setRightHandSide( const Function& rightHandSide );
-    virtual void setRightHandSide( const NumericArray& rightHandSide );
-    virtual const NumericArray& getRightHandSide();
+    Stencil& getStencil();
+    void setRightHandSide( const Function& rightHandSide );
+    void setRightHandSide( const DiscreteFunction& rightHandSide );
+    const DiscreteFunction& getRightHandSide();
     virtual void setBoundaryConstraint( const Function& boundaryConstraint ) =0;
     virtual void applyBoundaryConstraint() =0;
-    virtual void applyBoundaryConstraint( NumericArray& array ) const =0;
-    virtual NumericArray& getSolution() =0;
-    virtual const NumericArray& getSolution() const =0;
-    virtual NumericArray residuum() =0;
-    virtual Point getLowerLeftCorner() const =0;
+    virtual void applyBoundaryConstraint( DiscreteFunction& function ) const =0;
+    DiscreteFunction& getSolution();
+    const DiscreteFunction& getSolution() const;
+    virtual DiscreteFunction residuum() =0;
     virtual Problem* getCoarsGridProblem(Index nx, Index ny) const =0;
     virtual Point getFirstPoint() const =0;
     virtual Point getLastPoint() const =0;
@@ -35,7 +35,8 @@ protected:
     Stencil& stencil_;
     const Index nx_;
     const Index ny_;
-    NumericArray rightHandSide_;
+    DiscreteFunction rightHandSide_;
+    DiscreteFunction solution_;
 };
 
 }
