@@ -43,8 +43,8 @@ DiscreteFunction PeriodicProblem::residuum()
     DiscreteFunction result(solution_);
     if (stencil_.size()<2)
     {
-        for (Index sy=1; sy<=ny_; sy++)
-            for(Index sx=1; sx<=nx_; sx++)
+        for (Index sy=2; sy<ny_; sy++)
+            for(Index sx=2; sx<nx_; sx++)
                 result(sx,sy)=rightHandSide_(sx,sy)
                             -stencil_.apply(solution_,C,sx,sy,nx_,ny_);
     }
