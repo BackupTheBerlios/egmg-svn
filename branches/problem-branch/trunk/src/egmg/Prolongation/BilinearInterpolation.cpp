@@ -34,7 +34,6 @@ DiscreteFunction BilinearInterpolation::prolongate(
             result(sx,sy)=
                 1./2*(result(sx,sy-1)
                      +result(sx,sy+1));
-    problem.applyBoundaryConstraint(result);
     return result;
 }
 

@@ -2,6 +2,7 @@
 #define DISCRETEFUNCTION_H_
 
 #include "parameters.h"
+#include "../Function/Function.h"
 #include <ostream>
 
 namespace mg
@@ -13,6 +14,7 @@ public:
     DiscreteFunction();
 	DiscreteFunction(Precision initialValue, Index nx, Index ny);
     DiscreteFunction(const DiscreteFunction& rhs);
+    DiscreteFunction(const Function& function, Index nx, Index ny);
     const DiscreteFunction& operator =(const DiscreteFunction& rhs);
     Precision& operator()(Integer sx, Integer sy);
     const Precision& operator()(Integer sx, Integer sy) const;

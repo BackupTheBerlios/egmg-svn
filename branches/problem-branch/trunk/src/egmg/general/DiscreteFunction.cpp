@@ -16,6 +16,16 @@ DiscreteFunction::DiscreteFunction(const DiscreteFunction& rhs)
 {
 }
 
+DiscreteFunction(const Function& function, Index nx, Index ny)
+    : NumericArray(0.0,(nx+3)*(ny+3)), nx_(nx), ny_(ny)
+{
+    const Precision hx = 1.0/nx_;
+    const Precision hy = 1.0/ny_;
+    for (Index sy=0; sy<=ny_; ++sy)
+        for (Index sx=0; sx<=nx_; ++sx)
+               operator[](calculateIndex(sx,sy))=function(sx*hx,sy*hy);
+}
+
 DiscreteFunction::DiscreteFunction(Precision initialValue, Index nx, Index ny)
     : NumericArray(initialValue,(nx+3)*(ny+3)), nx_(nx), ny_(ny)
 {

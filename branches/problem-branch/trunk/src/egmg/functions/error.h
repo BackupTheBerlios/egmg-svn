@@ -8,6 +8,7 @@
 
 #include "../general/parameters.h"
 #include "../Function/Function.h"
+#include "../Problem/Problem.h"
 
 namespace mg
 {
@@ -25,9 +26,7 @@ namespace mg
      * \return              the maximum norm of the error
      */
     Precision error(
-        const NumericArray& u,
-        const Index nx,
-        const Index ny,
+        const Problem& problem,
         const Function& solution);
 }
 

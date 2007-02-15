@@ -10,18 +10,19 @@
 namespace mg
 {
     Precision error(
-        const NumericArray& u,
-        const Index nx,
-        const Index ny,
+        const Problem& problem,
         const Function& solution)
     {
         Precision result=0.0;
+        const Index nx = problem.getNx();
+        const Index ny = problem.getNy();
+        const DiscreteFunction& u = problem.getSolution();
         const Precision hx=1.0/nx;
         const Precision hy=1.0/ny;
-        for (Index sx=1; sx<nx; sx++)
-            for(Index sy=1; sy<ny; sy++)
+        for (Index sx=0; sx<=nx; sx++)
+            for(Index sy=0; sy<=ny; sy++)
             {
-                Precision temp=std::fabs(solution(sy*hx,sx*hy)-u[sx*(nx+1)+sy]);
+                Precision temp=std::fabs(solution(sx*hx,sy*hy)-u(sx,sy));
                 result=std::max(result,temp);
             }
             
