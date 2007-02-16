@@ -8,6 +8,7 @@
 #include <valarray>
 #include <cassert>
 #include <cmath>
+#include <utility>
 
 /**
  * \brief the namespace mg is for everything in this library
@@ -42,6 +43,11 @@ namespace mg
      * \brief vector holding integers
      */
     typedef std::valarray<Integer> PositionArray;
+    
+    /**
+     * \brief pair of matrix and right and side
+     */
+    typedef std::pair<NumericArray,NumericArray> LinearEquationSystem;
         
     /**
      * \enum mg::Position

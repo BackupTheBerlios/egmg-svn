@@ -19,6 +19,11 @@ public:
     virtual Point getFirstPoint() const;
     virtual Point getLastPoint() const;
     virtual DirichletProblem* getCoarsGridProblem(Index nx, Index ny) const;
+protected:
+    virtual void fillBorderValues(
+        NumericArray& matrix,
+        NumericArray& rightSide,
+        const Index dimension) const;
 };
 
 }

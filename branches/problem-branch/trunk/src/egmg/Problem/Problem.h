@@ -30,13 +30,31 @@ public:
     virtual Point getLastPoint() const =0;
     Index getNx() const;
     Index getNy() const;
+    LinearEquationSystem getLinearEquationSystem() const;
+    void setSolution(NumericArray& solution);
     
 protected:
+    virtual void fillBorderValues(
+        NumericArray& matrix,
+        NumericArray& rightSide,
+        const Index dimension) const =0;
     Stencil& stencil_;
     const Index nx_;
     const Index ny_;
     DiscreteFunction rightHandSide_;
     DiscreteFunction solution_;
+    
+private:
+    void fillRightHandSide(NumericArray& rightSide) const;
+    void pointFillMatrix(
+        NumericArray& matrix,
+        const Index dimension,
+        const Position postion,
+        const Index sx,
+        const Index sy) const;
+    void fillMatrix(
+        NumericArray& matrix,
+        Index dimension) const;
 };
 
 }

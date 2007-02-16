@@ -6,87 +6,14 @@
 
 #include <algorithm>
 #include "directSolver.h"
+#include "../Stencil/Stencil.h"
+#include "../general/parameters.h"
 
 namespace mg
 {
 
 namespace
 {
-    
-void fillBorderValues(
-    NumericArray& matrix,
-    const Index dimension,
-    const NumericArray& u,
-    NumericArray& rightSide,
-    const Index nx,
-    const Index ny)
-{
-    //border values XDIR
-    for (Index sx=0; sx<=nx; ++sx)
-    {
-        //lower border
-        matrix[sx*dimension+sx]=1;
-        rightSide[sx]=u[sx];
-        //upper border
-        matrix[(dimension-1-sx)*dimension+(dimension-1-sx)]=1;
-        rightSide[dimension-1-sx]=u[dimension-1-sx];
-    }
-    //border values YDIR
-    //corners have been process in XDIR (y=1..ny-1 instead of y=0..ny)
-    for (Index sy=1; sy<ny; ++sy)
-    {
-        //left border
-        matrix[sy*(nx+1)*dimension+sy*(nx+1)]=1;
-        rightSide[sy*(nx+1)]=u[sy*(nx+1)];
-        //right border
-        matrix[(sy*(nx+1)+nx)*dimension+(sy*(nx+1)+nx)]=1;
-        rightSide[sy*(nx+1)+nx]=u[sy*(nx+1)+nx];
-    }
-}
-
-void pointFillMatrix(
-    NumericArray& matrix,
-    const Index dimension,
-    const Stencil& stencil,
-    const Position postion,
-    const Index sx,
-    const Index sy,
-    const Index nx,
-    const Index ny)
-{
-    PositionArray jX=stencil.getJx(postion,nx,ny);
-    PositionArray jY=stencil.getJy(postion,nx,ny);
-    NumericArray operatorL=stencil.getL(postion,sx,sy,nx,ny);
-    for (Index i=0; i<operatorL.size(); ++i)
-        matrix[(sy*(nx+1)+sx)*dimension+((sy+jY[i])*(nx+1)+sx+jX[i])]=operatorL[i];
-}
-
-void fillMatrix(
-    NumericArray& matrix,
-    const Index dimension,
-    const Stencil& stencil,
-    const Index nx,
-    const Index ny)
-{
-    //corner points
-    pointFillMatrix(matrix,dimension,stencil,NW,1,ny-1,nx,ny);
-    pointFillMatrix(matrix,dimension,stencil,NE,nx-1,ny-1,nx,ny);
-    pointFillMatrix(matrix,dimension,stencil,SE,nx-1,1,nx,ny);
-    pointFillMatrix(matrix,dimension,stencil,SW,1,1,nx,ny);
-    //border points
-    for (Index sy=2; sy<(ny-1); ++sy)
-        pointFillMatrix(matrix,dimension,stencil,W,1,sy,nx,ny);
-    for (Index sy=2; sy<(ny-1); ++sy)
-        pointFillMatrix(matrix,dimension,stencil,E,nx-1,sy,nx,ny);
-    for (Index sx=2; sx<(nx-1); ++sx)
-        pointFillMatrix(matrix,dimension,stencil,N,sx,ny-1,nx,ny);
-    for (Index sx=2; sx<(nx-1); ++sx)
-        pointFillMatrix(matrix,dimension,stencil,S,sx,1,nx,ny);
-    //center Points
-    for (Index sy=2; sy<(ny-1); ++sy)
-        for (Index sx=2; sx<(nx-1); ++sx)
-            pointFillMatrix(matrix,dimension,stencil,C,sx,sy,nx,ny);
-}
 
 PositionArray pivotLU(
     NumericArray& matrix,
@@ -123,10 +50,10 @@ PositionArray pivotLU(
 }
 
 NumericArray solve(
-    NumericArray& matrix,
-    const NumericArray& b,
-    const Index dimension)
+    NumericArray matrix,
+    const NumericArray& b)
 {
+    const Index dimension = b.size();
     PositionArray permutation=pivotLU(matrix,dimension);
 
     NumericArray result(dimension);
@@ -152,21 +79,10 @@ NumericArray solve(
 
 }
 
-void directSolver(
-    NumericArray& u,
-    const NumericArray& f,
-    const Stencil& stencil,
-    const Index nx,
-    const Index ny)
-{
-    const Index dimension=u.size();
-    NumericArray matrix(0.0,dimension*dimension);
-    NumericArray rightSide=f;
-    
-    fillBorderValues(matrix,dimension,u,rightSide,nx,ny);
-
-    fillMatrix(matrix,dimension,stencil,nx,ny);
-    
-    u=solve(matrix,rightSide,u.size());
-}  
+NumericArray directSolver(
+    const LinearEquationSystem& les)
+{  
+    return solve(les.first,les.second);
+}
+  
 }

@@ -53,10 +53,10 @@ const Precision& DiscreteFunction::operator()(Integer sx, Integer sy) const
 
 Index DiscreteFunction::calculateIndex(Integer sx, Integer sy) const
 {
-    assert( sx+1 >= 0 && sy+1 >= 0 );
+    //assert( sx+1 >= 0 && sy+1 >= 0 );
     Index sx_ = static_cast<Index>(sx+1);
     Index sy_ = static_cast<Index>(sy+1);
-    assert( sx_ < nx_+3 && sy_ < ny_+3 );
+    //assert( sx_ < nx_+3 && sy_ < ny_+3 );
     return sy_*(nx_+3)+sx_;
 }
 

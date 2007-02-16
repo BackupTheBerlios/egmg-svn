@@ -5,4 +5,5 @@ lib functions : <template>../../warnings
 				error.cpp
 	 			generatePositionArrays.cpp
 				output.cpp
-				printStencil.cpp ;
+				printStencil.cpp
+				directSolver.cpp ;

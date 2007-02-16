@@ -109,4 +109,32 @@ DirichletProblem* DirichletProblem::getCoarsGridProblem(
     return new DirichletProblem(stencil_,nxNew,nyNew);
 }
 
+void DirichletProblem::fillBorderValues(
+        NumericArray& matrix,
+        NumericArray& rightSide,
+        const Index dimension) const
+{
+    //border values XDIR
+    for (Index sx=0; sx<=nx_; ++sx)
+    {
+        //lower border
+        matrix[sx*dimension+sx]=1;
+        rightSide[sx]=solution_[sx];
+        //upper border
+        matrix[(dimension-1-sx)*dimension+(dimension-1-sx)]=1;
+        rightSide[dimension-1-sx]=solution_[dimension-1-sx];
+    }
+    //border values YDIR
+    //corners have been process in XDIR (y=1..ny-1 instead of y=0..ny)
+    for (Index sy=1; sy<ny_; ++sy)
+    {
+        //left border
+        matrix[sy*(nx_+1)*dimension+sy*(nx_+1)]=1;
+        rightSide[sy*(nx_+1)]=solution_[sy*(nx_+1)];
+        //right border
+        matrix[(sy*(nx_+1)+nx_)*dimension+(sy*(nx_+1)+nx_)]=1;
+        rightSide[sy*(nx_+1)+nx_]=solution_[sy*(nx_+1)+nx_];
+    }
+}
+
 }

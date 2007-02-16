@@ -17,5 +17,6 @@
 #include "generatePositionArrays.h"
 #include "printStencil.h"
 #include "WHighJacScalarProduct.h"
+#include "directSolver.h"
 
 #endif /*FUNCTIONSINCLUDES_H_*/

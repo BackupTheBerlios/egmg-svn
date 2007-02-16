@@ -11,6 +11,8 @@
 #include "directSolver.h"
 #include "printStencil.h"
 #include "../general/DiscreteFunction.h"
+#include <iostream>
+#include <iomanip>
 
 namespace mg
 {
@@ -30,10 +32,9 @@ void cycle(
     const Index ny = problem.getNy();
     
     if ( cycleType.solve())
-    {
-        for(int i=0; i<16; ++i)
-                relaxation.relax(problem);
-        //directSolver(u,f,stencil,nx,ny);
+    {        
+        NumericArray temp = directSolver(problem.getLinearEquationSystem());
+        problem.setSolution(temp);
     }
     else
     {

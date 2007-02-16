@@ -6,8 +6,7 @@
 #ifndef DIRECTSOLVER_H_
 #define DIRECTSOLVER_H_
 
-#include "../general/parameters.h"
-#include "../Stencil/Stencil.h"
+#include "../Problem/Problem.h"
 
 namespace mg
 {
@@ -24,11 +23,7 @@ namespace mg
  * \param[in] nx        number of steps in x direction
  * \param[in] ny        number of steps in y direction
  */
-void directSolver(
-    NumericArray& u,
-    const NumericArray& f,
-    const Stencil& stencil,
-    const Index nx,
-    const Index ny);
+NumericArray directSolver(
+    const LinearEquationSystem& les);
 }
 #endif /*DIRECTSOLVER_H_*/

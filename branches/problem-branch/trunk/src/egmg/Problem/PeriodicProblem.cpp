@@ -105,4 +105,36 @@ PeriodicProblem* PeriodicProblem::getCoarsGridProblem(
     return new PeriodicProblem(stencil_,nxNew,nyNew);
 }
 
+void PeriodicProblem::fillBorderValues(
+        NumericArray& matrix,
+        NumericArray& rightSide,
+        const Index dimension) const
+{
+    for (Index sx=0; sx<=nx_; ++sx)
+    {
+        matrix[(0*(nx_+1)+sx)*dimension+(0*(nx_+1)+sx)]=1.0;
+        matrix[(0*(nx_+1)+sx)*dimension+(ny_*(nx_+1)+sx)]=-1.0;
+        rightSide[(0*(nx_+1)+sx)]=0.0;
+        
+        matrix[(ny_*(nx_+1)+sx)*dimension+(ny_*(nx_+1)+sx)]=-2.0;
+        matrix[(ny_*(nx_+1)+sx)*dimension+(1*(nx_+1)+sx)]=1.0;
+        matrix[(ny_*(nx_+1)+sx)*dimension+((ny_-1)*(nx_+1)+sx)]+=1.0;
+        rightSide[(ny_*(nx_+1)+sx)]=0.0;
+    }
+    for (Index sy=1; sy<ny_; ++sy)
+    {
+        matrix[(sy*(nx_+1)+0)*dimension+(sy*(nx_+1)+0)]=1.0;
+        matrix[(sy*(nx_+1)+0)*dimension+(sy*(nx_+1)+nx_)]=-1.0;
+        rightSide[(sy*(nx_+1)+0)]=0.0;
+        
+        matrix[(sy*(nx_+1)+nx_)*dimension+(sy*(nx_+1)+nx_)]=2.0;
+        matrix[(sy*(nx_+1)+nx_)*dimension+(sy*(nx_+1)+nx_-1)]=-1.0;
+        matrix[(sy*(nx_+1)+nx_)*dimension+(sy*(nx_+1)+1)]+=-1.0;
+        rightSide[(sy*(nx_+1)+nx_)]=0.0;
+        
+        //matrix[(sy*(nx_+1)+nx_)*dimension+sy*(nx_+1)]=1;
+        //rightSide[(sy*(nx_+1)+nx_)]=solution_(nx_,sy);
+    }
+}
+
 }
