@@ -20,6 +20,7 @@ public:
     const Precision& operator()(Integer sx, Integer sy) const;
     void write(std::ostream& out) const;
     Precision twoNorm() const;
+    const DiscreteFunction abs() const;
 private:
     Index calculateIndex(Integer sx, Integer sy) const;
     Index nx_;
@@ -27,6 +28,7 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& stream, const DiscreteFunction& function);
+const DiscreteFunction operator -(const DiscreteFunction& lhs, const DiscreteFunction& rhs);
 
 }
 

@@ -80,8 +80,8 @@ void DiscreteFunction::write(std::ostream& out) const
 Precision DiscreteFunction::twoNorm() const
 {
     Precision result = 0.0;
-    for (Index sy=1; sy<ny_; ++sy)
-        for (Index sx=1; sx<nx_; ++sx)
+    for (Index sy=0; sy<=ny_; ++sy)
+        for (Index sx=0; sx<=nx_; ++sx)
         {
             Precision temp = operator[](calculateIndex(sx,sy));
             result+=temp*temp;
@@ -89,10 +89,26 @@ Precision DiscreteFunction::twoNorm() const
     return std::sqrt(result);
 }
 
+const DiscreteFunction DiscreteFunction::abs() const
+{
+    DiscreteFunction result(*this);
+    for (Index sy=0; sy<=ny_; ++sy)
+        for (Index sx=0; sx<=nx_; ++sx)
+            result(sx,sy) = std::abs(operator[](calculateIndex(sx,sy)));
+    return result;
+}
+
 std::ostream& operator<<(std::ostream& stream, const DiscreteFunction& function)
 {
     function.write(stream);
     return stream;
+}
+
+const DiscreteFunction operator -(const DiscreteFunction& lhs, const DiscreteFunction& rhs)
+{
+    DiscreteFunction result(lhs);
+    result-=rhs;
+    return result;    
 }
 
 }

@@ -29,9 +29,9 @@ void PeriodicProblem::applyBoundaryConstraint( DiscreteFunction& u ) const
     for(Index sx=0;sx<=nx_;++sx)
     {
         u(sx,0)=u(sx,ny_);
-        u(sx,ny_+1)=u(sx,1);
+        u(sx,nx_+1)=u(sx,1);
     }
-    for(Index sy=1;sy<ny_;++sy)
+    for(Index sy=0;sy<=ny_;++sy)
     {
         u(0,sy)=u(nx_,sy);
         u(nx_+1,sy)=u(1,sy);
@@ -40,11 +40,11 @@ void PeriodicProblem::applyBoundaryConstraint( DiscreteFunction& u ) const
 
 DiscreteFunction PeriodicProblem::residuum()
 {
-    DiscreteFunction result(solution_);
+    DiscreteFunction result(0.0,nx_,ny_);
     if (stencil_.size()<2)
     {
-        for (Index sy=2; sy<ny_; sy++)
-            for(Index sx=2; sx<nx_; sx++)
+        for (Index sy=1; sy<=ny_; sy++)
+            for(Index sx=1; sx<=nx_; sx++)
                 result(sx,sy)=rightHandSide_(sx,sy)
                             -stencil_.apply(solution_,C,sx,sy,nx_,ny_);
     }
@@ -84,7 +84,7 @@ DiscreteFunction PeriodicProblem::residuum()
                 result(sx,sy)=rightHandSide_(sx,sy)
                         -stencil_.apply(solution_,C,sx,sy,nx_,ny_);
     }
-    applyBoundaryConstraint(result);
+    //applyBoundaryConstraint(result);
     return result;
 }
 
