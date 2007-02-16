@@ -13,6 +13,7 @@ namespace mg
 void GSLexicographic::relax(
     Problem& problem) const
 {
+    problem.applyBoundaryConstraint();
     Precision factor = 1.0;
     Stencil& stencil = problem.getStencil();
     DiscreteFunction& u = problem.getSolution();
