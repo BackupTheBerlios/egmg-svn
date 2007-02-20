@@ -19,16 +19,24 @@ void DirichletProblem::setBoundaryConstraint( const Function& boundaryConstraint
 {
     const Precision hx = 1.0/nx_;
     const Precision hy = 1.0/ny_;
+    solution_(-1,-1)=boundaryConstraint(-hx,-hy);
     for (Index sx=0; sx<=nx_; sx++)
     {
+        solution_(sx,-1)=boundaryConstraint(sx*hx,-hy);
         solution_(sx,0)=boundaryConstraint(sx*hx,0.0);       //top border
         solution_(sx,ny_)=boundaryConstraint(sx*hx,1.0);     //bottom border
+        solution_(sx,ny_+1)=boundaryConstraint(sx*hx,1.0+hy);
     }
+    solution_(nx_+1,-1)=boundaryConstraint(1.0+hx,-hy);
+    solution_(-1,ny_+1)=boundaryConstraint(-hx,1.0+hy);
     for (Index sy=1; sy<ny_; sy++)
     {
+        solution_(-1,sy)=boundaryConstraint(-hx,sy*hy);
         solution_(0,sy)=boundaryConstraint(0.0,sy*hy);        //left border
         solution_(nx_,sy)=boundaryConstraint(1.0,sy*hy);      //right border
+        solution_(nx_+1,sy)=boundaryConstraint(1.0+hx,sy*hy);
     }
+    solution_(nx_+1,ny_+1)=boundaryConstraint(1.0+hx,1.0+hy);
 }
 
 void DirichletProblem::applyBoundaryConstraint()

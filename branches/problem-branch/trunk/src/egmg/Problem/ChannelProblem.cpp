@@ -18,10 +18,13 @@ ChannelProblem::~ChannelProblem()
 void ChannelProblem::setBoundaryConstraint( const Function& boundaryConstraint )
 {
     const Precision hx = 1.0/nx_;
+    const Precision hy = 1.0/ny_;
     for (Index sx=0; sx<=nx_; sx++)
     {
+        solution_(sx,-1)=boundaryConstraint(sx*hx,-hy);
         solution_(sx,0)=boundaryConstraint(sx*hx,0.0);       //top border
         solution_(sx,ny_)=boundaryConstraint(sx*hx,1.0);     //bottom border
+        solution_(sx,ny_+1)=boundaryConstraint(sx*hx,1.0+hy);
     }
 }
 
