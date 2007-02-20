@@ -98,12 +98,12 @@ const DiscreteFunction DiscreteFunction::abs() const
     return result;
 }
 
-Precision DiscreteFunction::getNx() const
+Index DiscreteFunction::getNx() const
 {
     return nx_;
 }
 
-Precision DiscreteFunction::getNy() const
+Index DiscreteFunction::getNy() const
 {
     return ny_;
 }
