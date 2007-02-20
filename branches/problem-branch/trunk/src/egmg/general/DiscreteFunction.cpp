@@ -98,6 +98,16 @@ const DiscreteFunction DiscreteFunction::abs() const
     return result;
 }
 
+Precision DiscreteFunction::getNx() const
+{
+    return nx_;
+}
+
+Precision DiscreteFunction::getNy() const
+{
+    return ny_;
+}
+
 std::ostream& operator<<(std::ostream& stream, const DiscreteFunction& function)
 {
     function.write(stream);

@@ -21,6 +21,8 @@ public:
     void write(std::ostream& out) const;
     Precision twoNorm() const;
     const DiscreteFunction abs() const;
+    Precision getNx() const;
+    Precision getNy() const;
 private:
     Index calculateIndex(Integer sx, Integer sy) const;
     Index nx_;
