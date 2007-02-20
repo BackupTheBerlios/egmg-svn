@@ -3,5 +3,6 @@
 
 #include "DirichletProblem.h"
 #include "PeriodicProblem.h"
+#include "ChannelProblem.h"
 
 #endif /*PROBLEMINCLUDES_H_*/

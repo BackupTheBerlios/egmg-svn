@@ -1,9 +1,9 @@
-#include "PeriodicProblem.h"
+#include "ChannelProblem.h"
 
 namespace mg
 {
 
-PeriodicProblem::PeriodicProblem(
+ChannelProblem::ChannelProblem(
     Stencil& stencil,
     Index nx,
     Index ny)
@@ -11,26 +11,27 @@ PeriodicProblem::PeriodicProblem(
 {
 }
 
-PeriodicProblem::~PeriodicProblem()
+ChannelProblem::~ChannelProblem()
 {
 }
 
-void PeriodicProblem::setBoundaryConstraint( const Function& )
+void ChannelProblem::setBoundaryConstraint( const Function& boundaryConstraint )
 {
+    const Precision hx = 1.0/nx_;
+    for (Index sx=0; sx<=nx_; sx++)
+    {
+        solution_(sx,0)=boundaryConstraint(sx*hx,0.0);       //top border
+        solution_(sx,ny_)=boundaryConstraint(sx*hx,1.0);     //bottom border
+    }
 }
 
-void PeriodicProblem::applyBoundaryConstraint()
+void ChannelProblem::applyBoundaryConstraint()
 {
     applyBoundaryConstraint(solution_);
 }
 
-void PeriodicProblem::applyBoundaryConstraint( DiscreteFunction& u ) const
+void ChannelProblem::applyBoundaryConstraint( DiscreteFunction& u ) const
 {
-    for(Index sx=0;sx<=nx_;++sx)
-    {
-        u(sx,0)=u(sx,ny_);
-        u(sx,nx_+1)=u(sx,1);
-    }
     for(Index sy=0;sy<=ny_;++sy)
     {
         u(0,sy)=u(nx_,sy);
@@ -38,12 +39,12 @@ void PeriodicProblem::applyBoundaryConstraint( DiscreteFunction& u ) const
     }
 }
 
-DiscreteFunction PeriodicProblem::residuum()
+DiscreteFunction ChannelProblem::residuum()
 {
     DiscreteFunction result(0.0,nx_,ny_);
     if (stencil_.size()<2)
     {
-        for (Index sy=1; sy<=ny_; sy++)
+        for (Index sy=1; sy<ny_; sy++)
             for(Index sx=1; sx<=nx_; sx++)
                 result(sx,sy)=rightHandSide_(sx,sy)
                             -stencil_.apply(solution_,C,sx,sy,nx_,ny_);
@@ -88,38 +89,36 @@ DiscreteFunction PeriodicProblem::residuum()
     return result;
 }
 
-Point PeriodicProblem::getFirstPoint() const
+Point ChannelProblem::getFirstPoint() const
 {
     return Point(1,1);
 }
 
-Point PeriodicProblem::getLastPoint() const
+Point ChannelProblem::getLastPoint() const
 {
-    return Point(nx_,ny_);
+    return Point(nx_,ny_-1);
 }
 
-PeriodicProblem* PeriodicProblem::getCoarsGridProblem(
+ChannelProblem* ChannelProblem::getCoarsGridProblem(
     Index nxNew,
     Index nyNew) const
 {
-    return new PeriodicProblem(stencil_,nxNew,nyNew);
+    return new ChannelProblem(stencil_,nxNew,nyNew);
 }
 
-void PeriodicProblem::fillBorderValues(
+void ChannelProblem::fillBorderValues(
         NumericArray& matrix,
         NumericArray& rightSide,
         const Index dimension) const
 {
     for (Index sx=0; sx<=nx_; ++sx)
     {
-        matrix[(0*(nx_+1)+sx)*dimension+(0*(nx_+1)+sx)]=1.0;
-        matrix[(0*(nx_+1)+sx)*dimension+(ny_*(nx_+1)+sx)]=-1.0;
-        rightSide[(0*(nx_+1)+sx)]=0.0;
-        
-        matrix[(ny_*(nx_+1)+sx)*dimension+(ny_*(nx_+1)+sx)]=-2.0;
-        matrix[(ny_*(nx_+1)+sx)*dimension+(1*(nx_+1)+sx)]=1.0;
-        matrix[(ny_*(nx_+1)+sx)*dimension+((ny_-1)*(nx_+1)+sx)]+=1.0;
-        rightSide[(ny_*(nx_+1)+sx)]=0.0;
+        //lower border
+        matrix[sx*dimension+sx]=1;
+        rightSide[sx]=solution_[sx];
+        //upper border
+        matrix[(dimension-1-sx)*dimension+(dimension-1-sx)]=1;
+        rightSide[dimension-1-sx]=solution_[dimension-1-sx];
     }
     for (Index sy=1; sy<ny_; ++sy)
     {
@@ -131,9 +130,6 @@ void PeriodicProblem::fillBorderValues(
         matrix[(sy*(nx_+1)+nx_)*dimension+(sy*(nx_+1)+nx_-1)]=-1.0;
         matrix[(sy*(nx_+1)+nx_)*dimension+(sy*(nx_+1)+1)]+=-1.0;
         rightSide[(sy*(nx_+1)+nx_)]=0.0;
-        
-        //matrix[(sy*(nx_+1)+nx_)*dimension+sy*(nx_+1)]=1;
-        //rightSide[(sy*(nx_+1)+nx_)]=solution_(nx_,sy);
     }
 }
 

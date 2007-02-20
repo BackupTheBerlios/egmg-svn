@@ -3,4 +3,5 @@ subproject egmg/Problem ;
 lib Problem : <template>../../warnings
 				DirichletProblem.cpp
 				PeriodicProblem.cpp
+				ChannelProblem.cpp
 				Problem.cpp ;
