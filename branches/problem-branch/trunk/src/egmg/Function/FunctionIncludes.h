@@ -3,3 +3,4 @@
 #include "TestFunction1.h"
 #include "TestFunction2.h"
 #include "TestRightSide1.h"
+#include "TestFunction3.h"
