@@ -26,8 +26,8 @@ DiscreteFunction::DiscreteFunction(const Function& function, Index nx, Index ny)
 {
     const Precision hx = 1.0/nx_;
     const Precision hy = 1.0/ny_;
-    for (Index sy=0; sy<=ny_; ++sy)
-        for (Index sx=0; sx<=nx_; ++sx)
+    for (Integer sy=-1; sy<=static_cast<Integer>(ny_+1); ++sy)
+        for (Integer sx=-1; sx<=static_cast<Integer>(nx_+1); ++sx)
                operator[](calculateIndex(sx,sy))=function(sx*hx,sy*hy);
 }
 
@@ -53,10 +53,10 @@ const Precision& DiscreteFunction::operator()(Integer sx, Integer sy) const
 
 Index DiscreteFunction::calculateIndex(Integer sx, Integer sy) const
 {
-    //assert( sx+1 >= 0 && sy+1 >= 0 );
+    assert( sx+1 >= 0 && sy+1 >= 0 );
     Index sx_ = static_cast<Index>(sx+1);
     Index sy_ = static_cast<Index>(sy+1);
-    //assert( sx_ < nx_+3 && sy_ < ny_+3 );
+    assert( sx_ < nx_+3 && sy_ < ny_+3 );
     return sy_*(nx_+3)+sx_;
 }
 
@@ -68,8 +68,10 @@ void DiscreteFunction::write(std::ostream& out) const
        <<std::setw(10)<<std::left<<"value"<<std::endl;
     Precision hx=1.0/nx_;
     Precision hy=1.0/ny_;
-    for (Index sy=0; sy<=ny_; ++sy)
-        for (Index sx=0; sx<=nx_; ++sx)
+    for (Integer sy=-1; sy<=static_cast<Integer>(ny_+1); ++sy)
+    //for (Index sy=0; sy<=ny_; ++sy)
+        for (Integer sx=-1; sx<=static_cast<Integer>(nx_+1); ++sx)
+        //for (Index sx=0; sx<=nx_; ++sx)
             out<<std::setw(10)<<std::left<<sx*hx<<" "
                <<std::setw(10)<<std::left<<sy*hy<<" "
                <<std::setw(10)<<std::left<<operator[](calculateIndex(sx,sy))
@@ -119,6 +121,28 @@ const DiscreteFunction operator -(const DiscreteFunction& lhs, const DiscreteFun
     DiscreteFunction result(lhs);
     result-=rhs;
     return result;    
+}
+const DiscreteFunction operator +(const DiscreteFunction& lhs, const DiscreteFunction& rhs)
+{
+    DiscreteFunction result(lhs);
+    result+=rhs;
+    return result;
+}
+const DiscreteFunction operator *(const DiscreteFunction& lhs, const DiscreteFunction& rhs)
+{
+    DiscreteFunction result(lhs);
+    result*=rhs;
+    return result;
+}
+const DiscreteFunction operator *(const Precision lhs, const DiscreteFunction& rhs)
+{
+    DiscreteFunction result(rhs);
+    result*=lhs;
+    return result;
+}
+const DiscreteFunction operator *(const DiscreteFunction& rhs, const Precision lhs)
+{
+    return lhs*rhs;
 }
 
 }

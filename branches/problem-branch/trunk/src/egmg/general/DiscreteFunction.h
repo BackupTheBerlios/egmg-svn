@@ -31,6 +31,11 @@ private:
 
 std::ostream& operator<<(std::ostream& stream, const DiscreteFunction& function);
 const DiscreteFunction operator -(const DiscreteFunction& lhs, const DiscreteFunction& rhs);
+const DiscreteFunction operator +(const DiscreteFunction& lhs, const DiscreteFunction& rhs);
+const DiscreteFunction operator *(const DiscreteFunction& lhs, const DiscreteFunction& rhs);
+const DiscreteFunction operator *(const Precision lhs, const DiscreteFunction& rhs);
+const DiscreteFunction operator *(const DiscreteFunction& rhs, const Precision lhs);
+
 
 }
 
