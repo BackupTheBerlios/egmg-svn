@@ -26,12 +26,12 @@ void PeriodicProblem::applyBoundaryConstraint()
 
 void PeriodicProblem::applyBoundaryConstraint( DiscreteFunction& u ) const
 {
-    for(Index sx=0;sx<=nx_;++sx)
+    for(Index sx=0;sx<=nx_+1;++sx)
     {
         u(sx,0)=u(sx,ny_);
-        u(sx,nx_+1)=u(sx,1);
+        u(sx,ny_+1)=u(sx,1);
     }
-    for(Index sy=0;sy<=ny_;++sy)
+    for(Index sy=0;sy<=ny_+1;++sy)
     {
         u(0,sy)=u(nx_,sy);
         u(nx_+1,sy)=u(1,sy);

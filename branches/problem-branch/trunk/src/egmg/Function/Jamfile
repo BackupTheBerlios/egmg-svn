@@ -7,4 +7,5 @@ lib Function : <template>../../warnings
                 TestFunction1.cpp
                 TestFunction2.cpp
                 TestFunction3.cpp
+                TestFunction4.cpp
                 TestRightSide1.cpp ;

@@ -68,10 +68,10 @@ void DiscreteFunction::write(std::ostream& out) const
        <<std::setw(10)<<std::left<<"value"<<std::endl;
     Precision hx=1.0/nx_;
     Precision hy=1.0/ny_;
-    for (Integer sy=-1; sy<=static_cast<Integer>(ny_+1); ++sy)
-    //for (Index sy=0; sy<=ny_; ++sy)
-        for (Integer sx=-1; sx<=static_cast<Integer>(nx_+1); ++sx)
-        //for (Index sx=0; sx<=nx_; ++sx)
+    //for (Integer sy=-1; sy<=static_cast<Integer>(ny_+1); ++sy)
+    for (Index sy=0; sy<=ny_; ++sy)
+        //for (Integer sx=-1; sx<=static_cast<Integer>(nx_+1); ++sx)
+        for (Index sx=0; sx<=nx_; ++sx)
             out<<std::setw(10)<<std::left<<sx*hx<<" "
                <<std::setw(10)<<std::left<<sy*hy<<" "
                <<std::setw(10)<<std::left<<operator[](calculateIndex(sx,sy))
