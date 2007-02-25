@@ -7,48 +7,88 @@ namespace mg
 {
     
 DiscreteFunction::DiscreteFunction()
-    : NumericArray(), nx_(0), ny_(0)
+    : nx_(0), ny_(0), hx_(0.0), hy_(0.0), origin_(0.0,0.0)
 {
 }
 
 DiscreteFunction::DiscreteFunction(const DiscreteFunction& rhs)
-    : NumericArray(rhs), nx_(rhs.nx_), ny_(rhs.ny_)
+    : nx_(rhs.nx_), ny_(rhs.ny_),
+      hx_(rhs.hx_), hy(rhs.hy_),
+      origin_(rhs.origin_), data_(rhs.data_)
 {
 }
 
 DiscreteFunction::DiscreteFunction(Precision initialValue, Index nx, Index ny)
-    : NumericArray(initialValue,(nx+3)*(ny+3)), nx_(nx), ny_(ny)
+    : nx_(nx), ny_(ny),
+      hx_(1.0/nx), hy_(1.0/ny),
+      origin_(0.0,0.0),
+      data_(initialValue,(nx+3)*(ny+3))
+{
+}
+
+DiscreteFunction::DiscreteFunction(
+        Precision initialValue,
+        Point origin,
+        Precision hx,
+        Precision hy,
+        Index nx,
+        Index ny)
+    : nx_(nx), ny_(ny),
+      hx_(hx), hy_(hy),
+      origin_(origin),
+      data_(initialValue,(nx+3)*(ny+3))
 {
 }
 
 DiscreteFunction::DiscreteFunction(const Function& function, Index nx, Index ny)
-    : NumericArray(0.0,(nx+3)*(ny+3)), nx_(nx), ny_(ny)
+    : nx_(nx), ny_(ny), 
+      hx_(1.0/nx), hy_(1.0/ny),
+      origin_(0.0,0.0), data_(0.0,(nx+3)*(ny+3))
 {
-    const Precision hx = 1.0/nx_;
-    const Precision hy = 1.0/ny_;
     for (Integer sy=-1; sy<=static_cast<Integer>(ny_+1); ++sy)
         for (Integer sx=-1; sx<=static_cast<Integer>(nx_+1); ++sx)
-               operator[](calculateIndex(sx,sy))=function(sx*hx,sy*hy);
+               data_[calculateIndex(sx,sy)]=
+                    function(origin_.sx+sx*hx_,origin_.sy+sy*hy_);
+}
+
+DiscreteFunction(
+        const Function& function,
+        Point origin,
+        Precision hx,
+        Precision hy,
+        Index nx,
+        Index ny)
+    : nx_(nx), ny_(ny), 
+      hx_(hx), hy_(hy),
+      origin_(origin), data_(0.0,(nx+3)*(ny+3))
+{
+    for (Integer sy=-1; sy<=static_cast<Integer>(ny_+1); ++sy)
+        for (Integer sx=-1; sx<=static_cast<Integer>(nx_+1); ++sx)
+               data_[calculateIndex(sx,sy)]=
+                    function(origin_.sx+sx*hx_,origin_.sy+sy*hy_);
 }
 
 const DiscreteFunction& DiscreteFunction::operator =(const DiscreteFunction& rhs)
 {
-    NumericArray::resize(rhs.size());
-    NumericArray::operator =(rhs);
+    data_.resize(rhs.data_.size());
+    data_ = rhs.data_;
     nx_ = rhs.nx_;
     ny_ = rhs.ny_;
+    hx_ = rhs.hx_;
+    hy_ = rhs.hy_;
+    origin_ = rhs.origin_;
     return *this;
 }
 
 Precision& DiscreteFunction::operator()(Integer sx, Integer sy)
 {
-    return operator[](calculateIndex(sx,sy));
+    return data_[calculateIndex(sx,sy)];
 }
 
 const Precision& DiscreteFunction::operator()(Integer sx, Integer sy) const
 {
     
-    return operator[](calculateIndex(sx,sy));
+    return data_[calculateIndex(sx,sy)];
 }
 
 Index DiscreteFunction::calculateIndex(Integer sx, Integer sy) const
@@ -60,21 +100,26 @@ Index DiscreteFunction::calculateIndex(Integer sx, Integer sy) const
     return sy_*(nx_+3)+sx_;
 }
 
+bool DiscreteFunction::checkSimilarity( const DiscreteFunction& rhs) const
+{
+    return nx_ == rhs.nx_ && ny_ == rhs.ny_ &&
+           hx_ == rhs.hx_ && hy_ == rhs.hy_ && 
+           origin_ == rhs.origin_;
+}
+
 void DiscreteFunction::write(std::ostream& out) const
 {
     out<<"#begin points"<<std::endl;
     out<<std::setw(10)<<std::left<<"#x"<<" "
        <<std::setw(10)<<std::left<<"y"<<" "
        <<std::setw(10)<<std::left<<"value"<<std::endl;
-    Precision hx=1.0/nx_;
-    Precision hy=1.0/ny_;
     //for (Integer sy=-1; sy<=static_cast<Integer>(ny_+1); ++sy)
     for (Index sy=0; sy<=ny_; ++sy)
         //for (Integer sx=-1; sx<=static_cast<Integer>(nx_+1); ++sx)
         for (Index sx=0; sx<=nx_; ++sx)
-            out<<std::setw(10)<<std::left<<sx*hx<<" "
-               <<std::setw(10)<<std::left<<sy*hy<<" "
-               <<std::setw(10)<<std::left<<operator[](calculateIndex(sx,sy))
+            out<<std::setw(10)<<std::left<<origin_.sx + sx*hx_<<" "
+               <<std::setw(10)<<std::left<<origin_.sy + sy*hy_<<" "
+               <<std::setw(10)<<std::left<<data_[calculateIndex(sx,sy)]
                <<std::endl;
     out<<"#end points"<<std::endl;
 }
@@ -85,10 +130,10 @@ Precision DiscreteFunction::twoNorm() const
     for (Index sy=0; sy<=ny_; ++sy)
         for (Index sx=0; sx<=nx_; ++sx)
         {
-            Precision temp = operator[](calculateIndex(sx,sy));
+            Precision temp = data_[calculateIndex(sx,sy)];
             result+=temp*temp;
         }
-    return std::sqrt(result);
+    return std::sqrt(result)/(nx+1)*(ny+1);
 }
 
 const DiscreteFunction DiscreteFunction::abs() const
@@ -96,7 +141,7 @@ const DiscreteFunction DiscreteFunction::abs() const
     DiscreteFunction result(*this);
     for (Index sy=0; sy<=ny_; ++sy)
         for (Index sx=0; sx<=nx_; ++sx)
-            result(sx,sy) = std::abs(operator[](calculateIndex(sx,sy)));
+            result(sx,sy) = std::abs(data_[calculateIndex(sx,sy)]);
     return result;
 }
 
@@ -109,6 +154,60 @@ Index DiscreteFunction::getNy() const
 {
     return ny_;
 }
+
+Precision DiscreteFunction::getHx() const
+{
+    return hx_;
+}
+
+Precision DiscreteFunction::getHy() const
+{
+    return hy_;
+}
+
+Point DiscreteFunction::getOrigin() const
+{
+    return origin_;
+}
+
+const DiscreteFunction DiscreteFunction::operator +=(const DiscreteFunction rhs)
+{
+    assert( checkSimilarity(rhs) );
+    data_+=rhs.data_;
+
+}
+const DiscreteFunction DiscreteFunction::operator -=(const DiscreteFunction rhs)
+{
+    assert( checkSimilarity(rhs) );
+    data_-=rhs.data_;
+}
+const DiscreteFunction DiscreteFunction::operator +=(Precision rhs)
+{
+    data_+=rhs;
+}
+const DiscreteFunction DiscreteFunction::operator -=(Precision rhs)
+{
+    data_-=rhs;
+}
+const DiscreteFunction DiscreteFunction::operator *=(const DiscreteFunction rhs)
+{
+    assert( checkSimilarity(rhs) );
+    data_*=rhs.data_;
+}
+const DiscreteFunction DiscreteFunction::operator /=(const DiscreteFunction rhs)
+{
+    assert( checkSimilarity(rhs) );
+    data_/=rhs.data_;
+}
+const DiscreteFunction DiscreteFunction::operator *=(Precision rhs)
+{
+    data_+=rhs;
+}
+const DiscreteFunction DiscreteFunction::operator /=(Precision rhs)
+{
+    data_/=rhs;
+}
+
 
 std::ostream& operator<<(std::ostream& stream, const DiscreteFunction& function)
 {
@@ -134,6 +233,35 @@ const DiscreteFunction operator *(const DiscreteFunction& lhs, const DiscreteFun
     result*=rhs;
     return result;
 }
+const DiscreteFunction operator /(const DiscreteFunction& lhs, const DiscreteFunction& rhs)
+{
+    DiscreteFunction result(lhs);
+    result/=rhs;
+    return result;
+}
+
+const DiscreteFunction operator +(const Precision lhs, const DiscreteFunction& rhs)
+{
+    DiscreteFunction result(rhs);
+    result+=lhs;
+    return result;
+}
+const DiscreteFunction operator +(const DiscreteFunction& rhs, const Precision lhs)
+{
+    return lhs+rhs;
+}
+
+const DiscreteFunction operator -(const Precision lhs, const DiscreteFunction& rhs)
+{
+    DiscreteFunction result(rhs);
+    result-=lhs;
+    return result;
+}
+const DiscreteFunction operator -(const DiscreteFunction& rhs, const Precision lhs)
+{
+    return lhs-rhs;
+}
+
 const DiscreteFunction operator *(const Precision lhs, const DiscreteFunction& rhs)
 {
     DiscreteFunction result(rhs);
@@ -144,5 +272,12 @@ const DiscreteFunction operator *(const DiscreteFunction& rhs, const Precision l
 {
     return lhs*rhs;
 }
+const DiscreteFunction operator /(const DiscreteFunction& rhs, const Precision lhs)
+{
+    DiscreteFunction result(rhs);
+    result/=lhs;
+    return result;
+}
+
 
 }

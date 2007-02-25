@@ -107,6 +107,13 @@ namespace mg
         Index sy;
     };
     
+    struct FPoint
+    {
+        Point(Precision x, Precision y): x(x), y(y) {};
+        Precision x;
+        Precision y;
+    };
+    
 }
 
 
