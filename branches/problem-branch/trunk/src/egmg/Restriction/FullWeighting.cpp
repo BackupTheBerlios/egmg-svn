@@ -59,7 +59,7 @@ DiscreteFunction FullWeighting::restriction(
 
     for (Index sy=nfp.sy;sy<=nlp.sy;sy++)
     {
-        for(Index sx=nfp.sx;sx<nlp.sx;sx++)
+        for(Index sx=nfp.sx;sx<=nlp.sx;sx++)
             result(sx,sy)=
                 weight_*(4*u(2*sx,2*sy)
                         +2*u(2*sx-1,2*sy)

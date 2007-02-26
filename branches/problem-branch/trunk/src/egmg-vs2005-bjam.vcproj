@@ -63,107 +63,35 @@
 			Name="Stencil"
 			>
 			<File
-				RelativePath=".\Stencil\Biharmonic2D2.cpp"
+				RelativePath=".\egmg\Stencil\Helmholtz2D2.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Stencil\Biharmonic2D2.h"
+				RelativePath=".\egmg\Stencil\Helmholtz2D2.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Stencil\ConDiff2D1.cpp"
+				RelativePath=".\egmg\Stencil\Jamfile"
 				>
 			</File>
 			<File
-				RelativePath=".\Stencil\ConDiff2D1.h"
+				RelativePath=".\egmg\Stencil\Laplacian2D2.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Stencil\ConDiff2Dkap.cpp"
+				RelativePath=".\egmg\Stencil\Laplacian2D2.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Stencil\ConDiff2Dkap.h"
+				RelativePath=".\egmg\Stencil\Stencil.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Stencil\ConvectionDiffusion2D1.cpp"
+				RelativePath=".\egmg\Stencil\Stencil.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Stencil\ConvectionDiffusion2D1.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\Galerkin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\Galerkin.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\Helmholtz2D2.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\Helmholtz2D2.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\Jamfile"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\Laplacian2D2.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\Laplacian2D2.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\Laplacian2D4.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\Laplacian2D4.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\MSV2D4.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\MSV2D4.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\PreCalculatedStencil.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\PreCalculatedStencil.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\Stencil.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\Stencil.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\StencilBoard.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\StencilBoard.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Stencil\StencilIncludes.h"
+				RelativePath=".\egmg\Stencil\StencilIncludes.h"
 				>
 			</File>
 		</Filter>
@@ -171,31 +99,31 @@
 			Name="CycleType"
 			>
 			<File
-				RelativePath=".\CycleType\CycleType.h"
+				RelativePath=".\egmg\CycleType\CycleType.h"
 				>
 			</File>
 			<File
-				RelativePath=".\CycleType\CycleTypeIncludes.h"
+				RelativePath=".\egmg\CycleType\CycleTypeIncludes.h"
 				>
 			</File>
 			<File
-				RelativePath=".\CycleType\FCycle.h"
+				RelativePath=".\egmg\CycleType\FCycle.h"
 				>
 			</File>
 			<File
-				RelativePath=".\CycleType\Jamfile"
+				RelativePath=".\egmg\CycleType\Jamfile"
 				>
 			</File>
 			<File
-				RelativePath=".\CycleType\LevelCycle.h"
+				RelativePath=".\egmg\CycleType\LevelCycle.h"
 				>
 			</File>
 			<File
-				RelativePath=".\CycleType\VCycle.h"
+				RelativePath=".\egmg\CycleType\VCycle.h"
 				>
 			</File>
 			<File
-				RelativePath=".\CycleType\WCycle.h"
+				RelativePath=".\egmg\CycleType\WCycle.h"
 				>
 			</File>
 		</Filter>
@@ -203,15 +131,27 @@
 			Name="general"
 			>
 			<File
-				RelativePath=".\general\Jamfile"
+				RelativePath=".\egmg\general\DiscreteFunction.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\general\parameters.h"
+				RelativePath=".\egmg\general\DiscreteFunction.h"
 				>
 			</File>
 			<File
-				RelativePath=".\general\TransferOperator.h"
+				RelativePath=".\egmg\general\Jamfile"
+				>
+			</File>
+			<File
+				RelativePath=".\egmg\general\parameters.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\egmg\general\parameters.h"
+				>
+			</File>
+			<File
+				RelativePath=".\egmg\general\TransferOperator.h"
 				>
 			</File>
 		</Filter>
@@ -219,119 +159,115 @@
 			Name="functions"
 			>
 			<File
-				RelativePath=".\functions\cycle.cpp"
+				RelativePath=".\egmg\functions\cycle.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\cycle.h"
+				RelativePath=".\egmg\functions\cycle.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\directSolver.cpp"
+				RelativePath=".\egmg\functions\directSolver.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\directSolver.h"
+				RelativePath=".\egmg\functions\directSolver.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\error.cpp"
+				RelativePath=".\egmg\functions\error.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\error.h"
+				RelativePath=".\egmg\functions\error.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\expansion.h"
+				RelativePath=".\egmg\functions\expansion.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\f.h"
+				RelativePath=".\egmg\functions\functionsIncludes.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\functionsIncludes.h"
+				RelativePath=".\egmg\functions\generatePositionArrays.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\g.h"
+				RelativePath=".\egmg\functions\generatePositionArrays.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\generatePositionArrays.cpp"
+				RelativePath=".\egmg\functions\Jamfile"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\generatePositionArrays.h"
+				RelativePath=".\egmg\functions\krylov.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\Jamfile"
+				RelativePath=".\egmg\functions\krylov.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\maxResiduum.cpp"
+				RelativePath=".\egmg\functions\maxResiduum.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\maxResiduum.h"
+				RelativePath=".\egmg\functions\maxResiduum.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\output.cpp"
+				RelativePath=".\egmg\functions\output.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\output.h"
+				RelativePath=".\egmg\functions\output.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\printStencil.cpp"
+				RelativePath=".\egmg\functions\printStencil.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\printStencil.h"
+				RelativePath=".\egmg\functions\printStencil.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\putbval.cpp"
+				RelativePath=".\egmg\functions\putbval.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\putbval.h"
+				RelativePath=".\egmg\functions\putbval.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\putrhs.cpp"
+				RelativePath=".\egmg\functions\putrhs.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\putrhs.h"
+				RelativePath=".\egmg\functions\putrhs.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\residuum.cpp"
+				RelativePath=".\egmg\functions\residuum.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\residuum.h"
+				RelativePath=".\egmg\functions\residuum.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\twonormResiduum.cpp"
+				RelativePath=".\egmg\functions\twonormResiduum.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\twonormResiduum.h"
+				RelativePath=".\egmg\functions\twonormResiduum.h"
 				>
 			</File>
 			<File
-				RelativePath=".\functions\WHighJacScalarProduct.h"
-				>
-			</File>
-			<File
-				RelativePath=".\functions\zero.h"
+				RelativePath=".\egmg\functions\WHighJacScalarProduct.h"
 				>
 			</File>
 		</Filter>
@@ -339,55 +275,23 @@
 			Name="Prolongation"
 			>
 			<File
-				RelativePath=".\Prolongation\BicubicInterpolation.cpp"
+				RelativePath=".\egmg\Prolongation\BilinearInterpolation.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Prolongation\BicubicInterpolation.h"
+				RelativePath=".\egmg\Prolongation\BilinearInterpolation.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Prolongation\BilinearInterpolation.cpp"
+				RelativePath=".\egmg\Prolongation\Jamfile"
 				>
 			</File>
 			<File
-				RelativePath=".\Prolongation\BilinearInterpolation.h"
+				RelativePath=".\egmg\Prolongation\Prolongation.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Prolongation\DendyInterpolation.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Prolongation\DendyInterpolation.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Prolongation\DeZeeuwInterpolation.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Prolongation\DeZeeuwInterpolation.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Prolongation\Jamfile"
-				>
-			</File>
-			<File
-				RelativePath=".\Prolongation\Prolongation.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Prolongation\ProlongationIncludes.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Prolongation\SevenPointInterpolation.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Prolongation\SevenPointInterpolation.h"
+				RelativePath=".\egmg\Prolongation\ProlongationIncludes.h"
 				>
 			</File>
 		</Filter>
@@ -395,63 +299,23 @@
 			Name="Restriction"
 			>
 			<File
-				RelativePath=".\Restriction\DendyRestriction.cpp"
+				RelativePath=".\egmg\Restriction\FullWeighting.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Restriction\DendyRestriction.h"
+				RelativePath=".\egmg\Restriction\FullWeighting.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Restriction\FullWeighting.cpp"
+				RelativePath=".\egmg\Restriction\Jamfile"
 				>
 			</File>
 			<File
-				RelativePath=".\Restriction\FullWeighting.h"
+				RelativePath=".\egmg\Restriction\Restriction.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Restriction\HalfWeighting.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Restriction\HalfWeighting.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Restriction\Injection.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Restriction\Injection.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Restriction\Jamfile"
-				>
-			</File>
-			<File
-				RelativePath=".\Restriction\Restriction.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Restriction\RestrictionIncludes.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Restriction\SevenPointRestriction.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Restriction\SevenPointRestriction.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Restriction\TransposedProlongation.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Restriction\TransposedProlongation.h"
+				RelativePath=".\egmg\Restriction\RestrictionIncludes.h"
 				>
 			</File>
 		</Filter>
@@ -459,87 +323,143 @@
 			Name="Relaxation"
 			>
 			<File
-				RelativePath=".\Relaxation\GSLexicographic.cpp"
+				RelativePath=".\egmg\Relaxation\GSLexicographic.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\GSLexicographic.h"
+				RelativePath=".\egmg\Relaxation\GSLexicographic.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\GSRedBlack.cpp"
+				RelativePath=".\egmg\Relaxation\Jamfile"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\GSRedBlack.h"
+				RelativePath=".\egmg\Relaxation\Relaxation.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\Jacobi.cpp"
+				RelativePath=".\egmg\Relaxation\RelaxationIncludes.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Problem"
+			>
+			<File
+				RelativePath=".\egmg\Problem\ChannelProblem.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\Jacobi.h"
+				RelativePath=".\egmg\Problem\ChannelProblem.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\Jamfile"
+				RelativePath=".\egmg\Problem\DirichletProblem.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\LineGS.cpp"
+				RelativePath=".\egmg\Problem\DirichletProblem.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\LineGS.h"
+				RelativePath=".\egmg\Problem\Jamfile"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\LineJAC.cpp"
+				RelativePath=".\egmg\Problem\PeriodicProblem.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\LineJAC.h"
+				RelativePath=".\egmg\Problem\PeriodicProblem.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\LineRelaxation.cpp"
+				RelativePath=".\egmg\Problem\Problem.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\LineRelaxation.h"
+				RelativePath=".\egmg\Problem\Problem.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\Relaxation.h"
+				RelativePath=".\egmg\Problem\ProblemIncludes.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Function"
+			>
+			<File
+				RelativePath=".\egmg\Function\Constant.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\RelaxationIncludes.h"
+				RelativePath=".\egmg\Function\Constant.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\WHighJac.cpp"
+				RelativePath=".\egmg\Function\Function.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\WHighJac.h"
+				RelativePath=".\egmg\Function\Function.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\ZebraLine.cpp"
+				RelativePath=".\egmg\Function\FunctionIncludes.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\ZebraLine.h"
+				RelativePath=".\egmg\Function\Jamfile"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\ZebraLineGS.cpp"
+				RelativePath=".\egmg\Function\TestFunction1.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Relaxation\ZebraLineGS.h"
+				RelativePath=".\egmg\Function\TestFunction1.h"
+				>
+			</File>
+			<File
+				RelativePath=".\egmg\Function\TestFunction2.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\egmg\Function\TestFunction2.h"
+				>
+			</File>
+			<File
+				RelativePath=".\egmg\Function\TestFunction3.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\egmg\Function\TestFunction3.h"
+				>
+			</File>
+			<File
+				RelativePath=".\egmg\Function\TestFunction4.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\egmg\Function\TestFunction4.h"
+				>
+			</File>
+			<File
+				RelativePath=".\egmg\Function\TestRightSide1.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\egmg\Function\TestRightSide1.h"
+				>
+			</File>
+			<File
+				RelativePath=".\egmg\Function\Zero.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\egmg\Function\Zero.h"
 				>
 			</File>
 		</Filter>

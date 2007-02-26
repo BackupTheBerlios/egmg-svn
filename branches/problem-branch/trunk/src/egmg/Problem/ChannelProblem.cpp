@@ -100,6 +100,7 @@ DiscreteFunction ChannelProblem::residuum()
                 result(sx,sy)=rightHandSide_(sx,sy)
                         -stencil_.apply(solution_,C,sx,sy,nx_,ny_);*/
     }
+	applyBoundaryConstraint(result);
     return result;
 }
 

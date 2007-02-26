@@ -13,6 +13,8 @@ protected:
 public:
 	Precision operator() (Precision x, Precision y) const;
     virtual ~Function() =0;
+private:
+	const Function& operator =(const Function& rhs);
 };
 
 }

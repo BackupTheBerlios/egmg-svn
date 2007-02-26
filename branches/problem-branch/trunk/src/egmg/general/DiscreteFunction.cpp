@@ -86,8 +86,7 @@ Precision& DiscreteFunction::operator()(Integer sx, Integer sy)
 }
 
 const Precision& DiscreteFunction::operator()(Integer sx, Integer sy) const
-{
-    
+{  
     return data_[calculateIndex(sx,sy)];
 }
 

@@ -3,10 +3,13 @@
 namespace mg
 {
 
+Constant::Constant() : constant_(1.0)
+{}
+
 Constant::Constant(Precision constant): constant_(constant)
 {}
 
-Precision mg::Constant::apply(Precision, Precision) const
+Precision Constant::apply(Precision, Precision) const
 {
 	return constant_;
 }

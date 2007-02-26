@@ -8,9 +8,10 @@ namespace mg
 
 class Constant: public Function
 {
-	const Precision constant_;
+const Precision constant_;
 
 public:
+	Constant();
 	Constant(Precision constant);
 
 protected:
