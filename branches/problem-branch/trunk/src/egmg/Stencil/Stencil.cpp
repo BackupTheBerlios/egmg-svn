@@ -11,18 +11,54 @@ Stencil::Stencil() {}
 
 Stencil::~Stencil() {}
 
+Precision Stencil::apply(
+        const DiscreteFunction& u,
+        const Position pos,
+        const Index sx,
+        const Index sy) const
+{
+    const Index nx = u.getNx();
+    const Index ny = u.getNy();
+    const Precision hx = u.getHx();
+    const Precision hy = u.getHy();
+    const Point origin = u.getOrigin();
+    NumericArray opL = getL(pos,sx,sy,nx,ny,hx,hy,origin);
+    PositionArray jX = getJx(pos,nx,ny);
+    PositionArray jY = getJy(pos,nx,ny);
+    Precision result = 0.0;
+    for (Index i = 0; i<opL.size(); ++i)
+        result+=opL[i]*u(sx+jX[i],sy+jY[i]);
+    return result;
+}
+        
+Precision Stencil::getCenter(
+        const Position pos,
+        const Index sx,
+        const Index sy,
+        const Index nx,
+        const Index ny,
+        const Precision hx,
+        const Precision hy,
+        const Point origin) const
+{
+    return getL(pos,sx,sy,nx,ny,hx,hy,origin)[0];
+}
+
 NumericArray Stencil::getLInSize(
     const Position pos,
     const Index sx,
     const Index sy,
     const Index nx,
     const Index ny,
+    const Precision hx,
+    const Precision hy,
+    const Point origin,
 	const Index size ) const
 {
-	assert( size == 1 || size == 2 );
+	ASSERT( size == 1 || size == 2 );
 	NumericArray result( 0.0, size == 1 ? 9 : 25 );
 	
-	NumericArray operatorL = getL( pos, sx, sy, nx, ny );
+	NumericArray operatorL = getL( pos, sx, sy, nx, ny, hx, hy, origin );
 	PositionArray jX = getJx( pos, nx, ny );
 	PositionArray jY = getJy( pos, nx, ny );
 

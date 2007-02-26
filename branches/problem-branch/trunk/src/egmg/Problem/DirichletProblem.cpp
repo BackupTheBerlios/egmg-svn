@@ -5,9 +5,10 @@ namespace mg
 
 DirichletProblem::DirichletProblem(
     Stencil& stencil,
-    Index nx,
-    Index ny)
-    : Problem(stencil, nx, ny)
+        Point origin,
+        Index nx, Index ny,
+        Precision hx, Precision hy)
+    : Problem(stencil, origin, nx, ny, hx, hy)
 {
 }
 
@@ -17,26 +18,29 @@ DirichletProblem::~DirichletProblem()
 
 void DirichletProblem::setBoundaryConstraint( const Function& boundaryConstraint )
 {
-    const Precision hx = 1.0/nx_;
-    const Precision hy = 1.0/ny_;
-    solution_(-1,-1)=boundaryConstraint(-hx,-hy);
-    for (Index sx=0; sx<=nx_; sx++)
+    const Index nx = getNx();
+    const Index ny = getNy();
+    const Precision hx=getHx();
+    const Precision hy=getHy();
+    const Point origin = getOrigin();
+    solution_(-1,-1)=boundaryConstraint(origin.x-hx,origin.y-hy);
+    for (Index sx=0; sx<=nx; sx++)
     {
-        solution_(sx,-1)=boundaryConstraint(sx*hx,-hy);
-        solution_(sx,0)=boundaryConstraint(sx*hx,0.0);       //top border
-        solution_(sx,ny_)=boundaryConstraint(sx*hx,1.0);     //bottom border
-        solution_(sx,ny_+1)=boundaryConstraint(sx*hx,1.0+hy);
+        solution_(sx,-1)=boundaryConstraint(origin.x+sx*hx,origin.y-hy);
+        solution_(sx,0)=boundaryConstraint(origin.x+sx*hx,origin.y+0.0);       //top border
+        solution_(sx,ny)=boundaryConstraint(origin.x+sx*hx,origin.y+ny*hy);     //bottom border
+        solution_(sx,ny+1)=boundaryConstraint(origin.x+sx*hx,origin.y+(ny+1)*hy);
     }
-    solution_(nx_+1,-1)=boundaryConstraint(1.0+hx,-hy);
-    solution_(-1,ny_+1)=boundaryConstraint(-hx,1.0+hy);
-    for (Index sy=1; sy<ny_; sy++)
+    solution_(nx+1,-1)=boundaryConstraint(origin.x+(nx+1)*hx,origin.y-hy);
+    solution_(-1,ny+1)=boundaryConstraint(origin.x-hx,origin.y+(ny+1)*hy);
+    for (Index sy=1; sy<ny; sy++)
     {
-        solution_(-1,sy)=boundaryConstraint(-hx,sy*hy);
-        solution_(0,sy)=boundaryConstraint(0.0,sy*hy);        //left border
-        solution_(nx_,sy)=boundaryConstraint(1.0,sy*hy);      //right border
-        solution_(nx_+1,sy)=boundaryConstraint(1.0+hx,sy*hy);
+        solution_(-1,sy)=boundaryConstraint(origin.x-hx,origin.y+sy*hy);
+        solution_(0,sy)=boundaryConstraint(origin.x+0.0,origin.y+sy*hy);        //left border
+        solution_(nx,sy)=boundaryConstraint(origin.x+nx*hx,origin.y+sy*hy);      //right border
+        solution_(nx+1,sy)=boundaryConstraint(origin.x+(nx+1)*hx,origin.y+sy*hy);
     }
-    solution_(nx_+1,ny_+1)=boundaryConstraint(1.0+hx,1.0+hy);
+    solution_(nx+1,ny+1)=boundaryConstraint(origin.x+(nx+1)*hx,origin.y+(ny+1)*hy);
 }
 
 void DirichletProblem::applyBoundaryConstraint()
@@ -49,15 +53,20 @@ void DirichletProblem::applyBoundaryConstraint( DiscreteFunction& ) const
 
 DiscreteFunction DirichletProblem::residuum()
 {
-    DiscreteFunction result(0.0,nx_,ny_);
+    const Index nx = getNx();
+    const Index ny = getNy();
+    const Precision hx=getHx();
+    const Precision hy=getHy();
+    const Point origin = getOrigin();
+    DiscreteFunction result(0.0,origin,nx,ny,hx,hy);
     if (stencil_.size()<2)
     {
-        for (Index sy=1; sy<ny_; sy++)
+        for (Index sy=1; sy<ny; sy++)
         {
-            for(Index sx=1; sx<nx_; sx++)
+            for(Index sx=1; sx<nx; sx++)
             {
                 result(sx,sy)=rightHandSide_(sx,sy)
-                            -stencil_.apply(solution_,C,sx,sy,nx_,ny_);
+                            -stencil_.apply(solution_,C,sx,sy);
             }
         }
     }
@@ -65,56 +74,59 @@ DiscreteFunction DirichletProblem::residuum()
     {
         //south west corner
         result(1,1)=rightHandSide_(1,1)
-                    -stencil_.apply(solution_,SW,1,1,nx_,ny_);
+                    -stencil_.apply(solution_,SW,1,1);
         //south east corner
-        result(nx_-1,1)=rightHandSide_(nx_-1,1)
-                    -stencil_.apply(solution_,SE,nx_-1,1,nx_,ny_);
+        result(nx-1,1)=rightHandSide_(nx-1,1)
+                    -stencil_.apply(solution_,SE,nx-1,1);
         //north west corner
-        result(1,ny_-1)=rightHandSide_(1,ny_-1)
-                    -stencil_.apply(solution_,NW,1,ny_-1,nx_,ny_);
+        result(1,ny-1)=rightHandSide_(1,ny-1)
+                    -stencil_.apply(solution_,NW,1,ny-1);
         //north east corner
-        result(nx_-1,ny_-1)=rightHandSide_(nx_-1,ny_-1)
-                    -stencil_.apply(solution_,NE,nx_-1,ny_-1,nx_,ny_);
+        result(nx-1,ny-1)=rightHandSide_(nx-1,ny-1)
+                    -stencil_.apply(solution_,NE,nx-1,ny-1);
         //south boarder
-        for (Index sx=2; sx<nx_-1; sx++)
+        for (Index sx=2; sx<nx-1; sx++)
             result(sx,1)=rightHandSide_(sx,1)
-                    -stencil_.apply(solution_,S,sx,1,nx_,ny_);
+                    -stencil_.apply(solution_,S,sx,1);
         //north boarder
-        for (Index sx=2; sx<nx_-1; sx++)
-            result(sx,ny_-1)=rightHandSide_(sx,ny_-1)
-                    -stencil_.apply(solution_,N,sx,ny_-1,nx_,ny_);
+        for (Index sx=2; sx<nx-1; sx++)
+            result(sx,ny-1)=rightHandSide_(sx,ny-1)
+                    -stencil_.apply(solution_,N,sx,ny-1);
         //west boarder
-        for (Index sy=2; sy<ny_-1; sy++)
+        for (Index sy=2; sy<ny-1; sy++)
             result(1,sy)=rightHandSide_(1,sy)
-                    -stencil_.apply(solution_,W,1,sy,nx_,ny_);
+                    -stencil_.apply(solution_,W,1,sy);
         //east boarder;
-        for (Index sy=2; sy<ny_-1; sy++)
-            result(nx_-1,sy)=rightHandSide_(nx_-1,sy)
-                    -stencil_.apply(solution_,E,nx_-1,sy,nx_,ny_);
+        for (Index sy=2; sy<ny-1; sy++)
+            result(nx-1,sy)=rightHandSide_(nx-1,sy)
+                    -stencil_.apply(solution_,E,nx-1,sy);
         //the center
-        for (Index sy=2; sy<ny_-1; sy++)
-            for (Index sx=2; sx<nx_-1; sx++)
+        for (Index sy=2; sy<ny-1; sy++)
+            for (Index sx=2; sx<nx-1; sx++)
                 result(sx,sy)=rightHandSide_(sx,sy)
-                        -stencil_.apply(solution_,C,sx,sy,nx_,ny_);
+                        -stencil_.apply(solution_,C,sx,sy);
     }
     return result;
 }
 
-Point DirichletProblem::getFirstPoint() const
+IndexPair DirichletProblem::getFirstPoint(Index, Index) const
 {
-    return Point(1,1);
+    return IndexPair(1,1);
 }
 
-Point DirichletProblem::getLastPoint() const
+IndexPair DirichletProblem::getLastPoint(Index nx, Index ny) const
 {
-    return Point(nx_-1,ny_-1);
+    return IndexPair(nx-1,ny-1);
 }
 
-DirichletProblem* DirichletProblem::getCoarsGridProblem(
+ProblemPtr DirichletProblem::getCoarsGridProblem(
     Index nxNew,
-    Index nyNew) const
+    Index nyNew,
+    Precision hxNew,
+    Precision hyNew) const
 {
-    return new DirichletProblem(stencil_,nxNew,nyNew);
+    return ProblemPtr(
+        new DirichletProblem(stencil_,getOrigin(),nxNew,nyNew,hxNew,hyNew));
 }
 
 void DirichletProblem::fillBorderValues(
@@ -122,26 +134,28 @@ void DirichletProblem::fillBorderValues(
         NumericArray& rightSide,
         const Index dimension) const
 {
+    const Index nx = getNx();
+    const Index ny = getNy();
     //border values XDIR
-    for (Index sx=0; sx<=nx_; ++sx)
+    for (Index sx=0; sx<=nx; ++sx)
     {
         //lower border
         matrix[sx*dimension+sx]=1;
-        rightSide[sx]=solution_[sx];
+        rightSide[sx]=solution_(sx,0);
         //upper border
         matrix[(dimension-1-sx)*dimension+(dimension-1-sx)]=1;
-        rightSide[dimension-1-sx]=solution_[dimension-1-sx];
+        rightSide[dimension-1-sx]=solution_(nx-sx,ny);
     }
     //border values YDIR
     //corners have been process in XDIR (y=1..ny-1 instead of y=0..ny)
-    for (Index sy=1; sy<ny_; ++sy)
+    for (Index sy=1; sy<ny; ++sy)
     {
         //left border
-        matrix[sy*(nx_+1)*dimension+sy*(nx_+1)]=1;
-        rightSide[sy*(nx_+1)]=solution_[sy*(nx_+1)];
+        matrix[sy*(nx+1)*dimension+sy*(nx+1)]=1;
+        rightSide[sy*(nx+1)]=solution_(0,sy);
         //right border
-        matrix[(sy*(nx_+1)+nx_)*dimension+(sy*(nx_+1)+nx_)]=1;
-        rightSide[sy*(nx_+1)+nx_]=solution_[sy*(nx_+1)+nx_];
+        matrix[(sy*(nx+1)+nx)*dimension+(sy*(nx+1)+nx)]=1;
+        rightSide[sy*(nx+1)+nx]=solution_(nx,sy);
     }
 }
 

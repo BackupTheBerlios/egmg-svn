@@ -18,18 +18,21 @@ void GSLexicographic::relax(
     Stencil& stencil = problem.getStencil();
     DiscreteFunction& u = problem.getSolution();
     const DiscreteFunction& f = problem.getRightHandSide();
-    Point fp = problem.getFirstPoint();
-    Point lp = problem.getLastPoint();
+    const IndexPair fp = problem.getFirstPoint();
+    const IndexPair lp = problem.getLastPoint();
     const Index nx = problem.getNx();
     const Index ny = problem.getNy();
+    const Precision hx = problem.getHx();
+    const Precision hy = problem.getHy();
+    const Point origin = problem.getOrigin();
     if (stencil.size() < 2)
     {
         for (Index sy=fp.sy;sy<=lp.sy;sy++)
             for (Index sx=fp.sx;sx<=lp.sx;sx++)
             {
-                factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny);
+                factor = 1.0/stencil.getCenter(C,sx,sy,nx,ny,hx,hy,origin);
                 u(sx,sy)+=factor*(f(sx,sy)
-                        -stencil.apply(u,C,sx,sy,nx,ny));
+                        -stencil.apply(u,C,sx,sy));
             }
     }
     else

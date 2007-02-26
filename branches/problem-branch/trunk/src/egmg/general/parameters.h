@@ -9,6 +9,7 @@
 #include <cassert>
 #include <cmath>
 #include <utility>
+#include <memory>
 
 /**
  * \brief the namespace mg is for everything in this library
@@ -17,6 +18,9 @@
  */
 namespace mg
 {
+    class Problem;
+    
+    typedef std::auto_ptr<Problem> ProblemPtr;
     /**
      * \brief the Precision to do the calculations with
      */
@@ -100,21 +104,28 @@ namespace mg
      */
     enum Direction{ALTDIR=0,XDIR=1,YDIR=2};
     
-    struct Point
+    struct IndexPair
     {
-        Point(Index sx, Index sy): sx(sx), sy(sy){};
+        IndexPair(Index sx, Index sy): sx(sx), sy(sy){};
         Index sx;
         Index sy;
     };
     
-    struct FPoint
+    struct Point
     {
         Point(Precision x, Precision y): x(x), y(y) {};
         Precision x;
         Precision y;
     };
     
-}
+    bool operator== (const Point& lhs, const Point& rhs );
 
+    #ifndef NASSERT
+        #define ASSERT(exp) assert(exp);
+    #else
+        #define ASSERT(exp) ((void)0);
+    #endif
+    
+}
 
 #endif /*PARAMETERS_H_*/

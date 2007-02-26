@@ -30,6 +30,8 @@ void cycle(
     Stencil& stencil = problem.getStencil();
     const Index nx = problem.getNx();
     const Index ny = problem.getNy();
+    const Precision hx = problem.getHx();
+    const Precision hy = problem.getHy();
     
     if ( cycleType.solve())
     {        
@@ -49,10 +51,12 @@ void cycle(
                     (problem,residv);
             const Index nxNew = nx/2;
             const Index nyNew = ny/2;
+            const Precision hxNew = 2.0*hx;
+            const Precision hyNew = 2.0*hy;
             //we going to a coarser grid so Galerkin Operator needs to know
             //the transfer operators
             stencil.pushTransferOperators(restriction,prolongation,nxNew,nyNew);
-            Problem* coarsGridProblem = problem.getCoarsGridProblem(nxNew,nyNew);
+            ProblemPtr coarsGridProblem = problem.getCoarsGridProblem(nxNew,nyNew,hxNew,hyNew);
             coarsGridProblem->setRightHandSide( coarsResiduum );
             //do a multigrid cycle on the coars grid
 
@@ -74,8 +78,6 @@ void cycle(
                 relaxation.relax(problem);
 
             cycleType.accelerate(problem);
-            
-            delete coarsGridProblem;
         }
     }
 

@@ -6,6 +6,7 @@
 #define STENCIL_H_
 
 #include "../general/parameters.h"
+#include "../general/DiscreteFunction.h"
 
 namespace mg
 {
@@ -43,13 +44,11 @@ public:
      * \param[in] ny        number of points in y direction
      * \return              the value of \f$ L_h u_h \f$
      */
-    virtual Precision apply(
+    Precision apply(
         const DiscreteFunction& u,
         const Position pos,
         const Index sx,
-        const Index sy,
-        const Index nx,
-        const Index ny) const =0;
+        const Index sy) const;
         
     /**
      * \brief returns the coefficient of the center element at the given point
@@ -68,12 +67,15 @@ public:
      * \param[in] ny        number of points in y direction
      * \return              the center coefficient
      */
-    virtual Precision getCenter(
+    Precision getCenter(
         const Position pos,
         const Index sx,
         const Index sy,
         const Index nx,
-        const Index ny) const =0;
+        const Index ny,
+        const Precision hx,
+        const Precision hy,
+        const Point origin) const;
         
     /**
      * \brief retruns the coefficents of the stencil at the given point
@@ -143,7 +145,10 @@ public:
         const Index sx,
         const Index sy,
         const Index nx,
-        const Index ny) const =0;
+        const Index ny,
+        const Precision hx,
+        const Precision hy,
+        const Point origin) const =0;
     
 	/**
 	 * \brief retruns the coefficents of the stencil at the given point
@@ -165,6 +170,9 @@ public:
         const Index sy,
         const Index nx,
         const Index ny,
+        const Precision hx,
+        const Precision hy,
+        const Point origin,
 		const Index size ) const;
 
     /**
@@ -210,8 +218,8 @@ public:
     virtual void pushTransferOperators(
         const Restriction&,
         const Prolongation&,
-        const Index,
-        const Index );
+        const Index nx,
+        const Index ny);
     
     /**
      * \brief removes the top TransferOperators from the stack

@@ -40,27 +40,15 @@ public:
 
     virtual ~Helmholtz2D2();
 
-    Precision apply(
-        const DiscreteFunction& u,
+    NumericArray getL(
         const Position,
         const Index sx,
         const Index sy,
         const Index nx,
-        const Index ny) const;
-
-    Precision getCenter(
-        const Position,
-        const Index,
-        const Index,
-        const Index nx,
-        const Index ny) const;
-
-    NumericArray getL(
-        const Position,
-        const Index,
-        const Index,
-        const Index nx,
-        const Index ny) const;
+        const Index ny,
+        const Precision hx,
+        const Precision hy,
+        const Point origin) const;
 
     PositionArray getJx(
 		const Position,

@@ -7,13 +7,18 @@
 #include "../Stencil/Stencil.h"
 #include "../general/DiscreteFunction.h"
 
+
 namespace mg
 {
 
 class Problem
 {
 public:
-    Problem(Stencil& stencil, Index nx, Index ny);
+    Problem(
+        Stencil& stencil,
+        Point origin,
+        Index nx, Index ny,
+        Precision hx, Precision hy);
 	virtual ~Problem();
     Stencil& getStencil();
     void setRightHandSide( const Function& rightHandSide );
@@ -25,11 +30,18 @@ public:
     DiscreteFunction& getSolution();
     const DiscreteFunction& getSolution() const;
     virtual DiscreteFunction residuum() =0;
-    virtual Problem* getCoarsGridProblem(Index nx, Index ny) const =0;
-    virtual Point getFirstPoint() const =0;
-    virtual Point getLastPoint() const =0;
+    virtual ProblemPtr getCoarsGridProblem(
+        Index nxNew, Index nyNew,
+        Precision hxNew, Precision hyNew) const =0;
+    IndexPair getFirstPoint() const;
+    IndexPair getLastPoint() const;
+    virtual IndexPair getFirstPoint(Index nx, Index ny) const =0;
+    virtual IndexPair getLastPoint(Index nx, Index ny) const =0;
     Index getNx() const;
     Index getNy() const;
+    Precision getHx() const;
+    Precision getHy() const;
+    Point getOrigin() const;
     LinearEquationSystem getLinearEquationSystem() const;
     void setSolution(NumericArray& solution);
     
@@ -39,8 +51,6 @@ protected:
         NumericArray& rightSide,
         const Index dimension) const =0;
     Stencil& stencil_;
-    const Index nx_;
-    const Index ny_;
     DiscreteFunction rightHandSide_;
     DiscreteFunction solution_;
     

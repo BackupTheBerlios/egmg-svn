@@ -14,8 +14,13 @@ DiscreteFunction BilinearInterpolation::prolongate(
     const Index ny = problem.getNy();
     const Index nxNew = 2*nx;
     const Index nyNew = 2*ny;
+    const Precision hx = problem.getHx();
+    const Precision hy = problem.getHy();
+    const Precision hxNew = hx/2.0;
+    const Precision hyNew = hy/2.0;
+    const Point origin = problem.getOrigin();
     const DiscreteFunction& u = problem.getSolution();
-    DiscreteFunction result(0.0,nxNew,nyNew);
+    DiscreteFunction result(0.0,origin,nxNew,nyNew,hxNew,hyNew);
 
     //"interpolation" of coarse grid points
     for (Index sy=0; sy<=ny; ++sy)
@@ -35,6 +40,30 @@ DiscreteFunction BilinearInterpolation::prolongate(
                 1./2*(result(sx,sy-1)
                      +result(sx,sy+1));
     return result;
+}
+
+const NumericArray& BilinearInterpolation::getI(
+    const Position,
+    const Index,
+    const Index,
+    const Index,
+    const Index,
+    const Precision,
+    const Precision,
+    const Point,
+    const Stencil&) const
+{
+    return i_;  
+}
+    
+const PositionArray& BilinearInterpolation::getJx( const Position ) const
+{
+    return jx_; 
+}
+
+const PositionArray& BilinearInterpolation::getJy( const Position ) const
+{
+    return jy_;
 }
 
 }

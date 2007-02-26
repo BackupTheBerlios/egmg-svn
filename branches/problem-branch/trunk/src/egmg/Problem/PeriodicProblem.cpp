@@ -5,9 +5,10 @@ namespace mg
 
 PeriodicProblem::PeriodicProblem(
     Stencil& stencil,
-    Index nx,
-    Index ny)
-    : Problem(stencil, nx, ny)
+    Point origin,
+    Index nx, Index ny,
+    Precision hx, Precision hy)
+    : Problem(stencil, origin, nx, ny, hx, hy)
 {
 }
 
@@ -26,27 +27,34 @@ void PeriodicProblem::applyBoundaryConstraint()
 
 void PeriodicProblem::applyBoundaryConstraint( DiscreteFunction& u ) const
 {
-    for(Index sx=0;sx<=nx_+1;++sx)
+    const Index nx = getNx();
+    const Index ny = getNy();
+    for(Index sx=0;sx<=nx+1;++sx)
     {
-        u(sx,0)=u(sx,ny_);
-        u(sx,ny_+1)=u(sx,1);
+        u(sx,0)=u(sx,ny);
+        u(sx,ny+1)=u(sx,1);
     }
-    for(Index sy=0;sy<=ny_+1;++sy)
+    for(Index sy=0;sy<=ny+1;++sy)
     {
-        u(0,sy)=u(nx_,sy);
-        u(nx_+1,sy)=u(1,sy);
+        u(0,sy)=u(nx,sy);
+        u(nx+1,sy)=u(1,sy);
     }
 }
 
 DiscreteFunction PeriodicProblem::residuum()
 {
-    DiscreteFunction result(0.0,nx_,ny_);
+    const Index nx = getNx();
+    const Index ny = getNy();
+    const Precision hx=getHx();
+    const Precision hy=getHy();
+    const Point origin = getOrigin();
+    DiscreteFunction result(0.0,origin,nx,ny,hx,hy);
     if (stencil_.size()<2)
     {
-        for (Index sy=1; sy<=ny_; sy++)
-            for(Index sx=1; sx<=nx_; sx++)
+        for (Index sy=1; sy<=ny; sy++)
+            for(Index sx=1; sx<=nx; sx++)
                 result(sx,sy)=rightHandSide_(sx,sy)
-                            -stencil_.apply(solution_,C,sx,sy,nx_,ny_);
+                            -stencil_.apply(solution_,C,sx,sy);
     }
     else
     {
@@ -88,21 +96,24 @@ DiscreteFunction PeriodicProblem::residuum()
     return result;
 }
 
-Point PeriodicProblem::getFirstPoint() const
+IndexPair PeriodicProblem::getFirstPoint(Index, Index) const
 {
-    return Point(1,1);
+    return IndexPair(1,1);
 }
 
-Point PeriodicProblem::getLastPoint() const
+IndexPair PeriodicProblem::getLastPoint(Index nx, Index ny) const
 {
-    return Point(nx_,ny_);
+    return IndexPair(nx,ny);
 }
 
-PeriodicProblem* PeriodicProblem::getCoarsGridProblem(
+ProblemPtr PeriodicProblem::getCoarsGridProblem(
     Index nxNew,
-    Index nyNew) const
+    Index nyNew,
+    Precision hxNew,
+    Precision hyNew) const
 {
-    return new PeriodicProblem(stencil_,nxNew,nyNew);
+    return ProblemPtr(
+        new PeriodicProblem(stencil_,getOrigin(),nxNew,nyNew,hxNew,hyNew));
 }
 
 void PeriodicProblem::fillBorderValues(
@@ -110,27 +121,29 @@ void PeriodicProblem::fillBorderValues(
         NumericArray& rightSide,
         const Index dimension) const
 {
-    for (Index sx=0; sx<=nx_; ++sx)
+    const Index nx = getNx();
+    const Index ny = getNy();
+    for (Index sx=0; sx<=nx; ++sx)
     {
-        matrix[(0*(nx_+1)+sx)*dimension+(0*(nx_+1)+sx)]=1.0;
-        matrix[(0*(nx_+1)+sx)*dimension+(ny_*(nx_+1)+sx)]=-1.0;
-        rightSide[(0*(nx_+1)+sx)]=0.0;
+        matrix[(0*(nx+1)+sx)*dimension+(0*(nx+1)+sx)]=1.0;
+        matrix[(0*(nx+1)+sx)*dimension+(ny*(nx+1)+sx)]=-1.0;
+        rightSide[(0*(nx+1)+sx)]=0.0;
         
-        matrix[(ny_*(nx_+1)+sx)*dimension+(ny_*(nx_+1)+sx)]=-2.0;
-        matrix[(ny_*(nx_+1)+sx)*dimension+(1*(nx_+1)+sx)]=1.0;
-        matrix[(ny_*(nx_+1)+sx)*dimension+((ny_-1)*(nx_+1)+sx)]+=1.0;
-        rightSide[(ny_*(nx_+1)+sx)]=0.0;
+        matrix[(ny*(nx+1)+sx)*dimension+(ny*(nx+1)+sx)]=-2.0;
+        matrix[(ny*(nx+1)+sx)*dimension+(1*(nx+1)+sx)]=1.0;
+        matrix[(ny*(nx+1)+sx)*dimension+((ny-1)*(nx+1)+sx)]+=1.0;
+        rightSide[(ny*(nx+1)+sx)]=0.0;
     }
-    for (Index sy=1; sy<ny_; ++sy)
+    for (Index sy=1; sy<ny; ++sy)
     {
-        matrix[(sy*(nx_+1)+0)*dimension+(sy*(nx_+1)+0)]=1.0;
-        matrix[(sy*(nx_+1)+0)*dimension+(sy*(nx_+1)+nx_)]=-1.0;
-        rightSide[(sy*(nx_+1)+0)]=0.0;
+        matrix[(sy*(nx+1)+0)*dimension+(sy*(nx+1)+0)]=1.0;
+        matrix[(sy*(nx+1)+0)*dimension+(sy*(nx+1)+nx)]=-1.0;
+        rightSide[(sy*(nx+1)+0)]=0.0;
         
-        matrix[(sy*(nx_+1)+nx_)*dimension+(sy*(nx_+1)+nx_)]=2.0;
-        matrix[(sy*(nx_+1)+nx_)*dimension+(sy*(nx_+1)+nx_-1)]=-1.0;
-        matrix[(sy*(nx_+1)+nx_)*dimension+(sy*(nx_+1)+1)]+=-1.0;
-        rightSide[(sy*(nx_+1)+nx_)]=0.0;
+        matrix[(sy*(nx+1)+nx)*dimension+(sy*(nx+1)+nx)]=2.0;
+        matrix[(sy*(nx+1)+nx)*dimension+(sy*(nx+1)+nx-1)]=-1.0;
+        matrix[(sy*(nx+1)+nx)*dimension+(sy*(nx+1)+1)]+=-1.0;
+        rightSide[(sy*(nx+1)+nx)]=0.0;
         
         //matrix[(sy*(nx_+1)+nx_)*dimension+sy*(nx_+1)]=1;
         //rightSide[(sy*(nx_+1)+nx_)]=solution_(nx_,sy);

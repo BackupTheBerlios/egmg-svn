@@ -1,4 +1,5 @@
 subproject egmg/general ;
 
 lib general : <template>../../warnings
-			  DiscreteFunction.cpp ;
+			  DiscreteFunction.cpp
+			  parameters.cpp ;

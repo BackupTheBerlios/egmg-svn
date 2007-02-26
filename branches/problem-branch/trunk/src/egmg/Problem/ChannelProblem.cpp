@@ -5,9 +5,10 @@ namespace mg
 
 ChannelProblem::ChannelProblem(
     Stencil& stencil,
-    Index nx,
-    Index ny)
-    : Problem(stencil, nx, ny)
+    Point origin,
+    Index nx, Index ny,
+    Precision hx, Precision hy)
+    : Problem(stencil, origin, nx, ny, hx, hy)
 {
 }
 
@@ -17,14 +18,17 @@ ChannelProblem::~ChannelProblem()
 
 void ChannelProblem::setBoundaryConstraint( const Function& boundaryConstraint )
 {
-    const Precision hx = 1.0/nx_;
-    const Precision hy = 1.0/ny_;
-    for (Index sx=0; sx<=nx_; sx++)
+    const Index nx = getNx();
+    const Index ny = getNy();
+    const Precision hx = getHy();
+    const Precision hy = getHx();
+    const Point origin = getOrigin();
+    for (Index sx=0; sx<=nx; sx++)
     {
-        solution_(sx,-1)=boundaryConstraint(sx*hx,-hy);
-        solution_(sx,0)=boundaryConstraint(sx*hx,0.0);       //top border
-        solution_(sx,ny_)=boundaryConstraint(sx*hx,1.0);     //bottom border
-        solution_(sx,ny_+1)=boundaryConstraint(sx*hx,1.0+hy);
+        solution_(sx,-1)=boundaryConstraint(origin.x+sx*hx,origin.y-hy);
+        solution_(sx,0)=boundaryConstraint(origin.x+sx*hx,origin.y+0.0);       //top border
+        solution_(sx,ny)=boundaryConstraint(origin.x+sx*hx,origin.y+ny*hy);     //bottom border
+        solution_(sx,ny+1)=boundaryConstraint(origin.x+sx*hx,origin.y+(ny+1)*hy);
     }
 }
 
@@ -35,22 +39,29 @@ void ChannelProblem::applyBoundaryConstraint()
 
 void ChannelProblem::applyBoundaryConstraint( DiscreteFunction& u ) const
 {
-    for(Index sy=0;sy<=ny_;++sy)
+    const Index nx = getNx();
+    const Index ny = getNy();
+    for(Index sy=0;sy<=ny;++sy)
     {
-        u(0,sy)=u(nx_,sy);
-        u(nx_+1,sy)=u(1,sy);
+        u(0,sy)=u(nx,sy);
+        u(nx+1,sy)=u(1,sy);
     }
 }
 
 DiscreteFunction ChannelProblem::residuum()
 {
-    DiscreteFunction result(0.0,nx_,ny_);
+    const Index nx = getNx();
+    const Index ny = getNy();
+    const Precision hx=getHx();
+    const Precision hy=getHy();
+    const Point origin = getOrigin();
+    DiscreteFunction result(0.0,origin,nx,ny,hx,hy);
     if (stencil_.size()<2)
     {
-        for (Index sy=1; sy<ny_; sy++)
-            for(Index sx=1; sx<=nx_; sx++)
+        for (Index sy=1; sy<ny; sy++)
+            for(Index sx=1; sx<=nx; sx++)
                 result(sx,sy)=rightHandSide_(sx,sy)
-                            -stencil_.apply(solution_,C,sx,sy,nx_,ny_);
+                            -stencil_.apply(solution_,C,sx,sy);
     }
     else
     {
@@ -92,21 +103,24 @@ DiscreteFunction ChannelProblem::residuum()
     return result;
 }
 
-Point ChannelProblem::getFirstPoint() const
+IndexPair ChannelProblem::getFirstPoint(Index, Index) const
 {
-    return Point(1,1);
+    return IndexPair(1,1);
 }
 
-Point ChannelProblem::getLastPoint() const
+IndexPair ChannelProblem::getLastPoint(Index nx, Index ny) const
 {
-    return Point(nx_,ny_-1);
+    return IndexPair(nx,ny-1);
 }
 
-ChannelProblem* ChannelProblem::getCoarsGridProblem(
+ProblemPtr ChannelProblem::getCoarsGridProblem(
     Index nxNew,
-    Index nyNew) const
+    Index nyNew,
+    Precision hxNew,
+    Precision hyNew) const
 {
-    return new ChannelProblem(stencil_,nxNew,nyNew);
+    return ProblemPtr(
+        new ChannelProblem(stencil_,getOrigin(),nxNew,nyNew,hxNew,hyNew));
 }
 
 void ChannelProblem::fillBorderValues(
@@ -114,25 +128,27 @@ void ChannelProblem::fillBorderValues(
         NumericArray& rightSide,
         const Index dimension) const
 {
-    for (Index sx=0; sx<=nx_; ++sx)
+    const Index nx = getNx();
+    const Index ny = getNy();
+    for (Index sx=0; sx<=nx; ++sx)
     {
         //lower border
         matrix[sx*dimension+sx]=1;
-        rightSide[sx]=solution_[sx];
+        rightSide[sx]=solution_(sx,0);
         //upper border
         matrix[(dimension-1-sx)*dimension+(dimension-1-sx)]=1;
-        rightSide[dimension-1-sx]=solution_[dimension-1-sx];
+        rightSide[dimension-1-sx]=solution_(nx-sx,ny);
     }
-    for (Index sy=1; sy<ny_; ++sy)
+    for (Index sy=1; sy<ny; ++sy)
     {
-        matrix[(sy*(nx_+1)+0)*dimension+(sy*(nx_+1)+0)]=1.0;
-        matrix[(sy*(nx_+1)+0)*dimension+(sy*(nx_+1)+nx_)]=-1.0;
-        rightSide[(sy*(nx_+1)+0)]=0.0;
+        matrix[(sy*(nx+1)+0)*dimension+(sy*(nx+1)+0)]=1.0;
+        matrix[(sy*(nx+1)+0)*dimension+(sy*(nx+1)+nx)]=-1.0;
+        rightSide[(sy*(nx+1)+0)]=0.0;
         
-        matrix[(sy*(nx_+1)+nx_)*dimension+(sy*(nx_+1)+nx_)]=2.0;
-        matrix[(sy*(nx_+1)+nx_)*dimension+(sy*(nx_+1)+nx_-1)]=-1.0;
-        matrix[(sy*(nx_+1)+nx_)*dimension+(sy*(nx_+1)+1)]+=-1.0;
-        rightSide[(sy*(nx_+1)+nx_)]=0.0;
+        matrix[(sy*(nx+1)+nx)*dimension+(sy*(nx+1)+nx)]=2.0;
+        matrix[(sy*(nx+1)+nx)*dimension+(sy*(nx+1)+nx-1)]=-1.0;
+        matrix[(sy*(nx+1)+nx)*dimension+(sy*(nx+1)+1)]+=-1.0;
+        rightSide[(sy*(nx+1)+nx)]=0.0;
     }
 }
 

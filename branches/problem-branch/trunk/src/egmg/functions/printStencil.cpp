@@ -58,17 +58,20 @@ void printAllStencils(
     const Stencil& stencil,
     const Index nx,
     const Index ny,
+    const Precision hx,
+    const Precision hy,
+    const Point origin,
     std::ostream& out,
     Precision scale)
 {
     if (scale==0)
-        scale=nx*ny;
+        scale=hx*hy;
     for (Index sx = 1; sx<nx; ++sx)
         for (Index sy = 1; sy<ny; ++sy)
         {
             out<<sx<<" "<<sy<<std::endl;
             printStencil(   
-                    stencil.getL(C,sx,sy,nx,ny)/scale,
+                    stencil.getL(C,sx,sy,nx,ny,hx,hy,origin)/scale,
                     stencil.getJx(C,nx,ny),
                     stencil.getJy(C,nx,ny),
                     out);

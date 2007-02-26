@@ -75,24 +75,18 @@ public:
 
     const NumericArray& getI(
         const Position,
-        const Index,
-        const Index,
-        const Index,
-        const Index,
-        const Stencil&) const
-    {
-        return i_;  
-    }
+        const Index sx,
+        const Index sy,
+        const Index nx,
+        const Index ny,
+        const Precision hx,
+        const Precision hy,
+        const Point origin,
+        const Stencil& stencil) const;
 
-    const PositionArray& getJx( const Position ) const
-    {
-        return jx_; 
-    }
+    const PositionArray& getJx( const Position ) const;
 
-    const PositionArray& getJy( const Position ) const
-    {
-        return jy_;
-    }
+    const PositionArray& getJy( const Position ) const;
 };
 
 }

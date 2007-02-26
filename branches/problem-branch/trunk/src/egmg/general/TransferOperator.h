@@ -61,11 +61,14 @@ public:
      * \return              the coefficients of the TransferOperator
      */
     virtual const NumericArray& getI(
-        const Position pos,
+        const Position,
         const Index sx,
         const Index sy,
         const Index nx,
-        const Index ny, 
+        const Index ny,
+        const Precision hx,
+        const Precision hy,
+        const Point origin,
         const Stencil& stencil) const =0;
         
     /**

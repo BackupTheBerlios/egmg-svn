@@ -30,43 +30,20 @@ Helmholtz2D2::Helmholtz2D2(
 
 Helmholtz2D2::~Helmholtz2D2() {}
 
-Precision Helmholtz2D2::apply(
-    const DiscreteFunction& u,
-    const Position,
-    const Index sx,
-    const Index sy,
-    const Index nx,
-    const Index ny) const
-{
-    return 
-         (2.0*ax_*nx*nx+2.0*ay_*ny*ny+c_)*u(sx,sy)
-        -1.0*ax_*nx*nx*u(sx-1,sy)
-        -1.0*ax_*nx*nx*u(sx+1,sy)
-        -1.0*ay_*ny*ny*u(sx,sy-1)
-        -1.0*ay_*ny*ny*u(sx,sy+1);
-}
-
-Precision Helmholtz2D2::getCenter(
-    const Position,
-    const Index,
-    const Index,
-    const Index nx,
-    const Index ny) const
-{
-    return 2.0*ax_*nx*nx+2.0*ay_*ny*ny+c_;
-}
-
 NumericArray Helmholtz2D2::getL(
-    const Position,
-    const Index,
-    const Index,
-    const Index nx,
-    const Index ny) const
+        const Position,
+        const Index,
+        const Index,
+        const Index nx,
+        const Index ny,
+        const Precision hx,
+        const Precision hy,
+        const Point origin) const
 {
 	NumericArray result( 0.0, 5 );
-    result[0]=2.0*ax_*nx*nx+2.0*ay_*ny*ny+c_;
-    result[1]=result[3]=-1.0*ax_*nx*nx;
-    result[2]=result[4]=-1.0*ay_*ny*ny;
+    result[0]=2.0*ax_*1.0/hx*1.0/hx+2.0*ay_*1.0/hy*1.0/hy+c_;
+    result[1]=result[3]=-1.0*ax_*1.0/hx*1.0/hx;
+    result[2]=result[4]=-1.0*ay_*1.0/hy*1.0/hy;
     return result;
 }
 

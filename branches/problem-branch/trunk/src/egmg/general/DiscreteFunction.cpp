@@ -1,5 +1,4 @@
 #include "DiscreteFunction.h"
-#include <cassert>
 #include <iomanip>
 #include <cmath>
 
@@ -13,7 +12,7 @@ DiscreteFunction::DiscreteFunction()
 
 DiscreteFunction::DiscreteFunction(const DiscreteFunction& rhs)
     : nx_(rhs.nx_), ny_(rhs.ny_),
-      hx_(rhs.hx_), hy(rhs.hy_),
+      hx_(rhs.hx_), hy_(rhs.hy_),
       origin_(rhs.origin_), data_(rhs.data_)
 {
 }
@@ -29,10 +28,10 @@ DiscreteFunction::DiscreteFunction(Precision initialValue, Index nx, Index ny)
 DiscreteFunction::DiscreteFunction(
         Precision initialValue,
         Point origin,
-        Precision hx,
-        Precision hy,
         Index nx,
-        Index ny)
+        Index ny,
+        Precision hx,
+        Precision hy)
     : nx_(nx), ny_(ny),
       hx_(hx), hy_(hy),
       origin_(origin),
@@ -48,16 +47,16 @@ DiscreteFunction::DiscreteFunction(const Function& function, Index nx, Index ny)
     for (Integer sy=-1; sy<=static_cast<Integer>(ny_+1); ++sy)
         for (Integer sx=-1; sx<=static_cast<Integer>(nx_+1); ++sx)
                data_[calculateIndex(sx,sy)]=
-                    function(origin_.sx+sx*hx_,origin_.sy+sy*hy_);
+                    function(origin_.x+sx*hx_,origin_.y+sy*hy_);
 }
 
-DiscreteFunction(
+DiscreteFunction::DiscreteFunction(
         const Function& function,
         Point origin,
-        Precision hx,
-        Precision hy,
         Index nx,
-        Index ny)
+        Index ny,
+        Precision hx,
+        Precision hy)
     : nx_(nx), ny_(ny), 
       hx_(hx), hy_(hy),
       origin_(origin), data_(0.0,(nx+3)*(ny+3))
@@ -65,10 +64,11 @@ DiscreteFunction(
     for (Integer sy=-1; sy<=static_cast<Integer>(ny_+1); ++sy)
         for (Integer sx=-1; sx<=static_cast<Integer>(nx_+1); ++sx)
                data_[calculateIndex(sx,sy)]=
-                    function(origin_.sx+sx*hx_,origin_.sy+sy*hy_);
+                    function(origin_.x+sx*hx_,origin_.y+sy*hy_);
 }
 
-const DiscreteFunction& DiscreteFunction::operator =(const DiscreteFunction& rhs)
+const DiscreteFunction& DiscreteFunction::operator =(
+    const DiscreteFunction& rhs)
 {
     data_.resize(rhs.data_.size());
     data_ = rhs.data_;
@@ -93,10 +93,10 @@ const Precision& DiscreteFunction::operator()(Integer sx, Integer sy) const
 
 Index DiscreteFunction::calculateIndex(Integer sx, Integer sy) const
 {
-    assert( sx+1 >= 0 && sy+1 >= 0 );
+    ASSERT( sx+1 >= 0 && sy+1 >= 0 );
     Index sx_ = static_cast<Index>(sx+1);
     Index sy_ = static_cast<Index>(sy+1);
-    assert( sx_ < nx_+3 && sy_ < ny_+3 );
+    ASSERT( sx_ < nx_+3 && sy_ < ny_+3 );
     return sy_*(nx_+3)+sx_;
 }
 
@@ -117,8 +117,8 @@ void DiscreteFunction::write(std::ostream& out) const
     for (Index sy=0; sy<=ny_; ++sy)
         //for (Integer sx=-1; sx<=static_cast<Integer>(nx_+1); ++sx)
         for (Index sx=0; sx<=nx_; ++sx)
-            out<<std::setw(10)<<std::left<<origin_.sx + sx*hx_<<" "
-               <<std::setw(10)<<std::left<<origin_.sy + sy*hy_<<" "
+            out<<std::setw(10)<<std::left<<origin_.x + sx*hx_<<" "
+               <<std::setw(10)<<std::left<<origin_.y + sy*hy_<<" "
                <<std::setw(10)<<std::left<<data_[calculateIndex(sx,sy)]
                <<std::endl;
     out<<"#end points"<<std::endl;
@@ -133,7 +133,7 @@ Precision DiscreteFunction::twoNorm() const
             Precision temp = data_[calculateIndex(sx,sy)];
             result+=temp*temp;
         }
-    return std::sqrt(result)/(nx+1)*(ny+1);
+    return std::sqrt(result)/(nx_+1)*(ny_+1);
 }
 
 const DiscreteFunction DiscreteFunction::abs() const
@@ -170,42 +170,50 @@ Point DiscreteFunction::getOrigin() const
     return origin_;
 }
 
-const DiscreteFunction DiscreteFunction::operator +=(const DiscreteFunction rhs)
+const DiscreteFunction& DiscreteFunction::operator +=(const DiscreteFunction rhs)
 {
-    assert( checkSimilarity(rhs) );
+    ASSERT( checkSimilarity(rhs) );
     data_+=rhs.data_;
+    return *this;
 
 }
-const DiscreteFunction DiscreteFunction::operator -=(const DiscreteFunction rhs)
+const DiscreteFunction& DiscreteFunction::operator -=(const DiscreteFunction rhs)
 {
-    assert( checkSimilarity(rhs) );
+    ASSERT( checkSimilarity(rhs) );
     data_-=rhs.data_;
+    return *this;
 }
-const DiscreteFunction DiscreteFunction::operator +=(Precision rhs)
+const DiscreteFunction& DiscreteFunction::operator +=(Precision rhs)
 {
     data_+=rhs;
+    return *this;
 }
-const DiscreteFunction DiscreteFunction::operator -=(Precision rhs)
+const DiscreteFunction& DiscreteFunction::operator -=(Precision rhs)
 {
     data_-=rhs;
+    return *this;
 }
-const DiscreteFunction DiscreteFunction::operator *=(const DiscreteFunction rhs)
+const DiscreteFunction& DiscreteFunction::operator *=(const DiscreteFunction rhs)
 {
-    assert( checkSimilarity(rhs) );
+    ASSERT( checkSimilarity(rhs) );
     data_*=rhs.data_;
+    return *this;
 }
-const DiscreteFunction DiscreteFunction::operator /=(const DiscreteFunction rhs)
+const DiscreteFunction& DiscreteFunction::operator /=(const DiscreteFunction rhs)
 {
-    assert( checkSimilarity(rhs) );
+    ASSERT( checkSimilarity(rhs) );
     data_/=rhs.data_;
+    return *this;
 }
-const DiscreteFunction DiscreteFunction::operator *=(Precision rhs)
+const DiscreteFunction& DiscreteFunction::operator *=(Precision rhs)
 {
     data_+=rhs;
+    return *this;
 }
-const DiscreteFunction DiscreteFunction::operator /=(Precision rhs)
+const DiscreteFunction& DiscreteFunction::operator /=(Precision rhs)
 {
     data_/=rhs;
+    return *this;
 }
 
 
@@ -215,64 +223,86 @@ std::ostream& operator<<(std::ostream& stream, const DiscreteFunction& function)
     return stream;
 }
 
-const DiscreteFunction operator -(const DiscreteFunction& lhs, const DiscreteFunction& rhs)
+const DiscreteFunction operator -(
+    const DiscreteFunction& lhs,
+    const DiscreteFunction& rhs)
 {
     DiscreteFunction result(lhs);
     result-=rhs;
     return result;    
 }
-const DiscreteFunction operator +(const DiscreteFunction& lhs, const DiscreteFunction& rhs)
+const DiscreteFunction operator +(
+    const DiscreteFunction& lhs,
+    const DiscreteFunction& rhs)
 {
     DiscreteFunction result(lhs);
     result+=rhs;
     return result;
 }
-const DiscreteFunction operator *(const DiscreteFunction& lhs, const DiscreteFunction& rhs)
+const DiscreteFunction operator *(
+    const DiscreteFunction& lhs,
+    const DiscreteFunction& rhs)
 {
     DiscreteFunction result(lhs);
     result*=rhs;
     return result;
 }
-const DiscreteFunction operator /(const DiscreteFunction& lhs, const DiscreteFunction& rhs)
+const DiscreteFunction operator /(
+    const DiscreteFunction& lhs,
+    const DiscreteFunction& rhs)
 {
     DiscreteFunction result(lhs);
     result/=rhs;
     return result;
 }
 
-const DiscreteFunction operator +(const Precision lhs, const DiscreteFunction& rhs)
+const DiscreteFunction operator +(
+    const Precision lhs,
+    const DiscreteFunction& rhs)
 {
     DiscreteFunction result(rhs);
     result+=lhs;
     return result;
 }
-const DiscreteFunction operator +(const DiscreteFunction& rhs, const Precision lhs)
+const DiscreteFunction operator +(
+    const DiscreteFunction& rhs,
+    const Precision lhs)
 {
     return lhs+rhs;
 }
 
-const DiscreteFunction operator -(const Precision lhs, const DiscreteFunction& rhs)
+const DiscreteFunction operator -(
+    const Precision lhs,
+    const DiscreteFunction& rhs)
 {
     DiscreteFunction result(rhs);
     result-=lhs;
     return result;
 }
-const DiscreteFunction operator -(const DiscreteFunction& rhs, const Precision lhs)
+const DiscreteFunction operator -(
+    const DiscreteFunction& rhs,
+    const Precision lhs)
 {
     return lhs-rhs;
 }
 
-const DiscreteFunction operator *(const Precision lhs, const DiscreteFunction& rhs)
+const DiscreteFunction operator *(
+    const Precision lhs,
+    const DiscreteFunction& rhs)
 {
     DiscreteFunction result(rhs);
     result*=lhs;
     return result;
 }
-const DiscreteFunction operator *(const DiscreteFunction& rhs, const Precision lhs)
+const DiscreteFunction operator *(
+    const DiscreteFunction& rhs,
+    const Precision lhs)
 {
     return lhs*rhs;
 }
-const DiscreteFunction operator /(const DiscreteFunction& rhs, const Precision lhs)
+const DiscreteFunction operator /(
+    const Precision lhs,
+    const DiscreteFunction& rhs)
 {
     DiscreteFunction result(rhs);
     result/=lhs;

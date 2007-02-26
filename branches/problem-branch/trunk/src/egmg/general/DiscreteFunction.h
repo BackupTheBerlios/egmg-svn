@@ -16,19 +16,19 @@ public:
     DiscreteFunction(
         Precision initialValue,
         Point origin,
-        Precision hx,
-        Precision hy,
         Index nx,
-        Index ny);
+        Index ny,
+        Precision hx,
+        Precision hy);
     DiscreteFunction(const DiscreteFunction& rhs);
     DiscreteFunction(const Function& function, Index nx, Index ny);
     DiscreteFunction(
         const Function& function,
         Point origin,
-        Precision hx,
-        Precision hy,
         Index nx,
-        Index ny);
+        Index ny,
+        Precision hx,
+        Precision hy);
     const DiscreteFunction& operator =(const DiscreteFunction& rhs);
     Precision& operator()(Integer sx, Integer sy);
     const Precision& operator()(Integer sx, Integer sy) const;
@@ -40,19 +40,19 @@ public:
     Precision getHx() const;
     Precision getHy() const;
     Point getOrigin() const;
+    bool checkSimilarity( const DiscreteFunction& rhs) const;
     
-    const DiscreteFunction operator +=(const DiscreteFunction rhs);
-    const DiscreteFunction operator -=(const DiscreteFunction rhs);
-    const DiscreteFunction operator +=(Precision rhs);
-    const DiscreteFunction operator -=(Precision rhs);
-    const DiscreteFunction operator *=(const DiscreteFunction rhs);
-    const DiscreteFunction operator /=(const DiscreteFunction rhs);
-    const DiscreteFunction operator *=(Precision rhs);
-    const DiscreteFunction operator /=(Precision rhs);
+    const DiscreteFunction& operator +=(const DiscreteFunction rhs);
+    const DiscreteFunction& operator -=(const DiscreteFunction rhs);
+    const DiscreteFunction& operator +=(Precision rhs);
+    const DiscreteFunction& operator -=(Precision rhs);
+    const DiscreteFunction& operator *=(const DiscreteFunction rhs);
+    const DiscreteFunction& operator /=(const DiscreteFunction rhs);
+    const DiscreteFunction& operator *=(Precision rhs);
+    const DiscreteFunction& operator /=(Precision rhs);
     
 private:
     Index calculateIndex(Integer sx, Integer sy) const;
-    bool checkSimilarity( const DiscreteFunction& rhs) const;
     Index nx_;
     Index ny_;
     Precision hx_;
@@ -61,14 +61,54 @@ private:
     NumericArray data_;
 };
 
-std::ostream& operator<<(std::ostream& stream, const DiscreteFunction& function);
-const DiscreteFunction operator -(const DiscreteFunction& lhs, const DiscreteFunction& rhs);
-const DiscreteFunction operator +(const DiscreteFunction& lhs, const DiscreteFunction& rhs);
-const DiscreteFunction operator *(const DiscreteFunction& lhs, const DiscreteFunction& rhs);
-const DiscreteFunction operator *(const Precision lhs, const DiscreteFunction& rhs);
-const DiscreteFunction operator *(const DiscreteFunction& rhs, const Precision lhs);
+std::ostream& operator<<(
+    std::ostream& stream,
+    const DiscreteFunction& function);
 
+const DiscreteFunction operator -(
+    const DiscreteFunction& lhs,
+    const DiscreteFunction& rhs);
 
+const DiscreteFunction operator +(
+    const DiscreteFunction& lhs,
+    const DiscreteFunction& rhs);
+    
+const DiscreteFunction operator *(
+    const DiscreteFunction& lhs,
+    const DiscreteFunction& rhs);
+
+const DiscreteFunction operator /(
+    const DiscreteFunction& lhs,
+    const DiscreteFunction& rhs);
+
+const DiscreteFunction operator +(
+    const Precision lhs,
+    const DiscreteFunction& rhs);
+
+const DiscreteFunction operator +(
+    const DiscreteFunction& rhs,
+    const Precision lhs);
+
+const DiscreteFunction operator -(
+    const Precision lhs,
+    const DiscreteFunction& rhs);
+
+const DiscreteFunction operator -(
+    const DiscreteFunction& rhs,
+    const Precision lhs);
+    
+const DiscreteFunction operator *(
+    const Precision lhs,
+    const DiscreteFunction& rhs);
+    
+const DiscreteFunction operator *(
+    const DiscreteFunction& rhs,
+    const Precision lhs);
+    
+const DiscreteFunction operator /(
+    const Precision lhs,
+    const DiscreteFunction& rhs);
+    
 }
 
 #endif /*DISCRETEFUNCTION_H_*/

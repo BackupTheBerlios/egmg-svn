@@ -35,8 +35,11 @@ void printAllStencils(
     const Stencil& stencil,
     const Index nx,
     const Index ny,
+    const Precision hx,
+    const Precision hy,
+    const Point origin,
     std::ostream& out,
-    Precision scale=0);
+    Precision scale=0.0);
 }
 
 

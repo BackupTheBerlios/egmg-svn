@@ -9,16 +9,22 @@ namespace mg
 class DirichletProblem : public mg::Problem
 {
 public:
-	DirichletProblem(Stencil& stencil, Index nx, Index ny);
+	DirichletProblem(
+        Stencil& stencil,
+        Point origin,
+        Index nx, Index ny,
+        Precision hx, Precision hy);
 	virtual ~DirichletProblem();
     
     virtual void setBoundaryConstraint( const Function& boundaryConstraint );
     virtual void applyBoundaryConstraint();
     virtual void applyBoundaryConstraint( DiscreteFunction& function ) const;
     virtual DiscreteFunction residuum();
-    virtual Point getFirstPoint() const;
-    virtual Point getLastPoint() const;
-    virtual DirichletProblem* getCoarsGridProblem(Index nx, Index ny) const;
+    virtual IndexPair getFirstPoint(Index nx, Index ny) const;
+    virtual IndexPair getLastPoint(Index nx, Index ny) const;
+    virtual ProblemPtr getCoarsGridProblem(
+        Index nxNew, Index nyNew,
+        Precision hxNew, Precision hyNew) const;
 protected:
     virtual void fillBorderValues(
         NumericArray& matrix,
