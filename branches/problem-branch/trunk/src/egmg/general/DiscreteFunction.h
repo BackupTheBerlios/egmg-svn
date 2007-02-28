@@ -30,6 +30,7 @@ public:
         Precision hx,
         Precision hy);
     const DiscreteFunction& operator =(const DiscreteFunction& rhs);
+    const DiscreteFunction& operator =(const Function& rhs);
     Precision& operator()(Integer sx, Integer sy);
     const Precision& operator()(Integer sx, Integer sy) const;
     void write(std::ostream& out) const;

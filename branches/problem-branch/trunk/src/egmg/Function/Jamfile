@@ -4,6 +4,7 @@ lib Function : <template>../../warnings
 				Function.cpp 
                 Zero.cpp
                 Constant.cpp
+                RossbyHaurwitzWave.cpp
                 TestFunction1.cpp
                 TestFunction2.cpp
                 TestFunction3.cpp

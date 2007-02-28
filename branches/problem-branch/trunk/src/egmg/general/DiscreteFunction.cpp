@@ -80,6 +80,15 @@ const DiscreteFunction& DiscreteFunction::operator =(
     return *this;
 }
 
+const DiscreteFunction& DiscreteFunction::operator =(const Function& rhs)
+{
+    for (Integer sy=-1; sy<=static_cast<Integer>(ny_+1); ++sy)
+        for (Integer sx=-1; sx<=static_cast<Integer>(nx_+1); ++sx)
+               data_[calculateIndex(sx,sy)]=
+                    rhs(origin_.x+sx*hx_,origin_.y+sy*hy_);
+    return *this;
+}
+
 Precision& DiscreteFunction::operator()(Integer sx, Integer sy)
 {
     return data_[calculateIndex(sx,sy)];
