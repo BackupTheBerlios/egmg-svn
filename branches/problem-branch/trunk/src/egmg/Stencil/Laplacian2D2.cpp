@@ -38,9 +38,9 @@ NumericArray Laplacian2D2::getL(
     const Point) const
 {
 	NumericArray result( 0.0, 5 );
-    result[0]=2.0*ax_*1.0/hx*1.0/hx+2.0*ay_*1.0/hy*1.0/hy;
-    result[1]=result[3]=-1.0*ax_*1.0/hx*1.0/hx;
-    result[2]=result[4]=-1.0*ay_*1.0/hx*1.0/hx;
+    result[0]=(2.0*ax_)/(hx*hx)+2.0*ay_/(hy*hy);
+    result[1]=result[3]=-ax_/(hx*hx);
+    result[2]=result[4]=-ay_/(hy*hy);
     return result;
 }
 
