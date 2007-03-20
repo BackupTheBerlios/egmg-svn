@@ -4,7 +4,7 @@
 
 namespace mg
 {
-    
+
 DiscreteFunction::DiscreteFunction()
     : nx_(0), ny_(0), hx_(0.0), hy_(0.0), origin_(0.0,0.0)
 {
@@ -40,7 +40,7 @@ DiscreteFunction::DiscreteFunction(
 }
 
 DiscreteFunction::DiscreteFunction(const Function& function, Index nx, Index ny)
-    : nx_(nx), ny_(ny), 
+    : nx_(nx), ny_(ny),
       hx_(1.0/nx), hy_(1.0/ny),
       origin_(0.0,0.0), data_(0.0,(nx+3)*(ny+3))
 {
@@ -57,7 +57,7 @@ DiscreteFunction::DiscreteFunction(
         Index ny,
         Precision hx,
         Precision hy)
-    : nx_(nx), ny_(ny), 
+    : nx_(nx), ny_(ny),
       hx_(hx), hy_(hy),
       origin_(origin), data_(0.0,(nx+3)*(ny+3))
 {
@@ -95,7 +95,7 @@ Precision& DiscreteFunction::operator()(Integer sx, Integer sy)
 }
 
 const Precision& DiscreteFunction::operator()(Integer sx, Integer sy) const
-{  
+{
     return data_[calculateIndex(sx,sy)];
 }
 
@@ -111,7 +111,7 @@ Index DiscreteFunction::calculateIndex(Integer sx, Integer sy) const
 bool DiscreteFunction::checkSimilarity( const DiscreteFunction& rhs) const
 {
     return nx_ == rhs.nx_ && ny_ == rhs.ny_ &&
-           hx_ == rhs.hx_ && hy_ == rhs.hy_ && 
+           hx_ == rhs.hx_ && hy_ == rhs.hy_ &&
            origin_ == rhs.origin_;
 }
 
@@ -141,7 +141,7 @@ Precision DiscreteFunction::twoNorm() const
             Precision temp = data_[calculateIndex(sx,sy)];
             result+=temp*temp;
         }
-    return std::sqrt(result)/(nx_+1)*(ny_+1);
+    return std::sqrt(result/((nx_+1)*(ny_+1)));
 }
 
 const DiscreteFunction DiscreteFunction::abs() const
@@ -237,7 +237,7 @@ const DiscreteFunction operator -(
 {
     DiscreteFunction result(lhs);
     result-=rhs;
-    return result;    
+    return result;
 }
 const DiscreteFunction operator +(
     const DiscreteFunction& lhs,
