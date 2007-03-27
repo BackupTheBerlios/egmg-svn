@@ -1,10 +1,11 @@
 subproject egmg/Function ;
 
 lib Function : <template>../../warnings
-				Function.cpp 
+				Function.cpp
                 Zero.cpp
                 Constant.cpp
                 RossbyHaurwitzWave.cpp
+                BilinearFunction.cpp
                 TestFunction1.cpp
                 TestFunction2.cpp
                 TestFunction3.cpp

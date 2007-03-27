@@ -3,4 +3,6 @@ subproject egmg/Stencil ;
 lib Stencil : <template>../warnings
 			  Stencil.cpp
 			  Helmholtz2D2.cpp
+			  ScaledHelmholtz2D2.cpp
+			  HelmholtzLike2D2.cpp
 			  Laplacian2D2.cpp ;

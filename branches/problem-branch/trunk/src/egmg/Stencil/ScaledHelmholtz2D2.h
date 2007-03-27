@@ -1,0 +1,93 @@
+/** \file ScaledHelmholtz2D2.h
+ * \author Jiri Kraus
+ * \brief Contains the class ScaledHelmholtz2D2
+ */
+#ifndef ScaledHelmholtz2D2_H_
+#define ScaledHelmholtz2D2_H_
+
+#include "Stencil.h"
+#include "../general/DiscreteFunction.h"
+
+namespace mg
+{
+
+/**
+ * \brief   Helmholtz2D2 represents a discrete laplace like operator of second
+ *          order.
+ *
+ * Helmholtz2D2 is the stencil representing the discrete differential operator
+ * \f[
+ *  L_h u_h := a_x(u_h)_{xx}+a_y(u_h)_{yy}+c_{xy}(u_h)
+ * \f]
+ */
+class ScaledHelmholtz2D2 : public Stencil
+{
+
+public:
+    /**
+     * \brief The constructor of a Helmholtz2D2 object
+     *
+     * Helmholtz2D2 constructs a Helmholtz2D2 where \f$a_x\f$ , \f$a_y\f$
+     * and \f$c_{xy}\f$ are given by:
+     * \param[in] ax   coefficient of the diff. operator (default 1.0)
+     * \param[in] ay   coefficient of the diff. operator (default 1.0)
+     * \param[in] c coefficient of the diff. operator (default 1.0)
+     */
+    explicit ScaledHelmholtz2D2(
+        Precision ax = 1.0,
+        Precision ay = 1.0,
+        Precision c = 1.0 );
+
+    virtual ~ScaledHelmholtz2D2();
+
+    NumericArray getL(
+        const Position,
+        const Index sx,
+        const Index sy,
+        const Index nx,
+        const Index ny,
+        const Precision hx,
+        const Precision hy,
+        const Point origin) const;
+
+    PositionArray getJx(
+		const Position,
+		const Index,
+		const Index ) const;
+
+    PositionArray getJy(
+		const Position,
+		const Index,
+		const Index ) const;
+
+    /**
+     * \brief gives the max expansion of Helmholtz2D2
+     *
+     * \return  1
+     */
+    Index size() const;
+
+    /**
+     * \brief returns true, because Helmholtz2D2 is constant
+     *
+     * \return  true
+     */
+    bool isConstant() const;
+private:
+    const PositionArray jx_;
+    const PositionArray jy_;
+    const NumericArray l_;
+    const Precision ax_;
+    const Precision ay_;
+    const Precision c_;
+    //initilize jx_, makes it possible to make jx_ const
+    PositionArray initJx_() const;
+    //initilize jy_, makes it possible to make jy_ const
+    PositionArray initJy_() const;
+    NumericArray initL_( const Precision ax_, const Precision ay_, const Precision c) const;
+
+};
+
+}
+
+#endif /*ScaledHelmholtz2D2_H_*/

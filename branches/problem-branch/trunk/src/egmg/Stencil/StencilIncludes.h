@@ -6,6 +6,8 @@
 #define STENCILINCLUDES_H_
 
 #include "Helmholtz2D2.h"
+#include "ScaledHelmholtz2D2.h"
+#include "HelmholtzLike2D2.h"
 #include "Laplacian2D2.h"
 
 #endif /*STENCILINCLUDES_H_*/
