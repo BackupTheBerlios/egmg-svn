@@ -144,6 +144,19 @@ Precision DiscreteFunction::twoNorm() const
     return std::sqrt(result/((nx_+1)*(ny_+1)));
 }
 
+Precision DiscreteFunction::maxNorm() const
+{
+    Precision result = 0.0;
+    for (Index sy=0; sy<=ny_; ++sy)
+        for (Index sx=0; sx<=nx_; ++sx)
+        {
+            Precision temp = std::abs(data_[calculateIndex(sx,sy)]);
+            if ( temp > result )
+                result=temp;
+        }
+    return result;
+}
+
 const DiscreteFunction DiscreteFunction::abs() const
 {
     DiscreteFunction result(*this);
@@ -215,7 +228,7 @@ const DiscreteFunction& DiscreteFunction::operator /=(const DiscreteFunction rhs
 }
 const DiscreteFunction& DiscreteFunction::operator *=(Precision rhs)
 {
-    data_+=rhs;
+    data_*=rhs;
     return *this;
 }
 const DiscreteFunction& DiscreteFunction::operator /=(Precision rhs)

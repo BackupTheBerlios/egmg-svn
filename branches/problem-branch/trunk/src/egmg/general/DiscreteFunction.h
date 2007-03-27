@@ -35,6 +35,7 @@ public:
     const Precision& operator()(Integer sx, Integer sy) const;
     void write(std::ostream& out) const;
     Precision twoNorm() const;
+    Precision maxNorm() const;
     const DiscreteFunction abs() const;
     Index getNx() const;
     Index getNy() const;
@@ -42,7 +43,7 @@ public:
     Precision getHy() const;
     Point getOrigin() const;
     bool checkSimilarity( const DiscreteFunction& rhs) const;
-    
+
     const DiscreteFunction& operator +=(const DiscreteFunction rhs);
     const DiscreteFunction& operator -=(const DiscreteFunction rhs);
     const DiscreteFunction& operator +=(Precision rhs);
@@ -51,7 +52,7 @@ public:
     const DiscreteFunction& operator /=(const DiscreteFunction rhs);
     const DiscreteFunction& operator *=(Precision rhs);
     const DiscreteFunction& operator /=(Precision rhs);
-    
+
 private:
     Index calculateIndex(Integer sx, Integer sy) const;
     Index nx_;
@@ -73,7 +74,7 @@ const DiscreteFunction operator -(
 const DiscreteFunction operator +(
     const DiscreteFunction& lhs,
     const DiscreteFunction& rhs);
-    
+
 const DiscreteFunction operator *(
     const DiscreteFunction& lhs,
     const DiscreteFunction& rhs);
@@ -97,19 +98,19 @@ const DiscreteFunction operator -(
 const DiscreteFunction operator -(
     const DiscreteFunction& rhs,
     const Precision lhs);
-    
+
 const DiscreteFunction operator *(
     const Precision lhs,
     const DiscreteFunction& rhs);
-    
+
 const DiscreteFunction operator *(
     const DiscreteFunction& rhs,
     const Precision lhs);
-    
+
 const DiscreteFunction operator /(
     const Precision lhs,
     const DiscreteFunction& rhs);
-    
+
 }
 
 #endif /*DISCRETEFUNCTION_H_*/
