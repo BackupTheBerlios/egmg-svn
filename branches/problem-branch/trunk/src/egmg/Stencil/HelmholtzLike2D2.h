@@ -73,6 +73,15 @@ public:
      * \return  true
      */
     bool isConstant() const;
+
+    virtual void pushTransferOperators(
+        const Restriction&,
+        const Prolongation&,
+        const Index nx,
+        const Index ny);
+
+    virtual void popTransferOperators();
+
 private:
     const PositionArray jx_;
     const PositionArray jy_;
@@ -83,6 +92,7 @@ private:
     PositionArray initJx_() const;
     //initilize jy_, makes it possible to make jy_ const
     PositionArray initJy_() const;
+    Index indexFactor_;
 
 };
 

@@ -25,7 +25,7 @@ HelmholtzLike2D2::HelmholtzLike2D2(
     Precision ay,
     const DiscreteFunction& c )
     : jx_( initJx_() ), jy_( initJy_() ),
-      ax_( ax ), ay_( ay ), c_( c )
+      ax_( ax ), ay_( ay ), c_( c ), indexFactor_(1)
 {}
 
 HelmholtzLike2D2::~HelmholtzLike2D2() {}
@@ -41,7 +41,7 @@ NumericArray HelmholtzLike2D2::getL(
         const Point origin) const
 {
 	NumericArray result( 0.0, 5 );
-    result[0]=(2.0*ax_)/(hx*hx)+(2.0*ay_)/(hy*hy)+c_(sx,sy);
+    result[0]=(2.0*ax_)/(hx*hx)+(2.0*ay_)/(hy*hy)+c_(indexFactor_*sx,indexFactor_*sy);
     result[1]=result[3]=(-1.0*ax_)/(hx*hx);
     result[2]=result[4]=(-1.0*ay_)/(hy*hy);
     return result;
@@ -71,6 +71,20 @@ Index HelmholtzLike2D2::size() const
 bool HelmholtzLike2D2::isConstant() const
 {
     return false;
+}
+
+void HelmholtzLike2D2::pushTransferOperators(
+    const Restriction&,
+    const Prolongation&,
+    const Index,
+    const Index)
+{
+    indexFactor_*=2;
+}
+
+void HelmholtzLike2D2::popTransferOperators()
+{
+    indexFactor_/=2;
 }
 
 }
