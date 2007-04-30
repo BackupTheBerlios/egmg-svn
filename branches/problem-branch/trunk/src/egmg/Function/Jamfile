@@ -6,6 +6,7 @@ lib Function : <template>../../warnings
                 Constant.cpp
                 RossbyHaurwitzWave.cpp
                 BilinearFunction.cpp
+                Random.cpp
                 TestFunction1.cpp
                 TestFunction2.cpp
                 TestFunction3.cpp
